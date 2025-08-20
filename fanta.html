@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guida Asta Fantacalcio 2025/26</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .player-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, opacity 0.3s;
+        }
+
+        .player-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            /* Lower than modal */
+        }
+
+        .bought {
+            opacity: 0.4;
+        }
+
+        .bought .buy-btn,
+        .bought input {
+            pointer-events: none;
+        }
+
+        .bought-by-me {
+            border: 2px solid #22c55e;
+            /* green-500 */
+        }
+
+        .sort-btn.active {
+            background-color: #0891b2;
+            /* cyan-600 */
+            color: white;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-900 text-white">
+
+    <div class="container mx-auto p-4">
+
+        <!-- HEADER FISSO -->
+        <div class="sticky-header bg-gray-900/80 backdrop-blur-sm p-4 rounded-lg mb-6 shadow-lg">
+            <div class="flex justify-between items-center mb-4">
+                <h1 class="text-3xl font-bold text-center text-cyan-400">Guida Asta Fantacalcio</h1>
+                <button id="reset-btn"
+                    class="bg-red-800 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg flex items-center text-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20"
+                        fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 110 2H4a1 1 0 01-1-1V4a1 1 0 011-1zm10 15a1 1 0 01-1-1v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 111.885-.666A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 01-1 1z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    Reset Asta
+                </button>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                <div class="bg-gray-800 p-3 rounded-lg">
+                    <p class="text-sm text-gray-400">Budget Totale</p>
+                    <p class="text-2xl font-bold">500</p>
+                </div>
+                <div class="bg-gray-800 p-3 rounded-lg">
+                    <p class="text-sm text-gray-400">Budget Rimanente</p>
+                    <p id="remaining-budget" class="text-2xl font-bold text-green-400">500</p>
+                </div>
+                <div class="bg-gray-800 p-3 rounded-lg">
+                    <p class="text-sm text-gray-400">Giocatori in Rosa</p>
+                    <p id="squad-count" class="text-2xl font-bold">0 / 25</p>
+                </div>
+                <div class="bg-gray-800 p-3 rounded-lg">
+                    <p class="text-sm text-gray-400">Spesa per Ruolo</p>
+                    <div class="flex justify-center items-center space-x-2 text-xs">
+                        <span title="Portieri">P: <span id="spent-P">0</span></span>
+                        <span title="Difensori">D: <span id="spent-D">0</span></span>
+                        <span title="Centrocampisti">C: <span id="spent-C">0</span></span>
+                        <span title="Attaccanti">A: <span id="spent-A">0</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- LA MIA SQUADRA -->
+        <div class="mb-6">
+            <h2 class="text-2xl font-semibold mb-3 text-amber-400">La Mia Squadra</h2>
+            <div id="my-squad" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <p id="empty-squad-msg" class="text-gray-400">Nessun giocatore acquistato.</p>
+            </div>
+            <div class="mt-4 text-sm text-gray-300 grid grid-cols-2 md:grid-cols-4 gap-2">
+                <p>Portieri: <span id="count-P">0</span>/3</p>
+                <p>Difensori: <span id="count-D">0</span>/8</p>
+                <p>Centrocampisti: <span id="count-C">0</span>/8</p>
+                <p>Attaccanti: <span id="count-A">0</span>/6</p>
+            </div>
+        </div>
+
+        <!-- TABS PER RUOLI -->
+        <div class="mb-4 border-b border-gray-700">
+            <nav class="flex flex-wrap -mb-px" id="role-tabs">
+                <a href="#"
+                    class="role-tab text-lg font-medium text-center py-2 px-4 border-b-2 border-cyan-400 text-cyan-400"
+                    data-role="P">Portieri</a>
+                <a href="#"
+                    class="role-tab text-lg font-medium text-center py-2 px-4 border-b-2 border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500"
+                    data-role="D">Difensori</a>
+                <a href="#"
+                    class="role-tab text-lg font-medium text-center py-2 px-4 border-b-2 border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500"
+                    data-role="C">Centrocampisti</a>
+                <a href="#"
+                    class="role-tab text-lg font-medium text-center py-2 px-4 border-b-2 border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500"
+                    data-role="A">Attaccanti</a>
+            </nav>
+        </div>
+
+        <!-- CONTENUTO RUOLI -->
+        <div id="players-container">
+            <!-- I giocatori verranno inseriti qui da JavaScript -->
+        </div>
+    </div>
+
+    <!-- MODAL PER AGGIUNGERE GIOCATORE -->
+    <div id="add-player-modal"
+        class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-gray-800 rounded-lg p-6 w-full max-w-md shadow-2xl">
+            <h3 class="text-xl font-bold mb-4 text-cyan-400">Aggiungi Nuovo Giocatore</h3>
+            <form id="add-player-form">
+                <div class="mb-4">
+                    <label for="new-player-name" class="block text-sm font-medium text-gray-300">Nome</label>
+                    <input type="text" id="new-player-name" required
+                        class="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-cyan-500 focus:border-cyan-500">
+                </div>
+                <div class="mb-4">
+                    <label for="new-player-team" class="block text-sm font-medium text-gray-300">Squadra</label>
+                    <input type="text" id="new-player-team" required
+                        class="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-cyan-500 focus:border-cyan-500">
+                </div>
+                <div class="mb-4">
+                    <label for="new-player-qta" class="block text-sm font-medium text-gray-300">Quotazione</label>
+                    <input type="number" id="new-player-qta" required
+                        class="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-cyan-500 focus:border-cyan-500">
+                </div>
+                <div class="flex justify-end space-x-2 mt-6">
+                    <button type="button" id="cancel-add-player"
+                        class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Annulla</button>
+                    <button type="submit"
+                        class="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded">Salva</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL DI CONFERMA -->
+    <div id="confirm-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-gray-800 rounded-lg p-6 w-full max-w-sm shadow-2xl text-center">
+            <h3 id="confirm-title" class="text-xl font-bold mb-4 text-amber-400"></h3>
+            <p id="confirm-message" class="mb-6 text-gray-300"></p>
+            <div class="flex justify-center space-x-4">
+                <button id="cancel-confirm-btn"
+                    class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded">Annulla</button>
+                <button id="confirm-action-btn"
+                    class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded"></button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // --- DATABASE GIOCATORI E LOGHI (STATO INIZIALE) ---
+        const initialPlayersData = {
+            'P': {
+                'Top': [
+                    { id: 2428, nome: 'Sommer', squadra: 'Inter', qta: 16 }, { id: 5876, nome: 'Di Gregorio', squadra: 'Juventus', qta: 16 }, { id: 4312, nome: 'Maignan', squadra: 'Milan', qta: 16 }, { id: 572, nome: 'Meret', squadra: 'Napoli', qta: 16 }, { id: 5841, nome: 'Svilar', squadra: 'Roma', qta: 15 }
+                ],
+                'Buoni': [
+                    { id: 4431, nome: 'Carnesecchi', squadra: 'Atalanta', qta: 14 }, { id: 2814, nome: 'Provedel', squadra: 'Lazio', qta: 12 }, { id: 133, nome: 'Skorupski', squadra: 'Bologna', qta: 10 }
+                ],
+                'Scommesse': [
+                    { id: 5970, nome: 'Martinez Jo.', squadra: 'Genoa', qta: 9 }, { id: 6206, nome: 'Caprile', squadra: 'Napoli', qta: 8 }, { id: 4928, nome: 'Falcone', squadra: 'Lecce', qta: 7 }, { id: 4893, nome: 'Milinkovic-Savic V.', squadra: 'Torino', qta: 7 }, { id: 6512, nome: 'Montipo', squadra: 'Verona', qta: 6 }, { id: 6046, nome: 'Okoye', squadra: 'Udinese', qta: 5 }
+                ]
+            },
+            'D': {
+                'Top': [
+                    { id: 254, nome: 'Dimarco', squadra: 'Inter', qta: 19 }, { id: 2120, nome: 'Bastoni', squadra: 'Inter', qta: 16 }, { id: 5520, nome: 'Cambiaso', squadra: 'Juventus', qta: 15 }, { id: 2816, nome: 'Di Lorenzo', squadra: 'Napoli', qta: 14 }, { id: 257, nome: 'Bremer', squadra: 'Juventus', qta: 13 }, { id: 243, nome: 'Theo Hernandez', squadra: 'Milan', qta: 13 }
+                ],
+                'Buoni': [
+                    { id: 236, nome: 'Bellanova', squadra: 'Torino', qta: 12 }, { id: 553, nome: 'Buongiorno', squadra: 'Napoli', qta: 11 }, { id: 6032, nome: 'Kristiansen', squadra: 'Bologna', qta: 11 }, { id: 604, nome: 'Darmian', squadra: 'Inter', qta: 10 }, { id: 2159, nome: 'Pavard', squadra: 'Inter', qta: 10 }, { id: 4432, nome: 'Scalvini', squadra: 'Atalanta', qta: 10 }
+                ],
+                'Scommesse': [
+                    { id: 2172, nome: 'Mancini', squadra: 'Roma', qta: 9 }, { id: 5971, nome: 'Carboni A.', squadra: 'Monza', qta: 9 }, { id: 4898, nome: 'Bijol', squadra: 'Udinese', qta: 8 }, { id: 2118, nome: 'Calabria', squadra: 'Milan', qta: 7 }, { id: 5491, nome: 'Holm', squadra: 'Bologna', qta: 7 }, { id: 244, nome: 'Tomori', squadra: 'Milan', qta: 7 }, { id: 6418, nome: 'Dossena', squadra: 'Cagliari', qta: 6 }, { id: 4900, nome: 'Posch', squadra: 'Bologna', qta: 5 }, { id: 603, nome: 'Hien', squadra: 'Atalanta', qta: 5 }, { id: 6040, nome: 'Lovato', squadra: 'Torino', qta: 4 }
+                ]
+            },
+            'C': {
+                'Top': [
+                    { id: 2167, nome: 'Orsolini', squadra: 'Bologna', qta: 30 }, { id: 2423, nome: 'Pulisic', squadra: 'Milan', qta: 28 }, { id: 632, nome: 'Zaccagni', squadra: 'Lazio', qta: 26 }, { id: 5800, nome: 'Gudmundsson A.', squadra: 'Fiorentina', qta: 24 }, { id: 2194, nome: 'Calhanoglu', squadra: 'Inter', qta: 23 }
+                ],
+                'Buoni': [
+                    { id: 4731, nome: 'Koopmeiners', squadra: 'Juventus', qta: 19 }, { id: 6393, nome: 'Colpani', squadra: 'Fiorentina', qta: 19 }, { id: 6229, nome: 'De Ketelaere', squadra: 'Atalanta', qta: 18 }, { id: 600, nome: 'Barella', squadra: 'Inter', qta: 16 }, { id: 5973, nome: 'Frattesi', squadra: 'Inter', qta: 16 }, { id: 2176, nome: 'Pellegrini Lo.', squadra: 'Roma', qta: 15 }, { id: 2195, nome: 'Luis Alberto', squadra: 'Lazio', qta: 15 }
+                ],
+                'Scommesse': [
+                    { id: 602, nome: 'Fabbian', squadra: 'Bologna', qta: 14 }, { id: 6423, nome: 'Folorunsho', squadra: 'Napoli', qta: 14 }, { id: 2424, nome: 'Loftus-Cheek', squadra: 'Milan', qta: 13 }, { id: 4895, nome: 'Samardzic', squadra: 'Atalanta', qta: 12 }, { id: 601, nome: 'Ferguson', squadra: 'Bologna', qta: 12 }, { id: 6440, nome: 'Suslov', squadra: 'Verona', qta: 11 }, { id: 5988, nome: 'Thorstvedt', squadra: 'Sassuolo', qta: 9 }, { id: 6425, nome: 'Gaetano', squadra: 'Cagliari', qta: 8 }, { id: 6228, nome: 'Ederson', squadra: 'Atalanta', qta: 7 }
+                ]
+            },
+            'A': {
+                'Top': [
+                    { id: 2764, nome: 'Martinez L.', squadra: 'Inter', qta: 34 }, { id: 2531, nome: 'Lukaku', squadra: 'Napoli', qta: 31 }, { id: 4871, nome: 'Thuram', squadra: 'Inter', qta: 29 }, { id: 4730, nome: 'Lookman', squadra: 'Atalanta', qta: 29 }, { id: 309, nome: 'Dybala', squadra: 'Roma', qta: 26 }
+                ],
+                'Buoni': [
+                    { id: 2187, nome: 'Vlahovic', squadra: 'Juventus', qta: 23 }, { id: 6422, nome: 'Zirkzee', squadra: 'Milan', qta: 22 }, { id: 4880, nome: 'Scamacca', squadra: 'Atalanta', qta: 21 }, { id: 6408, nome: 'Retegui', squadra: 'Genoa', qta: 20 }, { id: 2426, nome: 'Leao', squadra: 'Milan', qta: 19 }, { id: 605, nome: 'Chiesa', squadra: 'Roma', qta: 19 }, { id: 4881, nome: 'Gonzalez N.', squadra: 'Fiorentina', qta: 18 }
+                ],
+                'Scommesse': [
+                    { id: 5462, nome: 'Zapata D.', squadra: 'Torino', qta: 17 }, { id: 6442, nome: 'Krstovic', squadra: 'Genoa', qta: 16 }, { id: 5519, nome: 'Pinamonti', squadra: 'Torino', qta: 15 }, { id: 2516, nome: 'Kvaratskhelia', squadra: 'Napoli', qta: 14 }, { id: 6632, nome: 'Castellanos', squadra: 'Lazio', qta: 13 }, { id: 4905, nome: 'Lauriente', squadra: 'Sassuolo', qta: 12 }, { id: 6230, nome: 'Lucca', squadra: 'Udinese', qta: 11 }, { id: 6411, nome: 'Noslin', squadra: 'Verona', qta: 9 }, { id: 6430, nome: 'Luvumbo', squadra: 'Cagliari', qta: 8 }
+                ]
+            }
+        };
+        const teamLogos = {
+            'Atalanta': 'https://upload.wikimedia.org/wikipedia/it/thumb/8/81/Logo_Atalanta_Bergamo.svg/1200px-Logo_Atalanta_Bergamo.svg.png',
+            'Bologna': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Bologna_F.C._1909_logo.svg/1200px-Bologna_F.C._1909_logo.svg.png',
+            'Cagliari': 'https://upload.wikimedia.org/wikipedia/it/thumb/8/88/Cagliari_calcio.svg/1200px-Cagliari_calcio.svg.png',
+            'Como': 'https://upload.wikimedia.org/wikipedia/commons/2/2c/Logo_Como_1907_2019.png',
+            'Cremonese': 'https://upload.wikimedia.org/wikipedia/it/thumb/2/23/Unione_Sportiva_Cremonese_logo.svg/1200px-Unione_Sportiva_Cremonese_logo.svg.png',
+            'Fiorentina': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/ACF_Fiorentina_-_logo_%28Italy%2C_2022%29.svg/1024px-ACF_Fiorentina_-_logo_%28Italy%2C_2022%29.svg.png',
+            'Genoa': 'https://upload.wikimedia.org/wikipedia/it/thumb/9/99/Genoa_Cricket_and_Football_Club_logo.svg/1200px-Genoa_Cricket_and_Football_Club_logo.svg.png',
+            'Inter': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFNcUnb49zp7qriWxPGn8xTAYQAFvIKLddRA&s',
+            'Juventus': 'https://upload.wikimedia.org/wikipedia/commons/5/51/Juventus_FC_2017_logo.png',
+            'Lazio': 'https://upload.wikimedia.org/wikipedia/it/thumb/6/62/Stemma_della_Societ%C3%A0_Sportiva_Lazio.svg/2560px-Stemma_della_Societ%C3%A0_Sportiva_Lazio.svg.png',
+            'Lecce': 'https://upload.wikimedia.org/wikipedia/it/thumb/3/36/US_Lecce_Stemma.svg/1200px-US_Lecce_Stemma.svg.png',
+            'Milan': 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Logo_of_AC_Milan.svg/1200px-Logo_of_AC_Milan.svg.png',
+            'Napoli': 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/SSC_Napoli_2024_%28deep_blue_navy%29.svg/500px-SSC_Napoli_2024_%28deep_blue_navy%29.svg.png',
+            'Parma': 'https://upload.wikimedia.org/wikipedia/it/4/40/Logo_Parma_Calcio_1913_%28adozione_2016%29.png',
+            'Pisa': 'https://upload.wikimedia.org/wikipedia/it/thumb/d/d7/Logo_Pisa_SC_2017.svg/1200px-Logo_Pisa_SC_2017.svg.png',
+            'Roma': 'https://images.seeklogo.com/logo-png/17/2/as-roma-logo-png_seeklogo-179010.png',
+            'Sassuolo': 'https://upload.wikimedia.org/wikipedia/sco/thumb/1/1c/US_Sassuolo_Calcio_logo.svg/1200px-US_Sassuolo_Calcio_logo.svg.png',
+            'Torino': 'https://upload.wikimedia.org/wikipedia/it/thumb/0/04/Torino_FC_logo.svg/1200px-Torino_FC_logo.svg.png',
+            'Udinese': 'https://upload.wikimedia.org/wikipedia/nap/4/44/Logo_Udinese.png',
+            'Verona': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRmXu6r1es26xlsMiRKRQwMLFJPTVQqID_C4g&s'
+        };
+
+        // --- STATO DELL'APPLICAZIONE (CARICATO O DI DEFAULT) ---
+        let playersData = JSON.parse(JSON.stringify(initialPlayersData)); // Deep copy
+        let state = { budget: 500, squad: [], activeRole: 'P', sortOptions: {}, removedPlayers: [] };
+        let playerToDelete = { id: null, role: null, tier: null };
+
+        // --- ELEMENTI DEL DOM ---
+        const playersContainer = document.getElementById('players-container');
+        const remainingBudgetEl = document.getElementById('remaining-budget');
+        const squadCountEl = document.getElementById('squad-count');
+        const mySquadEl = document.getElementById('my-squad');
+        const emptySquadMsgEl = document.getElementById('empty-squad-msg');
+        const tabs = document.querySelectorAll('.role-tab');
+        const addPlayerModal = document.getElementById('add-player-modal');
+        const addPlayerForm = document.getElementById('add-player-form');
+        const cancelAddPlayerBtn = document.getElementById('cancel-add-player');
+        const confirmModal = document.getElementById('confirm-modal');
+        const confirmActionBtn = document.getElementById('confirm-action-btn');
+        const cancelConfirmBtn = document.getElementById('cancel-confirm-btn');
+        const confirmTitle = document.getElementById('confirm-title');
+        const confirmMessage = document.getElementById('confirm-message');
+        const resetBtn = document.getElementById('reset-btn');
+
+
+        // --- FUNZIONI DI GESTIONE STATO ---
+        function saveState() {
+            const appState = {
+                state: state,
+                playersData: playersData
+            };
+            localStorage.setItem('fantacalcioAppState', JSON.stringify(appState));
+        }
+
+        function loadState() {
+            const savedData = localStorage.getItem('fantacalcioAppState');
+            if (savedData) {
+                try {
+                    const appState = JSON.parse(savedData);
+                    state = appState.state;
+                    playersData = appState.playersData;
+                } catch (e) {
+                    console.error("Errore nel caricamento dello stato, resetto.", e);
+                    resetState();
+                }
+            }
+        }
+
+        function resetState() {
+            localStorage.removeItem('fantacalcioAppState');
+            location.reload();
+        }
+
+        // --- FUNZIONI DI RENDER ---
+        function renderPlayers() {
+            playersContainer.innerHTML = '';
+            const roleData = playersData[state.activeRole];
+            const budgetAdvice = { P: 'Budget Consigliato: 20-30 (4-6%)', D: 'Budget Consigliato: 40-60 (8-12%)', C: 'Budget Consigliato: 120-150 (24-30%)', A: 'Budget Consigliato: 250-280 (50-56%)' };
+
+            const budgetEl = document.createElement('div');
+            budgetEl.className = 'bg-gray-800 p-3 rounded-lg mb-4 text-center';
+            budgetEl.innerHTML = `<p class="font-semibold text-cyan-300">${budgetAdvice[state.activeRole]}</p>`;
+            playersContainer.appendChild(budgetEl);
+
+            for (const tier in roleData) {
+                const sortKey = `${state.activeRole}-${tier}`;
+                if (!state.sortOptions[sortKey]) {
+                    state.sortOptions[sortKey] = 'price'; // Default sort
+                }
+
+                const tierHeader = document.createElement('div');
+                tierHeader.className = 'flex justify-between items-center mt-6 mb-3 border-b border-gray-700 pb-2';
+                tierHeader.innerHTML = `
+                    <h3 class="text-xl font-bold text-amber-400">${tier}</h3>
+                    <div class="flex space-x-2" data-tier="${tier}">
+                        <button class="sort-btn text-xs py-1 px-3 rounded-full bg-gray-700 hover:bg-gray-600 ${state.sortOptions[sortKey] === 'price' ? 'active' : ''}" data-sort="price">Prezzo</button>
+                        <button class="sort-btn text-xs py-1 px-3 rounded-full bg-gray-700 hover:bg-gray-600 ${state.sortOptions[sortKey] === 'team' ? 'active' : ''}" data-sort="team">Squadra</button>
+                    </div>
+                `;
+                playersContainer.appendChild(tierHeader);
+
+                const tierContainer = document.createElement('div');
+                tierContainer.id = `tier-container-${tier}`;
+                tierContainer.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4';
+                playersContainer.appendChild(tierContainer);
+
+                renderTierContent(tier, roleData[tier]);
+
+                const addBtnContainer = document.createElement('div');
+                addBtnContainer.className = 'flex justify-center items-center mt-4';
+                const addBtn = document.createElement('button');
+                addBtn.className = 'bg-cyan-800 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded-full flex items-center transition-colors';
+                addBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg> Aggiungi Giocatore`;
+                addBtn.onclick = () => showAddPlayerModal(state.activeRole, tier);
+                addBtnContainer.appendChild(addBtn);
+                playersContainer.appendChild(addBtnContainer);
+            }
+        }
+
+        function renderTierContent(tier, players) {
+            const tierContainer = document.getElementById(`tier-container-${tier}`);
+            tierContainer.innerHTML = '';
+            const sortKey = `${state.activeRole}-${tier}`;
+            const sortType = state.sortOptions[sortKey] || 'price';
+
+            const sortedPlayers = [...players].sort((a, b) => {
+                if (sortType === 'team') {
+                    return a.squadra.localeCompare(b.squadra);
+                }
+                const priceA = calculateRecommendedPrice(a, tier);
+                const priceB = calculateRecommendedPrice(b, tier);
+                return priceB - priceA;
+            });
+
+            sortedPlayers.forEach(player => {
+                const isBoughtByMe = state.squad.some(p => p.id === player.id);
+                const card = createPlayerCard(player, isBoughtByMe, state.activeRole, tier);
+                tierContainer.appendChild(card);
+            });
+        }
+
+        function calculateRecommendedPrice(player, tier) {
+            const qta = player.qta;
+            if (qta === 1) return 1;
+
+            let multiplier = 1.2; // Scommesse
+            if (tier === 'Top') {
+                multiplier = 2.2;
+            } else if (tier === 'Buoni') {
+                multiplier = 1.6;
+            }
+
+            return Math.round(qta * multiplier);
+        }
+
+        function createPlayerCard(player, isBoughtByMe = false, role, tier) {
+            const card = document.createElement('div');
+            card.id = `player-${player.id}`;
+            const isRemoved = state.removedPlayers.includes(player.id);
+            card.className = `player-card bg-gray-800 rounded-lg p-4 shadow-md flex flex-col justify-between relative ${isBoughtByMe ? 'bought-by-me' : ''} ${isRemoved ? 'bought' : ''}`;
+            const recommendedPrice = calculateRecommendedPrice(player, tier);
+
+            card.innerHTML = `
+                <button class="absolute top-2 right-2 text-red-500 hover:text-red-400 permanent-delete-btn" data-id="${player.id}" data-role="${role}" data-tier="${tier}" data-name="${player.nome}">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </button>
+                <div>
+                    <div class="flex items-center mb-3">
+                        <img src="${teamLogos[player.squadra] || 'https://placehold.co/40x40/2d3748/e2e8f0?text=?'}" alt="${player.squadra}" class="w-8 h-8 mr-3 object-contain rounded-full bg-white/10">
+                        <div>
+                            <p class="font-bold text-lg">${player.nome}</p>
+                            <p class="text-sm text-gray-400">${player.squadra}</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center text-sm mb-3">
+                        <span class="text-gray-400">Quotazione:</span>
+                        <span class="font-semibold text-cyan-400">${player.qta}</span>
+                    </div>
+                    <div class="space-y-2">
+                         <div>
+                            <label for="rec-price-${player.id}" class="text-xs text-gray-400">Prezzo Consigliato:</label>
+                            <input type="number" id="rec-price-${player.id}" value="${recommendedPrice}" class="w-full bg-gray-700 rounded p-1 text-center text-white">
+                        </div>
+                        <div>
+                            <label for="paid-price-${player.id}" class="text-xs text-gray-400">Prezzo Pagato:</label>
+                            <input type="number" id="paid-price-${player.id}" value="${player.qta}" class="w-full bg-gray-900 border border-gray-600 rounded p-1 text-center text-white focus:ring-2 focus:ring-cyan-500">
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4 flex space-x-2">
+                    <button class="buy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded w-full transition-colors" data-id="${player.id}">Compra</button>
+                    <button class="toggle-remove-btn ${isRemoved ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-red-600 hover:bg-red-700'} text-white font-bold py-2 px-4 rounded w-full transition-colors">${isRemoved ? 'Ripristina' : 'Rimuovi'}</button>
+                </div>
+            `;
+
+            if (isBoughtByMe) {
+                card.querySelector('.buy-btn').disabled = true;
+                card.querySelector('.buy-btn').textContent = 'Acquistato';
+                card.querySelector('.buy-btn').classList.replace('bg-green-600', 'bg-gray-600');
+            }
+
+            card.querySelector('.buy-btn').addEventListener('click', () => buyPlayer(player.id));
+            card.querySelector('.toggle-remove-btn').addEventListener('click', (e) => {
+                const card = e.currentTarget.closest('.player-card');
+                const button = e.currentTarget;
+                const playerId = player.id;
+
+                card.classList.toggle('bought');
+                if (card.classList.contains('bought')) {
+                    if (!state.removedPlayers.includes(playerId)) state.removedPlayers.push(playerId);
+                    button.textContent = 'Ripristina';
+                    button.classList.replace('bg-red-600', 'bg-yellow-600');
+                    button.classList.replace('hover:bg-red-700', 'hover:bg-yellow-700');
+                } else {
+                    state.removedPlayers = state.removedPlayers.filter(id => id !== playerId);
+                    button.textContent = 'Rimuovi';
+                    button.classList.replace('bg-yellow-600', 'bg-red-600');
+                    button.classList.replace('hover:bg-yellow-700', 'hover:bg-red-700');
+                }
+                saveState();
+            });
+            card.querySelector('.permanent-delete-btn').addEventListener('click', (e) => {
+                const button = e.currentTarget;
+                showConfirmModal(
+                    'Conferma Eliminazione',
+                    `Sei sicuro di voler eliminare ${button.dataset.name} dalla lista? L'azione è irreversibile.`,
+                    'Elimina',
+                    () => {
+                        playerToDelete.id = parseInt(button.dataset.id);
+                        playerToDelete.role = button.dataset.role;
+                        playerToDelete.tier = button.dataset.tier;
+                        deletePlayer();
+                    }
+                );
+            });
+            return card;
+        }
+
+        function updateUI() {
+            remainingBudgetEl.textContent = state.budget;
+            remainingBudgetEl.classList.toggle('text-red-500', state.budget < 100);
+            remainingBudgetEl.classList.toggle('text-green-400', state.budget >= 100);
+            squadCountEl.textContent = `${state.squad.length} / 25`;
+
+            const counts = { P: 0, D: 0, C: 0, A: 0 };
+            const spent = { P: 0, D: 0, C: 0, A: 0 };
+
+            state.squad.forEach(p => {
+                const playerInfo = getPlayerById(p.id);
+                if (playerInfo) {
+                    const role = playerInfo.R;
+                    counts[role]++;
+                    spent[role] += p.price;
+                }
+            });
+
+            for (const role in counts) {
+                document.getElementById(`count-${role}`).textContent = counts[role];
+                document.getElementById(`spent-${role}`).textContent = spent[role];
+            }
+            renderMySquad();
+        }
+
+        function buyPlayer(playerId) {
+            const playerCard = document.getElementById(`player-${playerId}`);
+            const pricePaid = parseInt(playerCard.querySelector(`#paid-price-${playerId}`).value);
+
+            if (isNaN(pricePaid) || pricePaid <= 0) { alert("Inserisci un prezzo valido."); return; }
+            if (state.budget < pricePaid) { alert("Budget non sufficiente!"); return; }
+
+            const playerInfo = getPlayerById(playerId);
+            const role = playerInfo.R;
+            const roleLimits = { P: 3, D: 8, C: 8, A: 6 };
+            const currentRoleCount = state.squad.filter(p => getPlayerById(p.id)?.R === role).length;
+
+            if (currentRoleCount >= roleLimits[role]) { alert(`Hai già raggiunto il limite di ${roleLimits[role]} giocatori per questo ruolo.`); return; }
+
+            state.budget -= pricePaid;
+            state.squad.push({ id: playerId, price: pricePaid });
+
+            playerCard.classList.add('bought-by-me');
+            const buyBtn = playerCard.querySelector('.buy-btn');
+            buyBtn.disabled = true;
+            buyBtn.textContent = 'Acquistato';
+            buyBtn.classList.replace('bg-green-600', 'bg-gray-600');
+            updateUI();
+            saveState();
+        }
+
+        function getPlayerById(id) {
+            for (const role in playersData) {
+                for (const tier in playersData[role]) {
+                    const player = playersData[role][tier].find(p => p.id === id);
+                    if (player) return { ...player, R: role };
+                }
+            }
+            return null;
+        }
+
+        function renderMySquad() {
+            emptySquadMsgEl.style.display = state.squad.length === 0 ? 'block' : 'none';
+            mySquadEl.innerHTML = '';
+            if (state.squad.length > 0) {
+                const sortedSquad = state.squad.sort((a, b) => {
+                    const roleOrder = { 'P': 1, 'D': 2, 'C': 3, 'A': 4 };
+                    const playerA = getPlayerById(a.id);
+                    const playerB = getPlayerById(b.id);
+                    if (!playerA || !playerB) return 0;
+                    if (roleOrder[playerA.R] !== roleOrder[playerB.R]) {
+                        return roleOrder[playerA.R] - roleOrder[playerB.R];
+                    }
+                    return b.price - a.price;
+                });
+
+                sortedSquad.forEach(boughtPlayer => {
+                    const playerInfo = getPlayerById(boughtPlayer.id);
+                    if (!playerInfo) return;
+                    const squadCard = document.createElement('div');
+                    squadCard.className = 'bg-gray-800 rounded-lg p-3 flex items-center justify-between shadow';
+                    squadCard.innerHTML = `
+                        <div class="flex items-center">
+                            <img src="${teamLogos[playerInfo.squadra] || 'https://placehold.co/40x40/2d3748/e2e8f0?text=?'}" alt="${playerInfo.squadra}" class="w-7 h-7 mr-3 object-contain rounded-full bg-white/10">
+                            <div>
+                                <p class="font-semibold">${playerInfo.nome} <span class="text-xs text-gray-400">(${playerInfo.R})</span></p>
+                                <p class="text-xs text-gray-500">${playerInfo.squadra}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                           <p class="font-bold text-cyan-400">${boughtPlayer.price}</p>
+                           <button class="sell-btn text-xs text-red-500 hover:text-red-400" data-id="${boughtPlayer.id}" data-price="${boughtPlayer.price}">Vendi</button>
+                        </div>
+                    `;
+                    squadCard.querySelector('.sell-btn').addEventListener('click', sellPlayer);
+                    mySquadEl.appendChild(squadCard);
+                });
+            }
+        }
+
+        function sellPlayer(event) {
+            const playerId = parseInt(event.target.dataset.id);
+            const price = parseInt(event.target.dataset.price);
+
+            state.squad = state.squad.filter(p => p.id !== playerId);
+            state.budget += price;
+
+            const playerCard = document.getElementById(`player-${playerId}`);
+            if (playerCard) {
+                playerCard.classList.remove('bought-by-me');
+                const buyBtn = playerCard.querySelector('.buy-btn');
+                buyBtn.disabled = false;
+                buyBtn.textContent = 'Compra';
+                buyBtn.classList.replace('bg-gray-600', 'bg-green-600');
+            }
+            updateUI();
+            saveState();
+        }
+
+        function showAddPlayerModal(role, tier) {
+            addPlayerForm.dataset.role = role;
+            addPlayerForm.dataset.tier = tier;
+            addPlayerModal.classList.remove('hidden');
+        }
+
+        function deletePlayer() {
+            const { id, role, tier } = playerToDelete;
+            const tierArray = playersData[role][tier];
+            const playerIndex = tierArray.findIndex(p => p.id === id);
+
+            if (playerIndex > -1) {
+                tierArray.splice(playerIndex, 1);
+            }
+
+            const cardToRemove = document.getElementById(`player-${id}`);
+            if (cardToRemove) {
+                cardToRemove.remove();
+            }
+
+            confirmModal.classList.add('hidden');
+            saveState();
+        }
+
+        function showConfirmModal(title, message, confirmText, onConfirm) {
+            confirmTitle.textContent = title;
+            confirmMessage.textContent = message;
+            confirmActionBtn.textContent = confirmText;
+
+            // This replaces any previous handler by assigning a new one.
+            confirmActionBtn.onclick = () => {
+                onConfirm();
+                confirmModal.classList.add('hidden');
+            };
+
+            confirmModal.classList.remove('hidden');
+        }
+
+        // --- INIZIALIZZAZIONE E EVENT LISTENERS ---
+        document.addEventListener('DOMContentLoaded', () => {
+            loadState();
+            renderPlayers();
+            updateUI();
+        });
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', e => {
+                e.preventDefault();
+                tabs.forEach(t => {
+                    t.classList.remove('border-cyan-400', 'text-cyan-400');
+                    t.classList.add('border-transparent', 'text-gray-400');
+                });
+                e.target.classList.add('border-cyan-400', 'text-cyan-400');
+                e.target.classList.remove('border-transparent', 'text-gray-400');
+                state.activeRole = e.target.dataset.role;
+                renderPlayers();
+            });
+        });
+
+        playersContainer.addEventListener('click', (e) => {
+            if (e.target.classList.contains('sort-btn')) {
+                const sortType = e.target.dataset.sort;
+                const tier = e.target.parentElement.dataset.tier;
+                const sortKey = `${state.activeRole}-${tier}`;
+                state.sortOptions[sortKey] = sortType;
+
+                e.target.parentElement.querySelectorAll('.sort-btn').forEach(btn => btn.classList.remove('active'));
+                e.target.classList.add('active');
+
+                renderTierContent(tier, playersData[state.activeRole][tier]);
+                saveState();
+            }
+        });
+
+        addPlayerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const role = e.target.dataset.role;
+            const tier = e.target.dataset.tier;
+            const newPlayer = {
+                id: Date.now(),
+                nome: document.getElementById('new-player-name').value,
+                squadra: document.getElementById('new-player-team').value,
+                qta: parseInt(document.getElementById('new-player-qta').value)
+            };
+            playersData[role][tier].push(newPlayer);
+            renderTierContent(tier, playersData[role][tier]);
+
+            addPlayerForm.reset();
+            addPlayerModal.classList.add('hidden');
+            saveState();
+        });
+
+        cancelAddPlayerBtn.addEventListener('click', () => {
+            addPlayerForm.reset();
+            addPlayerModal.classList.add('hidden');
+        });
+
+        cancelConfirmBtn.addEventListener('click', () => {
+            confirmModal.classList.add('hidden');
+        });
+
+        resetBtn.addEventListener('click', () => {
+            showConfirmModal(
+                'Reset Asta',
+                'Sei sicuro di voler resettare tutti i dati? La tua squadra e tutte le modifiche andranno perse.',
+                'Reset',
+                resetState
+            );
+        });
+
+    </script>
+</body>
+
+</html>

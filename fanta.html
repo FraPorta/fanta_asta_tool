@@ -58,16 +58,32 @@
         <div class="sticky-header bg-gray-900/80 backdrop-blur-sm p-4 rounded-lg mb-6 shadow-lg">
             <div class="flex justify-between items-center mb-4">
                 <h1 class="text-3xl font-bold text-center text-cyan-400">Guida Asta Fantacalcio</h1>
-                <button id="reset-btn"
-                    class="bg-red-800 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg flex items-center text-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20"
-                        fill="currentColor">
-                        <path fill-rule="evenodd"
-                            d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 110 2H4a1 1 0 01-1-1V4a1 1 0 011-1zm10 15a1 1 0 01-1-1v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 111.885-.666A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 01-1 1z"
-                            clip-rule="evenodd" />
-                    </svg>
-                    Reset Asta
-                </button>
+                <div class="flex gap-2">
+                    <button id="export-btn"
+                        class="bg-green-800 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg flex items-center text-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                        Esporta
+                    </button>
+                    <button id="import-btn"
+                        class="bg-blue-800 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg flex items-center text-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 11-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                        </svg>
+                        Importa
+                    </button>
+                    <button id="reset-btn"
+                        class="bg-red-800 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg flex items-center text-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20"
+                            fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 110 2H4a1 1 0 01-1-1V4a1 1 0 011-1zm10 15a1 1 0 01-1-1v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 111.885-.666A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 01-1 1z"
+                                clip-rule="evenodd" />
+                        </svg>
+                        Reset Asta
+                    </button>
+                </div>
             </div>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
                 <div class="bg-gray-800 p-3 rounded-lg">
@@ -359,6 +375,28 @@
         </div>
     </div>
 
+    <!-- HIDDEN FILE INPUT FOR IMPORT -->
+    <input type="file" id="import-file-input" accept=".json" style="display: none;">
+
+    <!-- MODAL PER IMPORT CONFERMA -->
+    <div id="import-confirm-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-gray-800 rounded-lg p-6 w-full max-w-md shadow-2xl">
+            <h3 class="text-xl font-bold mb-4 text-amber-400">Conferma Importazione</h3>
+            <div id="import-preview" class="mb-4 bg-gray-700 p-4 rounded-lg">
+                <!-- Preview content will be inserted here -->
+            </div>
+            <p class="mb-6 text-gray-300 text-sm">
+                <strong>Attenzione:</strong> L'importazione sovrascriverà tutti i dati attuali (squadra, budget, giocatori personalizzati).
+            </p>
+            <div class="flex justify-end space-x-4">
+                <button id="cancel-import-btn"
+                    class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Annulla</button>
+                <button id="confirm-import-btn"
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Importa</button>
+            </div>
+        </div>
+    </div>
+
 
     <script>
         // --- DATABASE GIOCATORI E LOGHI (STATO INIZIALE) ---
@@ -640,6 +678,18 @@
         let selectedPlayerFromCSV = null;
         let currentModalRole = null;
         let currentModalTier = null;
+
+        // Export/Import elements
+        const exportBtn = document.getElementById('export-btn');
+        const importBtn = document.getElementById('import-btn');
+        const importFileInput = document.getElementById('import-file-input');
+        const importConfirmModal = document.getElementById('import-confirm-modal');
+        const importPreview = document.getElementById('import-preview');
+        const cancelImportBtn = document.getElementById('cancel-import-btn');
+        const confirmImportBtn = document.getElementById('confirm-import-btn');
+
+        // State for import
+        let pendingImportData = null;
 
 
         // --- FUNZIONI DI GESTIONE STATO ---
@@ -1242,6 +1292,145 @@
             confirmModal.classList.remove('hidden');
         }
 
+        // --- EXPORT/IMPORT FUNCTIONS ---
+        function exportData() {
+            const exportData = {
+                version: "1.0",
+                timestamp: new Date().toISOString(),
+                state: state,
+                playersData: playersData,
+                csvPlayersData: csvPlayersData
+            };
+
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            
+            const date = new Date().toLocaleDateString('it-IT').replace(/\//g, '-');
+            link.download = `fantacalcio-backup-${date}.json`;
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            // Show success message
+            alert('Dati esportati con successo! Il file è stato scaricato.');
+        }
+
+        function importData() {
+            importFileInput.click();
+        }
+
+        function handleImportFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    
+                    // Validate the imported data
+                    if (!importedData.state || !importedData.playersData) {
+                        alert('File non valido: struttura dati mancante.');
+                        return;
+                    }
+
+                    pendingImportData = importedData;
+                    showImportPreview(importedData);
+                    
+                } catch (error) {
+                    alert('Errore nel leggere il file: ' + error.message);
+                }
+            };
+
+            reader.readAsText(file);
+            // Reset input
+            event.target.value = '';
+        }
+
+        function showImportPreview(data) {
+            const { state: importState, timestamp } = data;
+            const date = timestamp ? new Date(timestamp).toLocaleString('it-IT') : 'Sconosciuta';
+            
+            const squadCount = importState.squad ? importState.squad.length : 0;
+            const budgetRemaining = importState.budget || 500;
+            const budgetSpent = 500 - budgetRemaining;
+
+            // Count players by role
+            const roleCounts = { P: 0, D: 0, C: 0, A: 0 };
+            if (importState.squad) {
+                importState.squad.forEach(player => {
+                    // Try to find player info to determine role
+                    for (const role in data.playersData) {
+                        for (const tier in data.playersData[role]) {
+                            if (data.playersData[role][tier].some(p => p.id === player.id)) {
+                                roleCounts[role]++;
+                                break;
+                            }
+                        }
+                    }
+                });
+            }
+
+            importPreview.innerHTML = `
+                <h4 class="font-bold text-cyan-400 mb-3">Anteprima Backup</h4>
+                <div class="space-y-2 text-sm">
+                    <p><strong>Data:</strong> ${date}</p>
+                    <p><strong>Giocatori in squadra:</strong> ${squadCount}/25</p>
+                    <p><strong>Budget speso:</strong> €${budgetSpent}/500 (rimanente: €${budgetRemaining})</p>
+                    <div class="mt-3">
+                        <strong>Giocatori per ruolo:</strong>
+                        <div class="grid grid-cols-2 gap-2 mt-1 text-xs">
+                            <span>Portieri: ${roleCounts.P}/3</span>
+                            <span>Difensori: ${roleCounts.D}/8</span>
+                            <span>Centrocampisti: ${roleCounts.C}/8</span>
+                            <span>Attaccanti: ${roleCounts.A}/6</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            importConfirmModal.classList.remove('hidden');
+        }
+
+        function confirmImport() {
+            if (!pendingImportData) return;
+
+            try {
+                // Apply imported data
+                state = { ...pendingImportData.state };
+                playersData = JSON.parse(JSON.stringify(pendingImportData.playersData));
+                
+                if (pendingImportData.csvPlayersData) {
+                    csvPlayersData = [...pendingImportData.csvPlayersData];
+                }
+
+                // Save to localStorage
+                saveState();
+
+                // Update UI
+                renderPlayers();
+                updateUI();
+
+                // Close modal
+                importConfirmModal.classList.add('hidden');
+                pendingImportData = null;
+
+                alert('Dati importati con successo!');
+
+            } catch (error) {
+                alert('Errore nell\'importazione: ' + error.message);
+            }
+        }
+
+        function cancelImport() {
+            importConfirmModal.classList.add('hidden');
+            pendingImportData = null;
+        }
+
         // --- INIZIALIZZAZIONE E EVENT LISTENERS ---
         document.addEventListener('DOMContentLoaded', () => {
             loadState();
@@ -1320,6 +1509,13 @@
                 resetState
             );
         });
+
+        // Export/Import Event Listeners
+        exportBtn.addEventListener('click', exportData);
+        importBtn.addEventListener('click', importData);
+        importFileInput.addEventListener('change', handleImportFile);
+        cancelImportBtn.addEventListener('click', cancelImport);
+        confirmImportBtn.addEventListener('click', confirmImport);
 
         // CSV Event Listeners
         csvFileInput.addEventListener('change', () => {

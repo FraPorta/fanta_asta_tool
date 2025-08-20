@@ -61,15 +61,21 @@
                 <div class="flex gap-2">
                     <button id="export-btn"
                         class="bg-green-800 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg flex items-center text-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20"
+                            fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+                                clip-rule="evenodd" />
                         </svg>
                         Esporta
                     </button>
                     <button id="import-btn"
                         class="bg-blue-800 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg flex items-center text-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 11-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20"
+                            fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 11-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z"
+                                clip-rule="evenodd" />
                         </svg>
                         Importa
                     </button>
@@ -379,14 +385,16 @@
     <input type="file" id="import-file-input" accept=".json" style="display: none;">
 
     <!-- MODAL PER IMPORT CONFERMA -->
-    <div id="import-confirm-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
+    <div id="import-confirm-modal"
+        class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
         <div class="bg-gray-800 rounded-lg p-6 w-full max-w-md shadow-2xl">
             <h3 class="text-xl font-bold mb-4 text-amber-400">Conferma Importazione</h3>
             <div id="import-preview" class="mb-4 bg-gray-700 p-4 rounded-lg">
                 <!-- Preview content will be inserted here -->
             </div>
             <p class="mb-6 text-gray-300 text-sm">
-                <strong>Attenzione:</strong> L'importazione sovrascriverà tutti i dati attuali (squadra, budget, giocatori personalizzati).
+                <strong>Attenzione:</strong> L'importazione sovrascriverà tutti i dati attuali (squadra, budget,
+                giocatori personalizzati).
             </p>
             <div class="flex justify-end space-x-4">
                 <button id="cancel-import-btn"
@@ -912,7 +920,7 @@
                     spentElement.textContent = spent[role];
                 }
             }
-            
+
             renderMySquad();
         }
 
@@ -956,7 +964,7 @@
             // Show/hide empty message
             const hasPlayers = state.squad.length > 0;
             emptySquadMsgEl.style.display = hasPlayers ? 'none' : 'block';
-            
+
             // Check if squadSummary exists before using it
             if (squadSummary) {
                 squadSummary.classList.toggle('hidden', !hasPlayers);
@@ -1010,7 +1018,7 @@
                     // Update role counters
                     const countElement = document.getElementById(`squad-count-${role}`);
                     const spentElement = document.getElementById(`squad-spent-${role}`);
-                    
+
                     if (countElement) countElement.textContent = players.length;
                     if (spentElement) spentElement.textContent = spent[role];
                 } else if (section) {
@@ -1022,7 +1030,7 @@
             Object.keys(counts).forEach(role => {
                 const summaryCountElement = document.getElementById(`summary-count-${role}`);
                 const summarySpentElement = document.getElementById(`summary-spent-${role}`);
-                
+
                 if (summaryCountElement) summaryCountElement.textContent = counts[role];
                 if (summarySpentElement) summarySpentElement.textContent = spent[role];
             });
@@ -1304,13 +1312,13 @@
 
             const dataStr = JSON.stringify(exportData, null, 2);
             const dataBlob = new Blob([dataStr], { type: 'application/json' });
-            
+
             const link = document.createElement('a');
             link.href = URL.createObjectURL(dataBlob);
-            
+
             const date = new Date().toLocaleDateString('it-IT').replace(/\//g, '-');
             link.download = `fantacalcio-backup-${date}.json`;
-            
+
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -1328,10 +1336,10 @@
             if (!file) return;
 
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 try {
                     const importedData = JSON.parse(e.target.result);
-                    
+
                     // Validate the imported data
                     if (!importedData.state || !importedData.playersData) {
                         alert('File non valido: struttura dati mancante.');
@@ -1340,7 +1348,7 @@
 
                     pendingImportData = importedData;
                     showImportPreview(importedData);
-                    
+
                 } catch (error) {
                     alert('Errore nel leggere il file: ' + error.message);
                 }
@@ -1354,7 +1362,7 @@
         function showImportPreview(data) {
             const { state: importState, timestamp } = data;
             const date = timestamp ? new Date(timestamp).toLocaleString('it-IT') : 'Sconosciuta';
-            
+
             const squadCount = importState.squad ? importState.squad.length : 0;
             const budgetRemaining = importState.budget || 500;
             const budgetSpent = 500 - budgetRemaining;
@@ -1403,7 +1411,7 @@
                 // Apply imported data
                 state = { ...pendingImportData.state };
                 playersData = JSON.parse(JSON.stringify(pendingImportData.playersData));
-                
+
                 if (pendingImportData.csvPlayersData) {
                     csvPlayersData = [...pendingImportData.csvPlayersData];
                 }

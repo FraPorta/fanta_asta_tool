@@ -97,15 +97,94 @@
         <!-- LA MIA SQUADRA -->
         <div class="mb-6">
             <h2 class="text-2xl font-semibold mb-3 text-amber-400">La Mia Squadra</h2>
-            <div id="my-squad" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <p id="empty-squad-msg" class="text-gray-400">Nessun giocatore acquistato.</p>
+            <div id="empty-squad-msg" class="text-gray-400 text-center py-8">Nessun giocatore acquistato.</div>
+
+            <!-- PORTIERI -->
+            <div id="squad-P-section" class="mb-6 hidden">
+                <h3 class="text-lg font-semibold mb-3 text-cyan-300 flex items-center">
+                    <span class="bg-blue-600 text-white px-2 py-1 rounded-full text-sm mr-3">P</span>
+                    Portieri (<span id="squad-count-P">0</span>/3)
+                    <span class="ml-auto text-sm text-gray-400">Speso: <span id="squad-spent-P"
+                            class="text-cyan-400 font-bold">0</span></span>
+                </h3>
+                <div id="squad-P" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
             </div>
-            <div class="mt-4 text-sm text-gray-300 grid grid-cols-2 md:grid-cols-4 gap-2">
-                <p>Portieri: <span id="count-P">0</span>/3</p>
-                <p>Difensori: <span id="count-D">0</span>/8</p>
-                <p>Centrocampisti: <span id="count-C">0</span>/8</p>
-                <p>Attaccanti: <span id="count-A">0</span>/6</p>
+
+            <!-- DIFENSORI -->
+            <div id="squad-D-section" class="mb-6 hidden">
+                <h3 class="text-lg font-semibold mb-3 text-green-300 flex items-center">
+                    <span class="bg-green-600 text-white px-2 py-1 rounded-full text-sm mr-3">D</span>
+                    Difensori (<span id="squad-count-D">0</span>/8)
+                    <span class="ml-auto text-sm text-gray-400">Speso: <span id="squad-spent-D"
+                            class="text-green-400 font-bold">0</span></span>
+                </h3>
+                <div id="squad-D" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
             </div>
+
+            <!-- CENTROCAMPISTI -->
+            <div id="squad-C-section" class="mb-6 hidden">
+                <h3 class="text-lg font-semibold mb-3 text-yellow-300 flex items-center">
+                    <span class="bg-yellow-600 text-white px-2 py-1 rounded-full text-sm mr-3">C</span>
+                    Centrocampisti (<span id="squad-count-C">0</span>/8)
+                    <span class="ml-auto text-sm text-gray-400">Speso: <span id="squad-spent-C"
+                            class="text-yellow-400 font-bold">0</span></span>
+                </h3>
+                <div id="squad-C" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+            </div>
+
+            <!-- ATTACCANTI -->
+            <div id="squad-A-section" class="mb-6 hidden">
+                <h3 class="text-lg font-semibold mb-3 text-red-300 flex items-center">
+                    <span class="bg-red-600 text-white px-2 py-1 rounded-full text-sm mr-3">A</span>
+                    Attaccanti (<span id="squad-count-A">0</span>/6)
+                    <span class="ml-auto text-sm text-gray-400">Speso: <span id="squad-spent-A"
+                            class="text-red-400 font-bold">0</span></span>
+                </h3>
+                <div id="squad-A" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+            </div>
+
+            <!-- RIEPILOGO TOTALE -->
+            <div id="squad-summary" class="mt-6 bg-gray-800 p-4 rounded-lg hidden">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                    <div class="bg-blue-900/30 p-3 rounded-lg border border-blue-600/30">
+                        <p class="text-sm text-blue-300">Portieri</p>
+                        <p class="text-lg font-bold text-blue-400"><span id="summary-count-P">0</span>/3</p>
+                        <p class="text-xs text-gray-400">€ <span id="summary-spent-P">0</span></p>
+                    </div>
+                    <div class="bg-green-900/30 p-3 rounded-lg border border-green-600/30">
+                        <p class="text-sm text-green-300">Difensori</p>
+                        <p class="text-lg font-bold text-green-400"><span id="summary-count-D">0</span>/8</p>
+                        <p class="text-xs text-gray-400">€ <span id="summary-spent-D">0</span></p>
+                    </div>
+                    <div class="bg-yellow-900/30 p-3 rounded-lg border border-yellow-600/30">
+                        <p class="text-sm text-yellow-300">Centrocampisti</p>
+                        <p class="text-lg font-bold text-yellow-400"><span id="summary-count-C">0</span>/8</p>
+                        <p class="text-xs text-gray-400">€ <span id="summary-spent-C">0</span></p>
+                    </div>
+                    <div class="bg-red-900/30 p-3 rounded-lg border border-red-600/30">
+                        <p class="text-sm text-red-300">Attaccanti</p>
+                        <p class="text-lg font-bold text-red-400"><span id="summary-count-A">0</span>/6</p>
+                        <p class="text-xs text-gray-400">€ <span id="summary-spent-A">0</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CSV LOADER -->
+        <div class="mb-6 bg-gray-800 p-4 rounded-lg">
+            <h2 class="text-xl font-semibold mb-3 text-amber-400">Carica Quotazioni CSV</h2>
+            <div class="flex flex-col md:flex-row gap-4 items-center">
+                <input type="file" id="csv-file-input" accept=".csv"
+                    class="block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-cyan-600 file:text-white hover:file:bg-cyan-700">
+                <button id="load-csv-btn"
+                    class="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-6 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled>Carica CSV</button>
+                <button id="show-player-selector-btn"
+                    class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg hidden">Seleziona
+                    Giocatori</button>
+            </div>
+            <p class="text-sm text-gray-400 mt-2">Carica il file CSV con le quotazioni ufficiali per importare
+                automaticamente tutti i giocatori.</p>
         </div>
 
         <!-- TABS PER RUOLI -->
@@ -132,12 +211,114 @@
         </div>
     </div>
 
+    <!-- MODAL PER SELEZIONARE GIOCATORI DAL CSV -->
+    <div id="player-selector-modal"
+        class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-gray-800 rounded-lg p-6 w-full max-w-6xl max-h-[90vh] overflow-hidden shadow-2xl">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-cyan-400">Seleziona Giocatori dal CSV</h3>
+                <button id="close-player-selector" class="text-gray-400 hover:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="mb-4 flex gap-4 items-center">
+                <select id="role-filter" class="bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-white">
+                    <option value="">Tutti i ruoli</option>
+                    <option value="P">Portieri</option>
+                    <option value="D">Difensori</option>
+                    <option value="C">Centrocampisti</option>
+                    <option value="A">Attaccanti</option>
+                </select>
+                <select id="team-filter" class="bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-white">
+                    <option value="">Tutte le squadre</option>
+                </select>
+                <input type="text" id="name-filter" placeholder="Cerca per nome..."
+                    class="bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-white flex-grow">
+                <select id="tier-selector" class="bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-white">
+                    <option value="Top">Top</option>
+                    <option value="Buoni">Buoni</option>
+                    <option value="Scommesse">Scommesse</option>
+                </select>
+            </div>
+
+            <div class="overflow-y-auto max-h-96 mb-4">
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-700 sticky top-0">
+                        <tr>
+                            <th class="px-3 py-2 text-left">
+                                <input type="checkbox" id="select-all-players" class="rounded">
+                            </th>
+                            <th class="px-3 py-2 text-left">Nome</th>
+                            <th class="px-3 py-2 text-left">Ruolo</th>
+                            <th class="px-3 py-2 text-left">Squadra</th>
+                            <th class="px-3 py-2 text-left">Quotazione</th>
+                            <th class="px-3 py-2 text-left">FVM</th>
+                        </tr>
+                    </thead>
+                    <tbody id="players-table-body">
+                        <!-- Populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="flex justify-between items-center">
+                <span class="text-sm text-gray-400">
+                    Selezionati: <span id="selected-count">0</span> giocatori
+                </span>
+                <div class="flex space-x-2">
+                    <button id="cancel-player-selection"
+                        class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Annulla</button>
+                    <button id="add-selected-players"
+                        class="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded">Aggiungi
+                        Selezionati</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL PER AGGIUNGERE GIOCATORE -->
     <div id="add-player-modal"
         class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
         <div class="bg-gray-800 rounded-lg p-6 w-full max-w-md shadow-2xl">
-            <h3 class="text-xl font-bold mb-4 text-cyan-400">Aggiungi Nuovo Giocatore</h3>
-            <form id="add-player-form">
+            <h3 class="text-xl font-bold mb-4 text-cyan-400">Aggiungi Giocatore</h3>
+
+            <!-- Toggle between CSV and Manual input -->
+            <div class="mb-4 flex space-x-2">
+                <button type="button" id="csv-mode-btn"
+                    class="flex-1 py-2 px-4 bg-cyan-600 text-white rounded font-medium">Da CSV</button>
+                <button type="button" id="manual-mode-btn"
+                    class="flex-1 py-2 px-4 bg-gray-600 text-white rounded font-medium">Manuale</button>
+            </div>
+
+            <!-- CSV Selection Mode -->
+            <div id="csv-selection-mode">
+                <div class="mb-4">
+                    <label for="csv-player-filter" class="block text-sm font-medium text-gray-300 mb-2">Cerca
+                        Giocatore</label>
+                    <input type="text" id="csv-player-filter" placeholder="Digita il nome del giocatore..."
+                        class="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-white focus:outline-none focus:ring-cyan-500 focus:border-cyan-500">
+                </div>
+                <div class="mb-4 max-h-48 overflow-y-auto">
+                    <div id="csv-players-list" class="space-y-2">
+                        <p class="text-gray-400 text-sm">Carica prima un file CSV per vedere i giocatori disponibili.
+                        </p>
+                    </div>
+                </div>
+                <div id="selected-csv-player" class="mb-4 hidden">
+                    <div class="bg-gray-700 p-3 rounded-md">
+                        <h4 class="font-medium text-cyan-400 mb-2">Giocatore Selezionato:</h4>
+                        <div id="selected-player-info"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Manual Input Mode -->
+            <div id="manual-input-mode" class="hidden">
                 <div class="mb-4">
                     <label for="new-player-name" class="block text-sm font-medium text-gray-300">Nome</label>
                     <input type="text" id="new-player-name" required
@@ -153,13 +334,14 @@
                     <input type="number" id="new-player-qta" required
                         class="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-cyan-500 focus:border-cyan-500">
                 </div>
-                <div class="flex justify-end space-x-2 mt-6">
-                    <button type="button" id="cancel-add-player"
-                        class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Annulla</button>
-                    <button type="submit"
-                        class="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded">Salva</button>
-                </div>
-            </form>
+            </div>
+
+            <div class="flex justify-end space-x-2 mt-6">
+                <button type="button" id="cancel-add-player"
+                    class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Annulla</button>
+                <button type="button" id="save-add-player"
+                    class="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded">Aggiungi</button>
+            </div>
         </div>
     </div>
 
@@ -180,50 +362,27 @@
 
     <script>
         // --- DATABASE GIOCATORI E LOGHI (STATO INIZIALE) ---
+        let csvPlayersData = []; // Dati caricati dal CSV
         const initialPlayersData = {
             'P': {
-                'Top': [
-                    { id: 2428, nome: 'Sommer', squadra: 'Inter', qta: 16 }, { id: 5876, nome: 'Di Gregorio', squadra: 'Juventus', qta: 16 }, { id: 4312, nome: 'Maignan', squadra: 'Milan', qta: 16 }, { id: 572, nome: 'Meret', squadra: 'Napoli', qta: 16 }, { id: 5841, nome: 'Svilar', squadra: 'Roma', qta: 15 }
-                ],
-                'Buoni': [
-                    { id: 4431, nome: 'Carnesecchi', squadra: 'Atalanta', qta: 14 }, { id: 2814, nome: 'Provedel', squadra: 'Lazio', qta: 12 }, { id: 133, nome: 'Skorupski', squadra: 'Bologna', qta: 10 }
-                ],
-                'Scommesse': [
-                    { id: 5970, nome: 'Martinez Jo.', squadra: 'Genoa', qta: 9 }, { id: 6206, nome: 'Caprile', squadra: 'Napoli', qta: 8 }, { id: 4928, nome: 'Falcone', squadra: 'Lecce', qta: 7 }, { id: 4893, nome: 'Milinkovic-Savic V.', squadra: 'Torino', qta: 7 }, { id: 6512, nome: 'Montipo', squadra: 'Verona', qta: 6 }, { id: 6046, nome: 'Okoye', squadra: 'Udinese', qta: 5 }
-                ]
+                'Top': [],
+                'Buoni': [],
+                'Scommesse': []
             },
             'D': {
-                'Top': [
-                    { id: 254, nome: 'Dimarco', squadra: 'Inter', qta: 19 }, { id: 2120, nome: 'Bastoni', squadra: 'Inter', qta: 16 }, { id: 5520, nome: 'Cambiaso', squadra: 'Juventus', qta: 15 }, { id: 2816, nome: 'Di Lorenzo', squadra: 'Napoli', qta: 14 }, { id: 257, nome: 'Bremer', squadra: 'Juventus', qta: 13 }, { id: 243, nome: 'Theo Hernandez', squadra: 'Milan', qta: 13 }
-                ],
-                'Buoni': [
-                    { id: 236, nome: 'Bellanova', squadra: 'Torino', qta: 12 }, { id: 553, nome: 'Buongiorno', squadra: 'Napoli', qta: 11 }, { id: 6032, nome: 'Kristiansen', squadra: 'Bologna', qta: 11 }, { id: 604, nome: 'Darmian', squadra: 'Inter', qta: 10 }, { id: 2159, nome: 'Pavard', squadra: 'Inter', qta: 10 }, { id: 4432, nome: 'Scalvini', squadra: 'Atalanta', qta: 10 }
-                ],
-                'Scommesse': [
-                    { id: 2172, nome: 'Mancini', squadra: 'Roma', qta: 9 }, { id: 5971, nome: 'Carboni A.', squadra: 'Monza', qta: 9 }, { id: 4898, nome: 'Bijol', squadra: 'Udinese', qta: 8 }, { id: 2118, nome: 'Calabria', squadra: 'Milan', qta: 7 }, { id: 5491, nome: 'Holm', squadra: 'Bologna', qta: 7 }, { id: 244, nome: 'Tomori', squadra: 'Milan', qta: 7 }, { id: 6418, nome: 'Dossena', squadra: 'Cagliari', qta: 6 }, { id: 4900, nome: 'Posch', squadra: 'Bologna', qta: 5 }, { id: 603, nome: 'Hien', squadra: 'Atalanta', qta: 5 }, { id: 6040, nome: 'Lovato', squadra: 'Torino', qta: 4 }
-                ]
+                'Top': [],
+                'Buoni': [],
+                'Scommesse': []
             },
             'C': {
-                'Top': [
-                    { id: 2167, nome: 'Orsolini', squadra: 'Bologna', qta: 30 }, { id: 2423, nome: 'Pulisic', squadra: 'Milan', qta: 28 }, { id: 632, nome: 'Zaccagni', squadra: 'Lazio', qta: 26 }, { id: 5800, nome: 'Gudmundsson A.', squadra: 'Fiorentina', qta: 24 }, { id: 2194, nome: 'Calhanoglu', squadra: 'Inter', qta: 23 }
-                ],
-                'Buoni': [
-                    { id: 4731, nome: 'Koopmeiners', squadra: 'Juventus', qta: 19 }, { id: 6393, nome: 'Colpani', squadra: 'Fiorentina', qta: 19 }, { id: 6229, nome: 'De Ketelaere', squadra: 'Atalanta', qta: 18 }, { id: 600, nome: 'Barella', squadra: 'Inter', qta: 16 }, { id: 5973, nome: 'Frattesi', squadra: 'Inter', qta: 16 }, { id: 2176, nome: 'Pellegrini Lo.', squadra: 'Roma', qta: 15 }, { id: 2195, nome: 'Luis Alberto', squadra: 'Lazio', qta: 15 }
-                ],
-                'Scommesse': [
-                    { id: 602, nome: 'Fabbian', squadra: 'Bologna', qta: 14 }, { id: 6423, nome: 'Folorunsho', squadra: 'Napoli', qta: 14 }, { id: 2424, nome: 'Loftus-Cheek', squadra: 'Milan', qta: 13 }, { id: 4895, nome: 'Samardzic', squadra: 'Atalanta', qta: 12 }, { id: 601, nome: 'Ferguson', squadra: 'Bologna', qta: 12 }, { id: 6440, nome: 'Suslov', squadra: 'Verona', qta: 11 }, { id: 5988, nome: 'Thorstvedt', squadra: 'Sassuolo', qta: 9 }, { id: 6425, nome: 'Gaetano', squadra: 'Cagliari', qta: 8 }, { id: 6228, nome: 'Ederson', squadra: 'Atalanta', qta: 7 }
-                ]
+                'Top': [],
+                'Buoni': [],
+                'Scommesse': []
             },
             'A': {
-                'Top': [
-                    { id: 2764, nome: 'Martinez L.', squadra: 'Inter', qta: 34 }, { id: 2531, nome: 'Lukaku', squadra: 'Napoli', qta: 31 }, { id: 4871, nome: 'Thuram', squadra: 'Inter', qta: 29 }, { id: 4730, nome: 'Lookman', squadra: 'Atalanta', qta: 29 }, { id: 309, nome: 'Dybala', squadra: 'Roma', qta: 26 }
-                ],
-                'Buoni': [
-                    { id: 2187, nome: 'Vlahovic', squadra: 'Juventus', qta: 23 }, { id: 6422, nome: 'Zirkzee', squadra: 'Milan', qta: 22 }, { id: 4880, nome: 'Scamacca', squadra: 'Atalanta', qta: 21 }, { id: 6408, nome: 'Retegui', squadra: 'Genoa', qta: 20 }, { id: 2426, nome: 'Leao', squadra: 'Milan', qta: 19 }, { id: 605, nome: 'Chiesa', squadra: 'Roma', qta: 19 }, { id: 4881, nome: 'Gonzalez N.', squadra: 'Fiorentina', qta: 18 }
-                ],
-                'Scommesse': [
-                    { id: 5462, nome: 'Zapata D.', squadra: 'Torino', qta: 17 }, { id: 6442, nome: 'Krstovic', squadra: 'Genoa', qta: 16 }, { id: 5519, nome: 'Pinamonti', squadra: 'Torino', qta: 15 }, { id: 2516, nome: 'Kvaratskhelia', squadra: 'Napoli', qta: 14 }, { id: 6632, nome: 'Castellanos', squadra: 'Lazio', qta: 13 }, { id: 4905, nome: 'Lauriente', squadra: 'Sassuolo', qta: 12 }, { id: 6230, nome: 'Lucca', squadra: 'Udinese', qta: 11 }, { id: 6411, nome: 'Noslin', squadra: 'Verona', qta: 9 }, { id: 6430, nome: 'Luvumbo', squadra: 'Cagliari', qta: 8 }
-                ]
+                'Top': [],
+                'Buoni': [],
+                'Scommesse': []
             }
         };
         const teamLogos = {
@@ -249,6 +408,171 @@
             'Verona': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRmXu6r1es26xlsMiRKRQwMLFJPTVQqID_C4g&s'
         };
 
+        // --- FUNZIONI CSV ---
+        function parseCSV(csvText) {
+            const lines = csvText.split('\n');
+            const players = [];
+
+            // Skip the header lines (first 2 lines)
+            for (let i = 2; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (line === '') continue;
+
+                const columns = line.split(',');
+                if (columns.length >= 5) {
+                    const player = {
+                        id: parseInt(columns[0]) || Date.now() + i,
+                        role: columns[1] === 'P' ? 'P' : (columns[1] === 'D' ? 'D' : (columns[1] === 'C' ? 'C' : 'A')),
+                        nome: columns[3],
+                        squadra: columns[4],
+                        qta: parseInt(columns[5]) || 1,
+                        fvm: parseInt(columns[11]) || 0
+                    };
+
+                    // Skip players with quotation = 1 (usually bench players)
+                    if (player.qta > 1 && player.nome && player.squadra) {
+                        players.push(player);
+                    }
+                }
+            }
+
+            return players;
+        }
+
+        function loadCSVData() {
+            const fileInput = document.getElementById('csv-file-input');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert('Seleziona un file CSV prima di caricarlo');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const csvText = e.target.result;
+                csvPlayersData = parseCSV(csvText);
+
+                if (csvPlayersData.length > 0) {
+                    document.getElementById('show-player-selector-btn').classList.remove('hidden');
+                    alert(`Caricati ${csvPlayersData.length} giocatori dal CSV!`);
+                } else {
+                    alert('Nessun giocatore valido trovato nel CSV');
+                }
+            };
+
+            reader.readAsText(file);
+        }
+
+        function showPlayerSelector() {
+            const modal = document.getElementById('player-selector-modal');
+            populateTeamFilter();
+            populatePlayersTable();
+            modal.classList.remove('hidden');
+        }
+
+        function populateTeamFilter() {
+            const teamFilter = document.getElementById('team-filter');
+            const teams = [...new Set(csvPlayersData.map(p => p.squadra))].sort();
+
+            teamFilter.innerHTML = '<option value="">Tutte le squadre</option>';
+            teams.forEach(team => {
+                const option = document.createElement('option');
+                option.value = team;
+                option.textContent = team;
+                teamFilter.appendChild(option);
+            });
+        }
+
+        function getFilteredPlayers() {
+            const roleFilter = document.getElementById('role-filter').value;
+            const teamFilter = document.getElementById('team-filter').value;
+            const nameFilter = document.getElementById('name-filter').value.toLowerCase();
+
+            return csvPlayersData.filter(player => {
+                const matchesRole = !roleFilter || player.role === roleFilter;
+                const matchesTeam = !teamFilter || player.squadra === teamFilter;
+                const matchesName = !nameFilter || player.nome.toLowerCase().includes(nameFilter);
+
+                return matchesRole && matchesTeam && matchesName;
+            });
+        }
+
+        function populatePlayersTable() {
+            const tbody = document.getElementById('players-table-body');
+            const filteredPlayers = getFilteredPlayers();
+
+            tbody.innerHTML = '';
+
+            filteredPlayers.forEach(player => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-700';
+                row.innerHTML = `
+                    <td class="px-3 py-2">
+                        <input type="checkbox" class="player-checkbox rounded" data-player-id="${player.id}">
+                    </td>
+                    <td class="px-3 py-2">${player.nome}</td>
+                    <td class="px-3 py-2">${player.role}</td>
+                    <td class="px-3 py-2">${player.squadra}</td>
+                    <td class="px-3 py-2">${player.qta}</td>
+                    <td class="px-3 py-2">${player.fvm}</td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            updateSelectedCount();
+        }
+
+        function updateSelectedCount() {
+            const checkboxes = document.querySelectorAll('.player-checkbox:checked');
+            document.getElementById('selected-count').textContent = checkboxes.length;
+        }
+
+        function addSelectedPlayers() {
+            const checkboxes = document.querySelectorAll('.player-checkbox:checked');
+            const tierSelector = document.getElementById('tier-selector');
+            const selectedTier = tierSelector.value;
+
+            if (checkboxes.length === 0) {
+                alert('Seleziona almeno un giocatore');
+                return;
+            }
+
+            let addedCount = 0;
+
+            checkboxes.forEach(checkbox => {
+                const playerId = parseInt(checkbox.dataset.playerId);
+                const player = csvPlayersData.find(p => p.id === playerId);
+
+                if (player) {
+                    // Check if player already exists in any tier
+                    const existsInAnyTier = Object.values(playersData[player.role]).some(tier =>
+                        tier.some(p => p.id === player.id)
+                    );
+
+                    if (!existsInAnyTier) {
+                        const playerForList = {
+                            id: player.id,
+                            nome: player.nome,
+                            squadra: player.squadra,
+                            qta: player.qta
+                        };
+
+                        playersData[player.role][selectedTier].push(playerForList);
+                        addedCount++;
+                    }
+                }
+            });
+
+            if (addedCount > 0) {
+                renderPlayers();
+                saveState();
+                alert(`Aggiunti ${addedCount} giocatori alla categoria ${selectedTier}!`);
+            }
+
+            document.getElementById('player-selector-modal').classList.add('hidden');
+        }
+
         // --- STATO DELL'APPLICAZIONE (CARICATO O DI DEFAULT) ---
         let playersData = JSON.parse(JSON.stringify(initialPlayersData)); // Deep copy
         let state = { budget: 500, squad: [], activeRole: 'P', sortOptions: {}, removedPlayers: [] };
@@ -258,8 +582,25 @@
         const playersContainer = document.getElementById('players-container');
         const remainingBudgetEl = document.getElementById('remaining-budget');
         const squadCountEl = document.getElementById('squad-count');
-        const mySquadEl = document.getElementById('my-squad');
         const emptySquadMsgEl = document.getElementById('empty-squad-msg');
+
+        // Squad elements by role
+        const squadSections = {
+            P: document.getElementById('squad-P-section'),
+            D: document.getElementById('squad-D-section'),
+            C: document.getElementById('squad-C-section'),
+            A: document.getElementById('squad-A-section')
+        };
+
+        const squadContainers = {
+            P: document.getElementById('squad-P'),
+            D: document.getElementById('squad-D'),
+            C: document.getElementById('squad-C'),
+            A: document.getElementById('squad-A')
+        };
+
+        const squadSummary = document.getElementById('squad-summary');
+
         const tabs = document.querySelectorAll('.role-tab');
         const addPlayerModal = document.getElementById('add-player-modal');
         const addPlayerForm = document.getElementById('add-player-form');
@@ -270,6 +611,35 @@
         const confirmTitle = document.getElementById('confirm-title');
         const confirmMessage = document.getElementById('confirm-message');
         const resetBtn = document.getElementById('reset-btn');
+
+        // CSV elements
+        const csvFileInput = document.getElementById('csv-file-input');
+        const loadCSVBtn = document.getElementById('load-csv-btn');
+        const showPlayerSelectorBtn = document.getElementById('show-player-selector-btn');
+        const playerSelectorModal = document.getElementById('player-selector-modal');
+        const closePlayerSelectorBtn = document.getElementById('close-player-selector');
+        const cancelPlayerSelectionBtn = document.getElementById('cancel-player-selection');
+        const addSelectedPlayersBtn = document.getElementById('add-selected-players');
+        const selectAllPlayersBtn = document.getElementById('select-all-players');
+        const roleFilter = document.getElementById('role-filter');
+        const teamFilter = document.getElementById('team-filter');
+        const nameFilter = document.getElementById('name-filter');
+
+        // Add player modal elements
+        const csvModeBtn = document.getElementById('csv-mode-btn');
+        const manualModeBtn = document.getElementById('manual-mode-btn');
+        const csvSelectionMode = document.getElementById('csv-selection-mode');
+        const manualInputMode = document.getElementById('manual-input-mode');
+        const csvPlayerFilter = document.getElementById('csv-player-filter');
+        const csvPlayersList = document.getElementById('csv-players-list');
+        const selectedCsvPlayer = document.getElementById('selected-csv-player');
+        const selectedPlayerInfo = document.getElementById('selected-player-info');
+        const saveAddPlayerBtn = document.getElementById('save-add-player');
+
+        // State for add player modal
+        let selectedPlayerFromCSV = null;
+        let currentModalRole = null;
+        let currentModalTier = null;
 
 
         // --- FUNZIONI DI GESTIONE STATO ---
@@ -485,10 +855,14 @@
                 }
             });
 
+            // Update the elements in the header (these still exist)
             for (const role in counts) {
-                document.getElementById(`count-${role}`).textContent = counts[role];
-                document.getElementById(`spent-${role}`).textContent = spent[role];
+                const spentElement = document.getElementById(`spent-${role}`);
+                if (spentElement) {
+                    spentElement.textContent = spent[role];
+                }
             }
+            
             renderMySquad();
         }
 
@@ -529,42 +903,125 @@
         }
 
         function renderMySquad() {
-            emptySquadMsgEl.style.display = state.squad.length === 0 ? 'block' : 'none';
-            mySquadEl.innerHTML = '';
-            if (state.squad.length > 0) {
-                const sortedSquad = state.squad.sort((a, b) => {
-                    const roleOrder = { 'P': 1, 'D': 2, 'C': 3, 'A': 4 };
-                    const playerA = getPlayerById(a.id);
-                    const playerB = getPlayerById(b.id);
-                    if (!playerA || !playerB) return 0;
-                    if (roleOrder[playerA.R] !== roleOrder[playerB.R]) {
-                        return roleOrder[playerA.R] - roleOrder[playerB.R];
-                    }
-                    return b.price - a.price;
-                });
-
-                sortedSquad.forEach(boughtPlayer => {
-                    const playerInfo = getPlayerById(boughtPlayer.id);
-                    if (!playerInfo) return;
-                    const squadCard = document.createElement('div');
-                    squadCard.className = 'bg-gray-800 rounded-lg p-3 flex items-center justify-between shadow';
-                    squadCard.innerHTML = `
-                        <div class="flex items-center">
-                            <img src="${teamLogos[playerInfo.squadra] || 'https://placehold.co/40x40/2d3748/e2e8f0?text=?'}" alt="${playerInfo.squadra}" class="w-7 h-7 mr-3 object-contain rounded-full bg-white/10">
-                            <div>
-                                <p class="font-semibold">${playerInfo.nome} <span class="text-xs text-gray-400">(${playerInfo.R})</span></p>
-                                <p class="text-xs text-gray-500">${playerInfo.squadra}</p>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                           <p class="font-bold text-cyan-400">${boughtPlayer.price}</p>
-                           <button class="sell-btn text-xs text-red-500 hover:text-red-400" data-id="${boughtPlayer.id}" data-price="${boughtPlayer.price}">Vendi</button>
-                        </div>
-                    `;
-                    squadCard.querySelector('.sell-btn').addEventListener('click', sellPlayer);
-                    mySquadEl.appendChild(squadCard);
-                });
+            // Show/hide empty message
+            const hasPlayers = state.squad.length > 0;
+            emptySquadMsgEl.style.display = hasPlayers ? 'none' : 'block';
+            
+            // Check if squadSummary exists before using it
+            if (squadSummary) {
+                squadSummary.classList.toggle('hidden', !hasPlayers);
             }
+
+            // Clear all role containers - check if they exist first
+            Object.values(squadContainers).forEach(container => {
+                if (container) container.innerHTML = '';
+            });
+
+            if (!hasPlayers) {
+                // Hide all role sections
+                Object.values(squadSections).forEach(section => {
+                    if (section) section.classList.add('hidden');
+                });
+                return;
+            }
+
+            // Group players by role
+            const playersByRole = { P: [], D: [], C: [], A: [] };
+            const counts = { P: 0, D: 0, C: 0, A: 0 };
+            const spent = { P: 0, D: 0, C: 0, A: 0 };
+
+            state.squad.forEach(boughtPlayer => {
+                const playerInfo = getPlayerById(boughtPlayer.id);
+                if (playerInfo) {
+                    const role = playerInfo.R;
+                    playersByRole[role].push({ ...boughtPlayer, playerInfo });
+                    counts[role]++;
+                    spent[role] += boughtPlayer.price;
+                }
+            });
+
+            // Render each role section
+            Object.keys(playersByRole).forEach(role => {
+                const players = playersByRole[role];
+                const section = squadSections[role];
+                const container = squadContainers[role];
+
+                if (players.length > 0 && section && container) {
+                    section.classList.remove('hidden');
+
+                    // Sort players by price (highest first)
+                    players.sort((a, b) => b.price - a.price);
+
+                    players.forEach(({ id, price, playerInfo }) => {
+                        const squadCard = createSquadPlayerCard(playerInfo, price, id, role);
+                        container.appendChild(squadCard);
+                    });
+
+                    // Update role counters
+                    const countElement = document.getElementById(`squad-count-${role}`);
+                    const spentElement = document.getElementById(`squad-spent-${role}`);
+                    
+                    if (countElement) countElement.textContent = players.length;
+                    if (spentElement) spentElement.textContent = spent[role];
+                } else if (section) {
+                    section.classList.add('hidden');
+                }
+            });
+
+            // Update summary
+            Object.keys(counts).forEach(role => {
+                const summaryCountElement = document.getElementById(`summary-count-${role}`);
+                const summarySpentElement = document.getElementById(`summary-spent-${role}`);
+                
+                if (summaryCountElement) summaryCountElement.textContent = counts[role];
+                if (summarySpentElement) summarySpentElement.textContent = spent[role];
+            });
+        }
+
+        function createSquadPlayerCard(playerInfo, price, playerId, role) {
+            const roleColors = {
+                P: 'border-blue-500 bg-blue-900/10',
+                D: 'border-green-500 bg-green-900/10',
+                C: 'border-yellow-500 bg-yellow-900/10',
+                A: 'border-red-500 bg-red-900/10'
+            };
+
+            const priceColors = {
+                P: 'text-blue-400',
+                D: 'text-green-400',
+                C: 'text-yellow-400',
+                A: 'text-red-400'
+            };
+
+            const squadCard = document.createElement('div');
+            squadCard.className = `bg-gray-800 rounded-lg p-3 shadow-md border-l-4 ${roleColors[role]} hover:bg-gray-750 transition-colors`;
+
+            squadCard.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center flex-1">
+                        <img src="${teamLogos[playerInfo.squadra] || 'https://placehold.co/40x40/2d3748/e2e8f0?text=?'}" 
+                             alt="${playerInfo.squadra}" 
+                             class="w-8 h-8 mr-3 object-contain rounded-full bg-white/10">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2">
+                                <p class="font-semibold text-white">${playerInfo.nome}</p>
+                                <span class="px-2 py-1 text-xs font-bold rounded-full bg-gray-700 text-gray-300">${role}</span>
+                            </div>
+                            <p class="text-sm text-gray-400">${playerInfo.squadra} • Q.ta: ${playerInfo.qta}</p>
+                        </div>
+                    </div>
+                    <div class="text-right ml-3">
+                        <p class="font-bold text-lg ${priceColors[role]}">€${price}</p>
+                        <button class="sell-btn text-xs text-red-500 hover:text-red-400 font-medium" 
+                                data-id="${playerId}" data-price="${price}">
+                            Vendi
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            squadCard.querySelector('.sell-btn').addEventListener('click', sellPlayer);
+            return squadCard;
         }
 
         function sellPlayer(event) {
@@ -587,9 +1044,170 @@
         }
 
         function showAddPlayerModal(role, tier) {
-            addPlayerForm.dataset.role = role;
-            addPlayerForm.dataset.tier = tier;
+            currentModalRole = role;
+            currentModalTier = tier;
+            selectedPlayerFromCSV = null;
+
+            // Reset modal state
+            csvModeBtn.classList.add('bg-cyan-600');
+            csvModeBtn.classList.remove('bg-gray-600');
+            manualModeBtn.classList.add('bg-gray-600');
+            manualModeBtn.classList.remove('bg-cyan-600');
+            csvSelectionMode.classList.remove('hidden');
+            manualInputMode.classList.add('hidden');
+            selectedCsvPlayer.classList.add('hidden');
+
+            // Populate CSV players for the specific role
+            populateCSVPlayersForRole(role);
+
             addPlayerModal.classList.remove('hidden');
+        }
+
+        function populateCSVPlayersForRole(role) {
+            if (csvPlayersData.length === 0) {
+                csvPlayersList.innerHTML = '<p class="text-gray-400 text-sm">Carica prima un file CSV per vedere i giocatori disponibili.</p>';
+                return;
+            }
+
+            // Filter players by role and exclude already added players
+            const availablePlayers = csvPlayersData.filter(player => {
+                if (player.role !== role) return false;
+
+                // Check if player already exists in any tier
+                const existsInAnyTier = Object.values(playersData[role]).some(tierPlayers =>
+                    tierPlayers.some(p => p.id === player.id)
+                );
+
+                return !existsInAnyTier;
+            });
+
+            if (availablePlayers.length === 0) {
+                csvPlayersList.innerHTML = '<p class="text-gray-400 text-sm">Nessun giocatore disponibile per questo ruolo.</p>';
+                return;
+            }
+
+            renderAvailablePlayers(availablePlayers);
+        }
+
+        function renderAvailablePlayers(players) {
+            csvPlayersList.innerHTML = '';
+
+            players.forEach(player => {
+                const playerDiv = document.createElement('div');
+                playerDiv.className = 'p-2 bg-gray-700 rounded-md hover:bg-gray-600 cursor-pointer player-option';
+                playerDiv.dataset.playerId = player.id;
+
+                playerDiv.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <div class="font-medium">${player.nome}</div>
+                            <div class="text-sm text-gray-400">${player.squadra}</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-bold text-cyan-400">${player.qta}</div>
+                            ${player.fvm ? `<div class="text-xs text-gray-400">FVM: ${player.fvm}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+
+                playerDiv.addEventListener('click', () => selectPlayerFromCSV(player));
+                csvPlayersList.appendChild(playerDiv);
+            });
+        }
+
+        function selectPlayerFromCSV(player) {
+            selectedPlayerFromCSV = player;
+
+            // Update selection visual
+            document.querySelectorAll('.player-option').forEach(el => {
+                el.classList.remove('bg-cyan-600', 'bg-gray-600');
+                el.classList.add('bg-gray-700');
+            });
+
+            const selectedDiv = document.querySelector(`[data-player-id="${player.id}"]`);
+            selectedDiv.classList.remove('bg-gray-700');
+            selectedDiv.classList.add('bg-cyan-600');
+
+            // Show selected player info
+            selectedPlayerInfo.innerHTML = `
+                <div class="flex justify-between items-center">
+                    <div>
+                        <div class="font-medium">${player.nome}</div>
+                        <div class="text-sm text-gray-400">${player.squadra} - ${player.role}</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="font-bold text-cyan-400">Q.ta: ${player.qta}</div>
+                        ${player.fvm ? `<div class="text-xs text-gray-400">FVM: ${player.fvm}</div>` : ''}
+                    </div>
+                </div>
+            `;
+
+            selectedCsvPlayer.classList.remove('hidden');
+        }
+
+        function filterCSVPlayers() {
+            const filterValue = csvPlayerFilter.value.toLowerCase();
+            const playerOptions = document.querySelectorAll('.player-option');
+
+            playerOptions.forEach(option => {
+                const playerName = option.querySelector('.font-medium').textContent.toLowerCase();
+                const playerTeam = option.querySelector('.text-gray-400').textContent.toLowerCase();
+
+                if (playerName.includes(filterValue) || playerTeam.includes(filterValue)) {
+                    option.style.display = 'block';
+                } else {
+                    option.style.display = 'none';
+                }
+            });
+        }
+
+        function addPlayerToList() {
+            if (csvSelectionMode.classList.contains('hidden')) {
+                // Manual mode
+                const name = document.getElementById('new-player-name').value;
+                const team = document.getElementById('new-player-team').value;
+                const qta = parseInt(document.getElementById('new-player-qta').value);
+
+                if (!name || !team || !qta) {
+                    alert('Compila tutti i campi');
+                    return;
+                }
+
+                const newPlayer = {
+                    id: Date.now(),
+                    nome: name,
+                    squadra: team,
+                    qta: qta
+                };
+
+                playersData[currentModalRole][currentModalTier].push(newPlayer);
+            } else {
+                // CSV mode
+                if (!selectedPlayerFromCSV) {
+                    alert('Seleziona un giocatore dalla lista');
+                    return;
+                }
+
+                const playerForList = {
+                    id: selectedPlayerFromCSV.id,
+                    nome: selectedPlayerFromCSV.nome,
+                    squadra: selectedPlayerFromCSV.squadra,
+                    qta: selectedPlayerFromCSV.qta
+                };
+
+                playersData[currentModalRole][currentModalTier].push(playerForList);
+            }
+
+            renderTierContent(currentModalTier, playersData[currentModalRole][currentModalTier]);
+            addPlayerModal.classList.add('hidden');
+
+            // Reset form
+            document.getElementById('new-player-name').value = '';
+            document.getElementById('new-player-team').value = '';
+            document.getElementById('new-player-qta').value = '';
+            selectedPlayerFromCSV = null;
+
+            saveState();
         }
 
         function deletePlayer() {
@@ -660,26 +1278,33 @@
             }
         });
 
-        addPlayerForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const role = e.target.dataset.role;
-            const tier = e.target.dataset.tier;
-            const newPlayer = {
-                id: Date.now(),
-                nome: document.getElementById('new-player-name').value,
-                squadra: document.getElementById('new-player-team').value,
-                qta: parseInt(document.getElementById('new-player-qta').value)
-            };
-            playersData[role][tier].push(newPlayer);
-            renderTierContent(tier, playersData[role][tier]);
-
-            addPlayerForm.reset();
-            addPlayerModal.classList.add('hidden');
-            saveState();
+        // Add player modal event listeners
+        csvModeBtn.addEventListener('click', () => {
+            csvModeBtn.classList.add('bg-cyan-600');
+            csvModeBtn.classList.remove('bg-gray-600');
+            manualModeBtn.classList.add('bg-gray-600');
+            manualModeBtn.classList.remove('bg-cyan-600');
+            csvSelectionMode.classList.remove('hidden');
+            manualInputMode.classList.add('hidden');
         });
 
+        manualModeBtn.addEventListener('click', () => {
+            manualModeBtn.classList.add('bg-cyan-600');
+            manualModeBtn.classList.remove('bg-gray-600');
+            csvModeBtn.classList.add('bg-gray-600');
+            csvModeBtn.classList.remove('bg-cyan-600');
+            manualInputMode.classList.remove('hidden');
+            csvSelectionMode.classList.add('hidden');
+        });
+
+        csvPlayerFilter.addEventListener('input', filterCSVPlayers);
+        saveAddPlayerBtn.addEventListener('click', addPlayerToList);
+
         cancelAddPlayerBtn.addEventListener('click', () => {
-            addPlayerForm.reset();
+            document.getElementById('new-player-name').value = '';
+            document.getElementById('new-player-team').value = '';
+            document.getElementById('new-player-qta').value = '';
+            selectedPlayerFromCSV = null;
             addPlayerModal.classList.add('hidden');
         });
 
@@ -694,6 +1319,54 @@
                 'Reset',
                 resetState
             );
+        });
+
+        // CSV Event Listeners
+        csvFileInput.addEventListener('change', () => {
+            loadCSVBtn.disabled = !csvFileInput.files[0];
+        });
+
+        loadCSVBtn.addEventListener('click', loadCSVData);
+        showPlayerSelectorBtn.addEventListener('click', showPlayerSelector);
+        closePlayerSelectorBtn.addEventListener('click', () => {
+            playerSelectorModal.classList.add('hidden');
+        });
+        cancelPlayerSelectionBtn.addEventListener('click', () => {
+            playerSelectorModal.classList.add('hidden');
+        });
+        addSelectedPlayersBtn.addEventListener('click', addSelectedPlayers);
+
+        // Filter event listeners
+        roleFilter.addEventListener('change', populatePlayersTable);
+        teamFilter.addEventListener('change', populatePlayersTable);
+        nameFilter.addEventListener('input', populatePlayersTable);
+
+        // Select all functionality
+        selectAllPlayersBtn.addEventListener('change', (e) => {
+            const checkboxes = document.querySelectorAll('.player-checkbox');
+            checkboxes.forEach(cb => cb.checked = e.target.checked);
+            updateSelectedCount();
+        });
+
+        // Update count when individual checkboxes change
+        document.addEventListener('change', (e) => {
+            if (e.target.classList.contains('player-checkbox')) {
+                updateSelectedCount();
+
+                // Update select all checkbox state
+                const allCheckboxes = document.querySelectorAll('.player-checkbox');
+                const checkedCheckboxes = document.querySelectorAll('.player-checkbox:checked');
+
+                if (checkedCheckboxes.length === 0) {
+                    selectAllPlayersBtn.indeterminate = false;
+                    selectAllPlayersBtn.checked = false;
+                } else if (checkedCheckboxes.length === allCheckboxes.length) {
+                    selectAllPlayersBtn.indeterminate = false;
+                    selectAllPlayersBtn.checked = true;
+                } else {
+                    selectAllPlayersBtn.indeterminate = true;
+                }
+            }
         });
 
     </script>

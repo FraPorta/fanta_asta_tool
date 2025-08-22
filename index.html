@@ -205,8 +205,8 @@
                     class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg hidden">Seleziona
                     Giocatori</button>
             </div>
-            <p class="text-sm text-gray-400 mt-2">Carica il file CSV con le quotazioni ufficiali per importare
-                automaticamente tutti i giocatori.</p>
+            <p class="text-sm text-gray-400 mt-2">Carica qualsiasi file CSV con le quotazioni Fantacalcio. Il file deve
+                contenere colonne per ID, Ruolo, Nome, Squadra, Quotazione e FVM.</p>
         </div>
 
         <!-- TABS PER RUOLI -->
@@ -465,7 +465,7 @@
                 if (line === '') continue;
 
                 const columns = line.split(',');
-                if (columns.length >= 5) {
+                if (columns.length >= 12) {
                     const player = {
                         id: parseInt(columns[0]) || Date.now() + i,
                         role: columns[1] === 'P' ? 'P' : (columns[1] === 'D' ? 'D' : (columns[1] === 'C' ? 'C' : 'A')),
@@ -475,13 +475,14 @@
                         fvm: parseInt(columns[11]) || 0
                     };
 
-                    // Skip players with quotation = 1 (usually bench players)
-                    if (player.qta > 1 && player.nome && player.squadra) {
+                    // Include all players with valid name and team (removed quotation filter)
+                    if (player.nome && player.squadra && player.nome.trim() !== '' && player.squadra.trim() !== '') {
                         players.push(player);
                     }
                 }
             }
 
+            console.log(`Parsed ${players.length} players from CSV`);
             return players;
         }
 
@@ -494,17 +495,33 @@
                 return;
             }
 
+            // Check file type
+            if (!file.name.toLowerCase().endsWith('.csv')) {
+                alert('Seleziona un file CSV valido (.csv)');
+                return;
+            }
+
             const reader = new FileReader();
             reader.onload = function (e) {
-                const csvText = e.target.result;
-                csvPlayersData = parseCSV(csvText);
+                try {
+                    const csvText = e.target.result;
+                    csvPlayersData = parseCSV(csvText);
 
-                if (csvPlayersData.length > 0) {
-                    document.getElementById('show-player-selector-btn').classList.remove('hidden');
-                    alert(`Caricati ${csvPlayersData.length} giocatori dal CSV!`);
-                } else {
-                    alert('Nessun giocatore valido trovato nel CSV');
+                    if (csvPlayersData.length > 0) {
+                        document.getElementById('show-player-selector-btn').classList.remove('hidden');
+                        alert(`✅ Caricati ${csvPlayersData.length} giocatori dal CSV "${file.name}"!`);
+                        console.log('Players loaded:', csvPlayersData.slice(0, 5)); // Log first 5 for debugging
+                    } else {
+                        alert('❌ Nessun giocatore valido trovato nel CSV. Verifica che il formato sia corretto.');
+                    }
+                } catch (error) {
+                    console.error('Error parsing CSV:', error);
+                    alert('❌ Errore nel parsing del CSV. Verifica che il formato sia corretto.');
                 }
+            };
+
+            reader.onerror = function () {
+                alert('❌ Errore nel caricamento del file.');
             };
 
             reader.readAsText(file);

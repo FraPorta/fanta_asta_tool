@@ -647,7 +647,7 @@
 
         // --- STATO DELL'APPLICAZIONE (CARICATO O DI DEFAULT) ---
         let playersData = JSON.parse(JSON.stringify(initialPlayersData)); // Deep copy
-        let state = { budget: 500, squad: [], activeRole: 'P', sortOptions: {}, removedPlayers: [], searchQuery: '' };
+        let state = { budget: 500, squad: [], activeRole: 'P', sortOptions: {}, removedPlayers: [], searchQuery: '', viewMode: 'large' };
         let playerToDelete = { id: null, role: null, tier: null };
 
         // --- ELEMENTI DEL DOM ---
@@ -754,6 +754,43 @@
             location.reload();
         }
 
+        // --- HELPER FUNCTIONS FOR VIEW MODES ---
+        function getTierContainerClass() {
+            switch (state.viewMode) {
+                case 'large':
+                    return 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4';
+                case 'small':
+                    return 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3';
+                case 'list':
+                    return 'space-y-2';
+                default:
+                    return 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4';
+            }
+        }
+
+        function updateViewMode() {
+            // Update button states
+            const buttons = ['view-large', 'view-small', 'view-list'];
+            buttons.forEach(btnId => {
+                const btn = document.getElementById(btnId);
+                if (btn) {
+                    const isActive = (btnId === `view-${state.viewMode}`);
+                    btn.className = `px-3 py-1 text-xs rounded-md transition-colors ${isActive ? 'bg-cyan-600 text-white' : 'text-gray-400 hover:text-white'
+                        }`;
+                }
+            });
+
+            // Update tier containers
+            const roleData = playersData[state.activeRole];
+            for (const tier in roleData) {
+                const tierContainer = document.getElementById(`tier-container-${tier}`);
+                if (tierContainer) {
+                    tierContainer.className = getTierContainerClass();
+                    renderTierContent(tier, roleData[tier]);
+                }
+            }
+        }
+
         // --- FUNZIONI DI RENDER ---
         function renderPlayers() {
             playersContainer.innerHTML = '';
@@ -769,24 +806,46 @@
             const searchEl = document.createElement('div');
             searchEl.className = 'bg-gray-800 p-4 rounded-lg mb-4';
             searchEl.innerHTML = `
-                <div class="flex items-center space-x-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                    <input 
-                        type="text" 
-                        id="player-search-input"
-                        placeholder="Cerca giocatori nella tua lista..." 
-                        value="${state.searchQuery}"
-                        class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
-                    >
-                    ${state.searchQuery ? `
-                        <button id="clear-search-btn" class="text-gray-400 hover:text-white transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    ` : ''}
+                <div class="flex flex-col space-y-3">
+                    <div class="flex items-center space-x-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        <input 
+                            type="text" 
+                            id="player-search-input"
+                            placeholder="Cerca giocatori nella tua lista..." 
+                            value="${state.searchQuery}"
+                            class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                        >
+                        ${state.searchQuery ? `
+                            <button id="clear-search-btn" class="text-gray-400 hover:text-white transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        ` : ''}
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-400">Modalità visualizzazione:</span>
+                        <div class="flex bg-gray-700 rounded-lg p-1">
+                            <button id="view-large" class="px-3 py-1 text-xs rounded-md transition-colors ${state.viewMode === 'large' ? 'bg-cyan-600 text-white' : 'text-gray-400 hover:text-white'}" title="Card Grandi">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                </svg>
+                            </button>
+                            <button id="view-small" class="px-3 py-1 text-xs rounded-md transition-colors ${state.viewMode === 'small' ? 'bg-cyan-600 text-white' : 'text-gray-400 hover:text-white'}" title="Card Piccole">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14v6m-3-3h6M6 10h2a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2zm10 0h2a2 2 0 002-2V6a2 2 0 00-2-2h-2a2 2 0 00-2 2v2a2 2 0 002 2zM6 20h2a2 2 0 002-2v-2a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2z" />
+                                </svg>
+                            </button>
+                            <button id="view-list" class="px-3 py-1 text-xs rounded-md transition-colors ${state.viewMode === 'list' ? 'bg-cyan-600 text-white' : 'text-gray-400 hover:text-white'}" title="Lista">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             `;
             playersContainer.appendChild(searchEl);
@@ -796,11 +855,11 @@
             searchInput.addEventListener('input', (e) => {
                 const cursorPosition = e.target.selectionStart;
                 state.searchQuery = e.target.value;
-                
+
                 // Update clear button visibility
                 const searchContainer = searchInput.parentElement;
                 const existingClearBtn = document.getElementById('clear-search-btn');
-                
+
                 if (state.searchQuery && !existingClearBtn) {
                     // Add clear button
                     const clearBtn = document.createElement('button');
@@ -821,7 +880,7 @@
                     // Remove clear button
                     existingClearBtn.remove();
                 }
-                
+
                 // Update only the tier contents and headers
                 const roleData = playersData[state.activeRole];
                 for (const tier in roleData) {
@@ -830,29 +889,29 @@
                     if (tierHeaders.length > 0) {
                         const tierHeader = tierHeaders[0].closest('.flex');
                         const countSpan = tierHeader?.querySelector('span');
-                        
+
                         if (countSpan) {
                             let filteredCount = roleData[tier].length;
                             if (state.searchQuery && state.searchQuery.trim() !== '') {
                                 const searchTerm = state.searchQuery.toLowerCase().trim();
-                                filteredCount = roleData[tier].filter(player => 
-                                    player.nome.toLowerCase().includes(searchTerm) || 
+                                filteredCount = roleData[tier].filter(player =>
+                                    player.nome.toLowerCase().includes(searchTerm) ||
                                     player.squadra.toLowerCase().includes(searchTerm)
                                 ).length;
                             }
-                            
-                            countSpan.textContent = state.searchQuery && state.searchQuery.trim() !== '' ? 
-                                `${filteredCount}/${roleData[tier].length} giocatori` : 
+
+                            countSpan.textContent = state.searchQuery && state.searchQuery.trim() !== '' ?
+                                `${filteredCount}/${roleData[tier].length} giocatori` :
                                 `${roleData[tier].length} giocatori`;
                         }
                     }
-                    
+
                     // Update tier content
                     renderTierContent(tier, roleData[tier]);
                 }
-                
+
                 saveState();
-                
+
                 // Restore cursor position and focus
                 setTimeout(() => {
                     const newSearchInput = document.getElementById('player-search-input');
@@ -872,6 +931,25 @@
                 });
             }
 
+            // Add event listeners for view mode buttons
+            document.getElementById('view-large').addEventListener('click', () => {
+                state.viewMode = 'large';
+                updateViewMode();
+                saveState();
+            });
+
+            document.getElementById('view-small').addEventListener('click', () => {
+                state.viewMode = 'small';
+                updateViewMode();
+                saveState();
+            });
+
+            document.getElementById('view-list').addEventListener('click', () => {
+                state.viewMode = 'list';
+                updateViewMode();
+                saveState();
+            });
+
             for (const tier in roleData) {
                 const sortKey = `${state.activeRole}-${tier}`;
                 if (!state.sortOptions[sortKey]) {
@@ -882,8 +960,8 @@
                 let filteredCount = roleData[tier].length;
                 if (state.searchQuery && state.searchQuery.trim() !== '') {
                     const searchTerm = state.searchQuery.toLowerCase().trim();
-                    filteredCount = roleData[tier].filter(player => 
-                        player.nome.toLowerCase().includes(searchTerm) || 
+                    filteredCount = roleData[tier].filter(player =>
+                        player.nome.toLowerCase().includes(searchTerm) ||
                         player.squadra.toLowerCase().includes(searchTerm)
                     ).length;
                 }
@@ -894,10 +972,10 @@
                     <div class="flex items-center space-x-3">
                         <h3 class="text-xl font-bold text-amber-400">${tier}</h3>
                         <span class="text-sm text-gray-400">
-                            ${state.searchQuery && state.searchQuery.trim() !== '' ? 
-                                `${filteredCount}/${roleData[tier].length} giocatori` : 
-                                `${roleData[tier].length} giocatori`
-                            }
+                            ${state.searchQuery && state.searchQuery.trim() !== '' ?
+                        `${filteredCount}/${roleData[tier].length} giocatori` :
+                        `${roleData[tier].length} giocatori`
+                    }
                         </span>
                     </div>
                     <div class="flex space-x-2" data-tier="${tier}">
@@ -909,7 +987,7 @@
 
                 const tierContainer = document.createElement('div');
                 tierContainer.id = `tier-container-${tier}`;
-                tierContainer.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4';
+                tierContainer.className = getTierContainerClass();
                 playersContainer.appendChild(tierContainer);
 
                 renderTierContent(tier, roleData[tier]);
@@ -935,8 +1013,8 @@
             let filteredPlayers = players;
             if (state.searchQuery && state.searchQuery.trim() !== '') {
                 const searchTerm = state.searchQuery.toLowerCase().trim();
-                filteredPlayers = players.filter(player => 
-                    player.nome.toLowerCase().includes(searchTerm) || 
+                filteredPlayers = players.filter(player =>
+                    player.nome.toLowerCase().includes(searchTerm) ||
                     player.squadra.toLowerCase().includes(searchTerm)
                 );
             }
@@ -988,8 +1066,21 @@
             const card = document.createElement('div');
             card.id = `player-${player.id}`;
             const isRemoved = state.removedPlayers.includes(player.id);
-            card.className = `player-card bg-gray-800 rounded-lg p-4 shadow-md flex flex-col justify-between relative ${isBoughtByMe ? 'bought-by-me' : ''} ${isRemoved ? 'bought' : ''}`;
             const recommendedPrice = calculateRecommendedPrice(player, tier);
+
+            if (state.viewMode === 'list') {
+                return createListPlayerCard(player, isBoughtByMe, role, tier, isRemoved, recommendedPrice);
+            } else if (state.viewMode === 'small') {
+                return createSmallPlayerCard(player, isBoughtByMe, role, tier, isRemoved, recommendedPrice);
+            } else {
+                return createLargePlayerCard(player, isBoughtByMe, role, tier, isRemoved, recommendedPrice);
+            }
+        }
+
+        function createLargePlayerCard(player, isBoughtByMe, role, tier, isRemoved, recommendedPrice) {
+            const card = document.createElement('div');
+            card.id = `player-${player.id}`;
+            card.className = `player-card bg-gray-800 rounded-lg p-4 shadow-md flex flex-col justify-between relative ${isBoughtByMe ? 'bought-by-me' : ''} ${isRemoved ? 'bought' : ''}`;
 
             card.innerHTML = `
                 <button class="absolute top-2 right-2 text-red-500 hover:text-red-400 permanent-delete-btn" data-id="${player.id}" data-role="${role}" data-tier="${tier}" data-name="${player.nome}">
@@ -1026,13 +1117,98 @@
                 </div>
             `;
 
+            addPlayerCardEventListeners(card, player);
+            return card;
+        }
+
+        function createSmallPlayerCard(player, isBoughtByMe, role, tier, isRemoved, recommendedPrice) {
+            const card = document.createElement('div');
+            card.id = `player-${player.id}`;
+            card.className = `player-card bg-gray-800 rounded-lg p-3 shadow-md flex flex-col justify-between relative ${isBoughtByMe ? 'bought-by-me' : ''} ${isRemoved ? 'bought' : ''}`;
+
+            card.innerHTML = `
+                <button class="absolute top-1 right-1 text-red-500 hover:text-red-400 permanent-delete-btn" data-id="${player.id}" data-role="${role}" data-tier="${tier}" data-name="${player.nome}">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+                <div>
+                    <div class="flex items-center mb-2">
+                        <img src="${teamLogos[player.squadra] || 'https://placehold.co/40x40/2d3748/e2e8f0?text=?'}" alt="${player.squadra}" class="w-6 h-6 mr-2 object-contain rounded-full bg-white/10">
+                        <div class="flex-1 min-w-0">
+                            <p class="font-bold text-sm truncate">${player.nome}</p>
+                            <p class="text-xs text-gray-400 truncate">${player.squadra}</p>
+                        </div>
+                    </div>
+                    <div class="text-center mb-2">
+                        <span class="text-xs text-gray-400">Q.ta: </span>
+                        <span class="font-semibold text-cyan-400 text-sm">${player.qta}</span>
+                    </div>
+                    <div class="space-y-1">
+                        <input type="number" id="paid-price-${player.id}" value="${player.qta}" placeholder="Prezzo" class="w-full bg-gray-900 border border-gray-600 rounded p-1 text-center text-white text-xs focus:ring-1 focus:ring-cyan-500">
+                    </div>
+                </div>
+                <div class="mt-2 flex space-x-1">
+                    <button class="buy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-2 rounded w-full transition-colors text-xs" data-id="${player.id}">Compra</button>
+                    <button class="toggle-remove-btn ${isRemoved ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-red-600 hover:bg-red-700'} text-white font-bold py-1 px-2 rounded w-full transition-colors text-xs">${isRemoved ? 'Ripr.' : 'Rim.'}</button>
+                </div>
+            `;
+
+            addPlayerCardEventListeners(card, player);
+            return card;
+        }
+
+        function createListPlayerCard(player, isBoughtByMe, role, tier, isRemoved, recommendedPrice) {
+            const card = document.createElement('div');
+            card.id = `player-${player.id}`;
+            card.className = `player-card bg-gray-800 rounded-lg p-3 shadow-md relative ${isBoughtByMe ? 'bought-by-me' : ''} ${isRemoved ? 'bought' : ''}`;
+
+            card.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center flex-1">
+                        <img src="${teamLogos[player.squadra] || 'https://placehold.co/40x40/2d3748/e2e8f0?text=?'}" alt="${player.squadra}" class="w-8 h-8 mr-3 object-contain rounded-full bg-white/10">
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-3">
+                                <p class="font-bold text-lg">${player.nome}</p>
+                                <p class="text-sm text-gray-400">${player.squadra}</p>
+                                <span class="text-xs bg-gray-700 px-2 py-1 rounded">Q.ta: ${player.qta}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <div class="flex items-center space-x-2">
+                            <input type="number" id="paid-price-${player.id}" value="${player.qta}" class="w-20 bg-gray-900 border border-gray-600 rounded p-1 text-center text-white text-sm focus:ring-2 focus:ring-cyan-500" placeholder="Prezzo">
+                            <button class="buy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-3 rounded transition-colors text-sm" data-id="${player.id}">Compra</button>
+                            <button class="toggle-remove-btn ${isRemoved ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-red-600 hover:bg-red-700'} text-white font-bold py-1 px-3 rounded transition-colors text-sm">${isRemoved ? 'Ripristina' : 'Rimuovi'}</button>
+                        </div>
+                        <button class="text-red-500 hover:text-red-400 permanent-delete-btn" data-id="${player.id}" data-role="${role}" data-tier="${tier}" data-name="${player.nome}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            addPlayerCardEventListeners(card, player);
+            return card;
+        }
+
+        function addPlayerCardEventListeners(card, player) {
+            const isBoughtByMe = state.squad.find(p => p.id === player.id);
+            const isRemoved = state.removedPlayers.includes(player.id);
+
             if (isBoughtByMe) {
-                card.querySelector('.buy-btn').disabled = true;
-                card.querySelector('.buy-btn').textContent = 'Acquistato';
-                card.querySelector('.buy-btn').classList.replace('bg-green-600', 'bg-gray-600');
+                const buyBtn = card.querySelector('.buy-btn');
+                if (buyBtn) {
+                    buyBtn.disabled = true;
+                    buyBtn.textContent = 'Acquistato';
+                    buyBtn.classList.replace('bg-green-600', 'bg-gray-600');
+                }
             }
 
             card.querySelector('.buy-btn').addEventListener('click', () => buyPlayer(player.id));
+
             card.querySelector('.toggle-remove-btn').addEventListener('click', (e) => {
                 const card = e.currentTarget.closest('.player-card');
                 const button = e.currentTarget;
@@ -1052,21 +1228,26 @@
                 }
                 saveState();
             });
+
             card.querySelector('.permanent-delete-btn').addEventListener('click', (e) => {
                 const button = e.currentTarget;
+                const playerId = parseInt(button.dataset.id);
+                const role = button.dataset.role;
+                const tier = button.dataset.tier;
+                const name = button.dataset.name;
+
                 showConfirmModal(
                     'Conferma Eliminazione',
-                    `Sei sicuro di voler eliminare ${button.dataset.name} dalla lista? L'azione è irreversibile.`,
+                    `Sei sicuro di voler eliminare ${name} dalla lista? L'azione è irreversibile.`,
                     'Elimina',
                     () => {
-                        playerToDelete.id = parseInt(button.dataset.id);
-                        playerToDelete.role = button.dataset.role;
-                        playerToDelete.tier = button.dataset.tier;
+                        playerToDelete.id = playerId;
+                        playerToDelete.role = role;
+                        playerToDelete.tier = tier;
                         deletePlayer();
                     }
                 );
             });
-            return card;
         }
 
         function updateUI() {

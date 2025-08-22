@@ -557,7 +557,14 @@
                 const matchesTeam = !teamFilter || player.squadra === teamFilter;
                 const matchesName = !nameFilter || player.nome.toLowerCase().includes(nameFilter);
 
-                return matchesRole && matchesTeam && matchesName;
+                // Check if player already exists in any tier of any role (exclude already added players)
+                const existsInAnyTier = Object.values(playersData).some(roleData =>
+                    Object.values(roleData).some(tierPlayers =>
+                        tierPlayers.some(p => p.id === player.id)
+                    )
+                );
+
+                return matchesRole && matchesTeam && matchesName && !existsInAnyTier;
             });
         }
 
@@ -630,6 +637,8 @@
             if (addedCount > 0) {
                 renderPlayers();
                 saveState();
+                // Update the players table to remove added players from the list
+                populatePlayersTable();
                 alert(`Aggiunti ${addedCount} giocatori alla categoria ${selectedTier}!`);
             }
 

@@ -601,6 +601,7 @@
                         document.getElementById('show-player-selector-btn').classList.remove('hidden');
                         alert(`✅ Caricati ${csvPlayersData.length} giocatori dal CSV "${file.name}"!`);
                         console.log('Players loaded:', csvPlayersData.slice(0, 5)); // Log first 5 for debugging
+                        saveState(); // Salva lo stato con i dati CSV
                     } else {
                         alert('❌ Nessun giocatore valido trovato nel CSV. Verifica che il formato sia corretto.');
                     }
@@ -821,7 +822,8 @@
         function saveState() {
             const appState = {
                 state: state,
-                playersData: playersData
+                playersData: playersData,
+                csvPlayersData: csvPlayersData
             };
             localStorage.setItem('fantacalcioAppState', JSON.stringify(appState));
         }
@@ -833,6 +835,13 @@
                     const appState = JSON.parse(savedData);
                     state = appState.state;
                     playersData = appState.playersData;
+                    
+                    // Carica anche i dati CSV se disponibili
+                    if (appState.csvPlayersData && appState.csvPlayersData.length > 0) {
+                        csvPlayersData = appState.csvPlayersData;
+                        // Mostra il bottone per aprire il selettore di giocatori
+                        document.getElementById('show-player-selector-btn').classList.remove('hidden');
+                    }
                 } catch (e) {
                     console.error("Errore nel caricamento dello stato, resetto.", e);
                     resetState();

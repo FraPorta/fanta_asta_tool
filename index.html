@@ -290,6 +290,9 @@
                 <button id="show-player-selector-btn"
                     class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 sm:px-6 rounded-lg hidden text-sm sm:text-base min-h-[48px]">Seleziona
                     Giocatori</button>
+                <button id="populate-others-btn"
+                    class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-4 sm:px-6 rounded-lg hidden text-sm sm:text-base min-h-[48px]">Popola
+                    "Altri"</button>
             </div>
             <p class="text-sm text-gray-400 mt-2">Carica qualsiasi file CSV con le quotazioni Fantacalcio. Il file deve
                 contenere colonne per ID, Ruolo, Nome, Squadra, Quotazione e FVM.</p>
@@ -355,6 +358,7 @@
                     <option value="Top">Top</option>
                     <option value="Buoni">Buoni</option>
                     <option value="Scommesse">Scommesse</option>
+                    <option value="Altri">Altri</option>
                 </select>
             </div>
 
@@ -503,22 +507,26 @@
             'P': {
                 'Top': [],
                 'Buoni': [],
-                'Scommesse': []
+                'Scommesse': [],
+                'Altri': []
             },
             'D': {
                 'Top': [],
                 'Buoni': [],
-                'Scommesse': []
+                'Scommesse': [],
+                'Altri': []
             },
             'C': {
                 'Top': [],
                 'Buoni': [],
-                'Scommesse': []
+                'Scommesse': [],
+                'Altri': []
             },
             'A': {
                 'Top': [],
                 'Buoni': [],
-                'Scommesse': []
+                'Scommesse': [],
+                'Altri': []
             }
         };
         const teamLogos = {
@@ -599,6 +607,7 @@
 
                     if (csvPlayersData.length > 0) {
                         document.getElementById('show-player-selector-btn').classList.remove('hidden');
+                        document.getElementById('populate-others-btn').classList.remove('hidden');
                         alert(`✅ Caricati ${csvPlayersData.length} giocatori dal CSV "${file.name}"!`);
                         console.log('Players loaded:', csvPlayersData.slice(0, 5)); // Log first 5 for debugging
                         saveState(); // Salva lo stato con i dati CSV
@@ -737,6 +746,43 @@
             document.getElementById('player-selector-modal').classList.add('hidden');
         }
 
+        function populateOthersCategory() {
+            if (csvPlayersData.length === 0) {
+                alert('Carica prima un file CSV!');
+                return;
+            }
+
+            let addedCount = 0;
+
+            csvPlayersData.forEach(player => {
+                // Check if player already exists in any tier of any role
+                const existsInAnyTier = Object.values(playersData[player.role]).some(tier =>
+                    tier.some(p => p.id === player.id)
+                );
+
+                if (!existsInAnyTier) {
+                    const playerForList = {
+                        id: player.id,
+                        nome: player.nome,
+                        squadra: player.squadra,
+                        qta: player.qta,
+                        role: player.role
+                    };
+
+                    playersData[player.role]['Altri'].push(playerForList);
+                    addedCount++;
+                }
+            });
+
+            if (addedCount > 0) {
+                renderPlayers();
+                saveState();
+                alert(`Aggiunti ${addedCount} giocatori rimanenti nella categoria "Altri"!`);
+            } else {
+                alert('Tutti i giocatori sono già stati aggiunti alle categorie!');
+            }
+        }
+
         // --- STATO DELL'APPLICAZIONE (CARICATO O DI DEFAULT) ---
         let playersData = JSON.parse(JSON.stringify(initialPlayersData)); // Deep copy
         let state = { budget: 500, squad: [], activeRole: 'P', sortOptions: {}, removedPlayers: [], searchQuery: '', viewMode: 'large', favorites: [] };
@@ -780,6 +826,7 @@
         const csvFileInput = document.getElementById('csv-file-input');
         const loadCSVBtn = document.getElementById('load-csv-btn');
         const showPlayerSelectorBtn = document.getElementById('show-player-selector-btn');
+        const populateOthersBtn = document.getElementById('populate-others-btn');
         const playerSelectorModal = document.getElementById('player-selector-modal');
         const closePlayerSelectorBtn = document.getElementById('close-player-selector');
         const cancelPlayerSelectionBtn = document.getElementById('cancel-player-selection');
@@ -839,8 +886,9 @@
                     // Carica anche i dati CSV se disponibili
                     if (appState.csvPlayersData && appState.csvPlayersData.length > 0) {
                         csvPlayersData = appState.csvPlayersData;
-                        // Mostra il bottone per aprire il selettore di giocatori
+                        // Mostra i bottoni per aprire il selettore di giocatori e popolare "Altri"
                         document.getElementById('show-player-selector-btn').classList.remove('hidden');
+                        document.getElementById('populate-others-btn').classList.remove('hidden');
                     }
                 } catch (e) {
                     console.error("Errore nel caricamento dello stato, resetto.", e);
@@ -1171,10 +1219,16 @@
                     'D': 1.2,    // Difensori: 1.2x
                     'C': 1.5,    // Centrocampisti: 1.5x
                     'A': 2.0     // Attaccanti: 2x
+                },
+                'Altri': {
+                    'P': 1.0,    // Portieri: prezzo base
+                    'D': 1.0,    // Difensori: prezzo base
+                    'C': 1.0,    // Centrocampisti: prezzo base
+                    'A': 1.0     // Attaccanti: prezzo base
                 }
             };
 
-            const roleMultiplier = multipliers[tier]?.[player.role] || 1.2; // fallback
+            const roleMultiplier = multipliers[tier]?.[player.role] || 1.0; // fallback per Altri
             return Math.round(qta * roleMultiplier);
         }
 
@@ -2149,6 +2203,7 @@
 
         loadCSVBtn.addEventListener('click', loadCSVData);
         showPlayerSelectorBtn.addEventListener('click', showPlayerSelector);
+        populateOthersBtn.addEventListener('click', populateOthersCategory);
         closePlayerSelectorBtn.addEventListener('click', () => {
             playerSelectorModal.classList.add('hidden');
         });

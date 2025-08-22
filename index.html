@@ -715,7 +715,8 @@
                             id: player.id,
                             nome: player.nome,
                             squadra: player.squadra,
-                            qta: player.qta
+                            qta: player.qta,
+                            role: player.role
                         };
 
                         playersData[player.role][selectedTier].push(playerForList);
@@ -1142,14 +1143,30 @@
             const qta = player.qta;
             if (qta === 1) return 1;
 
-            let multiplier = 1.2; // Scommesse
-            if (tier === 'Top') {
-                multiplier = 2.2;
-            } else if (tier === 'Buoni') {
-                multiplier = 1.6;
-            }
+            // Moltiplicatori differenziati per ruolo e tier
+            const multipliers = {
+                'Top': {
+                    'P': 2.0,    // Portieri: 2x (es. 7 → 14)
+                    'D': 2.5,    // Difensori: 2.5x (es. 20 → 50)
+                    'C': 3.5,    // Centrocampisti: 3.5x (es. 30 → 105)
+                    'A': 4.5     // Attaccanti: 4.5x (es. 45 → 200)
+                },
+                'Buoni': {
+                    'P': 1.5,    // Portieri: 1.5x
+                    'D': 2.0,    // Difensori: 2x
+                    'C': 2.5,    // Centrocampisti: 2.5x
+                    'A': 3.0     // Attaccanti: 3x
+                },
+                'Scommesse': {
+                    'P': 1.0,    // Portieri: prezzo base
+                    'D': 1.2,    // Difensori: 1.2x
+                    'C': 1.5,    // Centrocampisti: 1.5x
+                    'A': 2.0     // Attaccanti: 2x
+                }
+            };
 
-            return Math.round(qta * multiplier);
+            const roleMultiplier = multipliers[tier]?.[player.role] || 1.2; // fallback
+            return Math.round(qta * roleMultiplier);
         }
 
         function createPlayerCard(player, isBoughtByMe = false, role, tier) {
@@ -1824,7 +1841,8 @@
                     id: Date.now(),
                     nome: name,
                     squadra: team,
-                    qta: qta
+                    qta: qta,
+                    role: currentModalRole
                 };
 
                 playersData[currentModalRole][currentModalTier].push(newPlayer);
@@ -1839,7 +1857,8 @@
                     id: selectedPlayerFromCSV.id,
                     nome: selectedPlayerFromCSV.nome,
                     squadra: selectedPlayerFromCSV.squadra,
-                    qta: selectedPlayerFromCSV.qta
+                    qta: selectedPlayerFromCSV.qta,
+                    role: selectedPlayerFromCSV.role
                 };
 
                 playersData[currentModalRole][currentModalTier].push(playerForList);

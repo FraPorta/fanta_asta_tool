@@ -8,7 +8,7 @@
 
 Un **tool web interattivo** per gestire le aste del Fantacalcio 2025/26. Ottimizzato per desktop e mobile, ti aiuta a organizzare la tua asta con un'interfaccia moderna e funzionalità avanzate.
 
-![Fanta Asta Tool Preview](https://via.placeholder.com/800x400/1f2937/06b6d4?text=Fanta+Asta+Tool+2025%2F26)
+![Fanta Asta Tool Preview]()
 
 ## ✨ Caratteristiche Principali
 
@@ -135,14 +135,31 @@ Il tool supporta diverse personalizzazioni tramite modifica del codice:
 
 ### Calcolo Prezzi
 ```javascript
-// Personalizza i moltiplicatori per tier
+// Personalizza i moltiplicatori per ruolo e tier
 function calculateRecommendedPrice(player, tier) {
     const multipliers = {
-        'Top': 1.2,      // +20%
-        'Buoni': 1.0,    // Prezzo base
-        'Scommesse': 0.8 // -20%
+        'Top': {
+            'P': 2.0,    // Portieri: 2x (es. 7 → 14)
+            'D': 2.5,    // Difensori: 2.5x (es. 20 → 50)
+            'C': 3.5,    // Centrocampisti: 3.5x (es. 30 → 105)
+            'A': 4.5     // Attaccanti: 4.5x (es. 45 → 200)
+        },
+        'Buoni': {
+            'P': 1.5,    // Portieri: 1.5x
+            'D': 2.0,    // Difensori: 2x
+            'C': 2.5,    // Centrocampisti: 2.5x
+            'A': 3.0     // Attaccanti: 3x
+        },
+        'Scommesse': {
+            'P': 1.0,    // Portieri: prezzo base
+            'D': 1.2,    // Difensori: 1.2x
+            'C': 1.5,    // Centrocampisti: 1.5x
+            'A': 2.0     // Attaccanti: 2x
+        }
     };
-    // ...
+    
+    const roleMultiplier = multipliers[tier][player.role] || 1.0;
+    return Math.round(player.qta * roleMultiplier);
 }
 ```
 

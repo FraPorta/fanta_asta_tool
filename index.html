@@ -72,47 +72,104 @@
             color: #fbbf24;
             /* amber-400 */
         }
+
+        /* Mobile Touch Targets */
+        @media (max-width: 640px) {
+            .player-card button {
+                min-height: 44px;
+                min-width: 44px;
+            }
+
+            .player-card input {
+                min-height: 44px;
+                font-size: 16px;
+                /* Prevents zoom on iOS */
+            }
+
+            /* Larger touch targets for small elements */
+            .permanent-delete-btn,
+            .favorite-btn {
+                padding: 8px;
+                min-height: 44px;
+                min-width: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            /* Better button sizing for mobile */
+            .mobile-touch-btn {
+                min-height: 48px;
+                font-size: 14px;
+                padding: 12px 16px;
+            }
+        }
+
+        /* Improve table readability on mobile */
+        @media (max-width: 640px) {
+            .player-selector-table tr {
+                border-bottom: 1px solid #374151;
+            }
+
+            .player-selector-table td {
+                padding: 8px 4px;
+                font-size: 12px;
+            }
+
+            /* List view specific improvements */
+            .player-card {
+                margin-bottom: 8px;
+            }
+
+            /* Better spacing for list view on mobile */
+            .player-card .flex-wrap {
+                justify-content: flex-start;
+            }
+        }
     </style>
 </head>
 
 <body class="bg-gray-900 text-white">
 
-    <div class="container mx-auto p-4">
+    <div class="container mx-auto p-2 sm:p-4">
 
         <!-- HEADER FISSO -->
         <div class="sticky-header bg-gray-900/80 backdrop-blur-sm p-4 rounded-lg mb-6 shadow-lg">
-            <div class="flex justify-between items-center mb-4">
-                <h1 class="text-3xl font-bold text-center text-cyan-400">Guida Asta Fantacalcio</h1>
-                <div class="flex gap-2">
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-3">
+                <h1 class="text-2xl sm:text-3xl font-bold text-center text-cyan-400">Guida Asta Fantacalcio</h1>
+                <div class="flex flex-wrap gap-1 sm:gap-2 justify-center">
                     <button id="export-btn"
-                        class="bg-green-800 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg flex items-center text-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20"
-                            fill="currentColor">
+                        class="bg-green-800 hover:bg-green-700 text-white font-bold py-2 px-2 sm:px-4 rounded-lg flex items-center text-xs sm:text-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2"
+                            viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd"
                                 d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
                                 clip-rule="evenodd" />
                         </svg>
-                        Esporta
+                        <span class="hidden sm:inline">Esporta</span>
+                        <span class="sm:hidden">Exp</span>
                     </button>
                     <button id="import-btn"
-                        class="bg-blue-800 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg flex items-center text-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20"
-                            fill="currentColor">
+                        class="bg-blue-800 hover:bg-blue-700 text-white font-bold py-2 px-2 sm:px-4 rounded-lg flex items-center text-xs sm:text-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2"
+                            viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd"
                                 d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 11-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z"
                                 clip-rule="evenodd" />
                         </svg>
-                        Importa
+                        <span class="hidden sm:inline">Importa</span>
+                        <span class="sm:hidden">Imp</span>
                     </button>
                     <button id="reset-btn"
-                        class="bg-red-800 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg flex items-center text-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20"
-                            fill="currentColor">
+                        class="bg-red-800 hover:bg-red-700 text-white font-bold py-2 px-2 sm:px-4 rounded-lg flex items-center text-xs sm:text-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2"
+                            viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd"
                                 d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 110 2H4a1 1 0 01-1-1V4a1 1 0 011-1zm10 15a1 1 0 01-1-1v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 111.885-.666A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 01-1 1z"
                                 clip-rule="evenodd" />
                         </svg>
-                        Reset Asta
+                        <span class="hidden sm:inline">Reset Asta</span>
+                        <span class="sm:hidden">Reset</span>
                     </button>
                 </div>
             </div>
@@ -131,11 +188,15 @@
                 </div>
                 <div class="bg-gray-800 p-3 rounded-lg">
                     <p class="text-sm text-gray-400">Spesa per Ruolo</p>
-                    <div class="flex justify-center items-center space-x-2 text-xs">
-                        <span title="Portieri">P: <span id="spent-P">0</span></span>
-                        <span title="Difensori">D: <span id="spent-D">0</span></span>
-                        <span title="Centrocampisti">C: <span id="spent-C">0</span></span>
-                        <span title="Attaccanti">A: <span id="spent-A">0</span></span>
+                    <div class="flex justify-center items-center space-x-1 sm:space-x-2 text-xs sm:text-sm">
+                        <span title="Portieri" class="text-center">P: <span id="spent-P"
+                                class="font-bold">0</span></span>
+                        <span title="Difensori" class="text-center">D: <span id="spent-D"
+                                class="font-bold">0</span></span>
+                        <span title="Centrocampisti" class="text-center">C: <span id="spent-C"
+                                class="font-bold">0</span></span>
+                        <span title="Attaccanti" class="text-center">A: <span id="spent-A"
+                                class="font-bold">0</span></span>
                     </div>
                 </div>
             </div>
@@ -227,7 +288,7 @@
                     class="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-6 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled>Carica CSV</button>
                 <button id="show-player-selector-btn"
-                    class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg hidden">Seleziona
+                    class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 sm:px-6 rounded-lg hidden text-sm sm:text-base min-h-[48px]">Seleziona
                     Giocatori</button>
             </div>
             <p class="text-sm text-gray-400 mt-2">Carica qualsiasi file CSV con le quotazioni Fantacalcio. Il file deve
@@ -260,11 +321,12 @@
 
     <!-- MODAL PER SELEZIONARE GIOCATORI DAL CSV -->
     <div id="player-selector-modal"
-        class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
-        <div class="bg-gray-800 rounded-lg p-6 w-full max-w-6xl max-h-[90vh] overflow-hidden shadow-2xl">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold text-cyan-400">Seleziona Giocatori dal CSV</h3>
-                <button id="close-player-selector" class="text-gray-400 hover:text-white">
+        class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden p-2 sm:p-4">
+        <div
+            class="bg-gray-800 rounded-lg p-3 sm:p-6 w-full max-w-full sm:max-w-6xl max-h-[95vh] sm:max-h-[90vh] overflow-hidden shadow-2xl">
+            <div class="flex justify-between items-center mb-3 sm:mb-4">
+                <h3 class="text-lg sm:text-xl font-bold text-cyan-400">Seleziona Giocatori dal CSV</h3>
+                <button id="close-player-selector" class="text-gray-400 hover:text-white p-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -273,38 +335,41 @@
                 </button>
             </div>
 
-            <div class="mb-4 flex gap-4 items-center">
-                <select id="role-filter" class="bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-white">
+            <div class="mb-4 flex flex-col sm:flex-row gap-2 sm:gap-4 items-stretch sm:items-center">
+                <select id="role-filter"
+                    class="bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-white text-sm sm:text-base min-h-[44px]">
                     <option value="">Tutti i ruoli</option>
                     <option value="P">Portieri</option>
                     <option value="D">Difensori</option>
                     <option value="C">Centrocampisti</option>
                     <option value="A">Attaccanti</option>
                 </select>
-                <select id="team-filter" class="bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-white">
+                <select id="team-filter"
+                    class="bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-white text-sm sm:text-base min-h-[44px]">
                     <option value="">Tutte le squadre</option>
                 </select>
                 <input type="text" id="name-filter" placeholder="Cerca per nome..."
-                    class="bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-white flex-grow">
-                <select id="tier-selector" class="bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-white">
+                    class="bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-white flex-grow text-sm sm:text-base min-h-[44px]">
+                <select id="tier-selector"
+                    class="bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-white text-sm sm:text-base min-h-[44px]">
                     <option value="Top">Top</option>
                     <option value="Buoni">Buoni</option>
                     <option value="Scommesse">Scommesse</option>
                 </select>
             </div>
 
-            <div class="overflow-y-auto max-h-96 mb-4">
-                <table class="w-full text-sm">
+            <div class="overflow-x-auto overflow-y-auto max-h-[50vh] sm:max-h-96 mb-3 sm:mb-4">
+                <table class="w-full text-xs sm:text-sm min-w-[600px] player-selector-table">
                     <thead class="bg-gray-700 sticky top-0">
                         <tr>
-                            <th class="px-3 py-2 text-left">
+                            <th class="px-2 sm:px-3 py-2 text-left">
                                 <input type="checkbox" id="select-all-players" class="rounded">
                             </th>
-                            <th class="px-3 py-2 text-left">Nome</th>
-                            <th class="px-3 py-2 text-left">Ruolo</th>
-                            <th class="px-3 py-2 text-left">Squadra</th>
-                            <th class="px-3 py-2 text-left">Quotazione</th>
-                            <th class="px-3 py-2 text-left">FVM</th>
+                            <th class="px-2 sm:px-3 py-2 text-left">Nome</th>
+                            <th class="px-2 sm:px-3 py-2 text-left">Ruolo</th>
+                            <th class="px-2 sm:px-3 py-2 text-left">Squadra</th>
+                            <th class="px-2 sm:px-3 py-2 text-left">Quotazione</th>
+                            <th class="px-2 sm:px-3 py-2 text-left">FVM</th>
                         </tr>
                     </thead>
                     <tbody id="players-table-body">
@@ -313,15 +378,15 @@
                 </table>
             </div>
 
-            <div class="flex justify-between items-center">
-                <span class="text-sm text-gray-400">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-0">
+                <span class="text-xs sm:text-sm text-gray-400 text-center sm:text-left">
                     Selezionati: <span id="selected-count">0</span> giocatori
                 </span>
-                <div class="flex space-x-2">
+                <div class="flex flex-col sm:flex-row gap-2 sm:space-x-2 w-full sm:w-auto">
                     <button id="cancel-player-selection"
-                        class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Annulla</button>
+                        class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded text-sm min-h-[44px]">Annulla</button>
                     <button id="add-selected-players"
-                        class="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded">Aggiungi
+                        class="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded text-sm min-h-[44px]">Aggiungi
                         Selezionati</button>
                 </div>
             </div>
@@ -603,14 +668,14 @@
                 const row = document.createElement('tr');
                 row.className = 'hover:bg-gray-700';
                 row.innerHTML = `
-                    <td class="px-3 py-2">
-                        <input type="checkbox" class="player-checkbox rounded" data-player-id="${player.id}">
+                    <td class="px-2 sm:px-3 py-2">
+                        <input type="checkbox" class="player-checkbox rounded min-h-[20px] min-w-[20px]" data-player-id="${player.id}">
                     </td>
-                    <td class="px-3 py-2">${player.nome}</td>
-                    <td class="px-3 py-2">${player.role}</td>
-                    <td class="px-3 py-2">${player.squadra}</td>
-                    <td class="px-3 py-2">${player.qta}</td>
-                    <td class="px-3 py-2">${player.fvm}</td>
+                    <td class="px-2 sm:px-3 py-2 text-xs sm:text-sm">${player.nome}</td>
+                    <td class="px-2 sm:px-3 py-2 text-center text-xs sm:text-sm">${player.role}</td>
+                    <td class="px-2 sm:px-3 py-2 text-xs sm:text-sm">${player.squadra}</td>
+                    <td class="px-2 sm:px-3 py-2 text-xs sm:text-sm font-semibold">${player.qta}</td>
+                    <td class="px-2 sm:px-3 py-2 text-xs sm:text-sm">${player.fvm}</td>
                 `;
                 tbody.appendChild(row);
             });
@@ -1143,17 +1208,17 @@
                     <div class="space-y-2">
                          <div>
                             <label for="rec-price-${player.id}" class="text-xs text-gray-400">Prezzo Consigliato:</label>
-                            <input type="number" id="rec-price-${player.id}" value="${recommendedPrice}" class="w-full bg-gray-700 rounded p-1 text-center text-white">
+                            <input type="number" id="rec-price-${player.id}" value="${recommendedPrice}" class="w-full bg-gray-700 rounded p-2 text-center text-white min-h-[44px] text-sm sm:text-base">
                         </div>
                         <div>
                             <label for="paid-price-${player.id}" class="text-xs text-gray-400">Prezzo Pagato:</label>
-                            <input type="number" id="paid-price-${player.id}" value="${player.qta}" class="w-full bg-gray-900 border border-gray-600 rounded p-1 text-center text-white focus:ring-2 focus:ring-cyan-500">
+                            <input type="number" id="paid-price-${player.id}" value="${player.qta}" class="w-full bg-gray-900 border border-gray-600 rounded p-2 text-center text-white focus:ring-2 focus:ring-cyan-500 min-h-[44px] text-sm sm:text-base">
                         </div>
                     </div>
                 </div>
-                <div class="mt-4 flex space-x-2">
-                    <button class="buy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded w-full transition-colors" data-id="${player.id}">Compra</button>
-                    <button class="toggle-remove-btn ${isRemoved ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-red-600 hover:bg-red-700'} text-white font-bold py-2 px-4 rounded w-full transition-colors">${isRemoved ? 'Ripristina' : 'Rimuovi'}</button>
+                <div class="mt-4 flex flex-col sm:flex-row gap-2">
+                    <button class="buy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded w-full transition-colors mobile-touch-btn text-sm sm:text-base" data-id="${player.id}">Compra</button>
+                    <button class="toggle-remove-btn ${isRemoved ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-red-600 hover:bg-red-700'} text-white font-bold py-3 px-4 rounded w-full transition-colors mobile-touch-btn text-sm sm:text-base">${isRemoved ? 'Ripristina' : 'Rimuovi'}</button>
                 </div>
             `;
 
@@ -1200,12 +1265,12 @@
                         <span class="font-semibold text-cyan-400 text-sm">${player.qta}</span>
                     </div>
                     <div class="space-y-1">
-                        <input type="number" id="paid-price-${player.id}" value="${player.qta}" placeholder="Prezzo" class="w-full bg-gray-900 border border-gray-600 rounded p-1 text-center text-white text-xs focus:ring-1 focus:ring-cyan-500">
+                        <input type="number" id="paid-price-${player.id}" value="${player.qta}" placeholder="Prezzo" class="w-full bg-gray-900 border border-gray-600 rounded p-2 text-center text-white text-xs sm:text-sm focus:ring-1 focus:ring-cyan-500 min-h-[40px]">
                     </div>
                 </div>
-                <div class="mt-2 flex space-x-1">
-                    <button class="buy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-2 rounded w-full transition-colors text-xs" data-id="${player.id}">Compra</button>
-                    <button class="toggle-remove-btn ${isRemoved ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-red-600 hover:bg-red-700'} text-white font-bold py-1 px-2 rounded w-full transition-colors text-xs">${isRemoved ? 'Ripr.' : 'Rim.'}</button>
+                <div class="mt-2 flex flex-col sm:flex-row gap-1">
+                    <button class="buy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-2 rounded w-full transition-colors text-xs sm:text-sm mobile-touch-btn" data-id="${player.id}">Compra</button>
+                    <button class="toggle-remove-btn ${isRemoved ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-red-600 hover:bg-red-700'} text-white font-bold py-2 px-2 rounded w-full transition-colors text-xs sm:text-sm mobile-touch-btn">${isRemoved ? 'Ripr.' : 'Rim.'}</button>
                 </div>
             `;
 
@@ -1229,30 +1294,33 @@
             card.className = `player-card bg-gray-800 rounded-lg p-3 shadow-md relative ${borderClass} ${isRemoved ? 'bought' : ''}`;
 
             card.innerHTML = `
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center flex-1">
-                        <button class="favorite-btn ${isFavorite ? 'active' : 'text-gray-400 hover:text-amber-400'} mr-2" data-id="${player.id}">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="${isFavorite ? 'currentColor' : 'none'}" viewBox="0 0 24 24" stroke="currentColor">
+                <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                    <!-- Info del giocatore -->
+                    <div class="flex items-center flex-1 min-w-0">
+                        <button class="favorite-btn ${isFavorite ? 'active' : 'text-gray-400 hover:text-amber-400'} mr-2 p-2" data-id="${player.id}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5" fill="${isFavorite ? 'currentColor' : 'none'}" viewBox="0 0 24 24" stroke="currentColor">
                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                             </svg>
                         </button>
-                        <img src="${teamLogos[player.squadra] || 'https://placehold.co/40x40/2d3748/e2e8f0?text=?'}" alt="${player.squadra}" class="w-8 h-8 mr-3 object-contain rounded-full bg-white/10">
-                        <div class="flex-1">
-                            <div class="flex items-center space-x-3">
-                                <p class="font-bold text-lg">${player.nome}</p>
-                                <p class="text-sm text-gray-400">${player.squadra}</p>
-                                <span class="text-xs bg-gray-700 px-2 py-1 rounded">Q.ta: ${player.qta}</span>
+                        <img src="${teamLogos[player.squadra] || 'https://placehold.co/40x40/2d3748/e2e8f0?text=?'}" alt="${player.squadra}" class="w-6 h-6 sm:w-8 sm:h-8 mr-2 sm:mr-3 object-contain rounded-full bg-white/10 flex-shrink-0">
+                        <div class="flex-1 min-w-0">
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+                                <p class="font-bold text-sm sm:text-lg truncate">${player.nome}</p>
+                                <div class="flex items-center gap-2 text-xs sm:text-sm">
+                                    <p class="text-gray-400 truncate">${player.squadra}</p>
+                                    <span class="bg-gray-700 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-xs flex-shrink-0">Q.ta: ${player.qta}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="flex items-center space-x-3">
-                        <div class="flex items-center space-x-2">
-                            <input type="number" id="paid-price-${player.id}" value="${player.qta}" class="w-20 bg-gray-900 border border-gray-600 rounded p-1 text-center text-white text-sm focus:ring-2 focus:ring-cyan-500" placeholder="Prezzo">
-                            <button class="buy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-3 rounded transition-colors text-sm" data-id="${player.id}">Compra</button>
-                            <button class="toggle-remove-btn ${isRemoved ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-red-600 hover:bg-red-700'} text-white font-bold py-1 px-3 rounded transition-colors text-sm">${isRemoved ? 'Ripristina' : 'Rimuovi'}</button>
-                        </div>
-                        <button class="text-red-500 hover:text-red-400 permanent-delete-btn" data-id="${player.id}" data-role="${role}" data-tier="${tier}" data-name="${player.nome}">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    
+                    <!-- Controlli -->
+                    <div class="flex flex-wrap items-center gap-2 justify-end sm:justify-start">
+                        <input type="number" id="paid-price-${player.id}" value="${player.qta}" class="w-16 sm:w-20 bg-gray-900 border border-gray-600 rounded p-2 text-center text-white text-xs sm:text-sm focus:ring-2 focus:ring-cyan-500 min-h-[40px] sm:min-h-[44px]" placeholder="€">
+                        <button class="buy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-2 sm:px-3 rounded transition-colors text-xs sm:text-sm mobile-touch-btn flex-shrink-0" data-id="${player.id}">Compra</button>
+                        <button class="toggle-remove-btn ${isRemoved ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-red-600 hover:bg-red-700'} text-white font-bold py-2 px-2 sm:px-3 rounded transition-colors text-xs sm:text-sm mobile-touch-btn flex-shrink-0">${isRemoved ? 'Ripr.' : 'Rim.'}</button>
+                        <button class="text-red-500 hover:text-red-400 permanent-delete-btn p-2 flex-shrink-0" data-id="${player.id}" data-role="${role}" data-tier="${tier}" data-name="${player.nome}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                             </svg>
                         </button>

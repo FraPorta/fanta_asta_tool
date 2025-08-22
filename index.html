@@ -42,52 +42,134 @@
             /* green-500 */
         }
 
+        .removed-card {
+            border: 2px solid #ef4444;
+            /* red-500 */
+            box-shadow: 0 0 0 1px #ef4444, 0 10px 15px -3px rgba(239, 68, 68, 0.2);
+        }
+
         .sort-btn.active {
             background-color: #0891b2;
             /* cyan-600 */
             color: white;
+        }
+
+        .favorite-card {
+            border: 2px solid #fbbf24;
+            /* amber-400 */
+            box-shadow: 0 0 0 1px #fbbf24, 0 10px 15px -3px rgba(251, 191, 36, 0.2);
+        }
+
+        .favorite-btn {
+            transition: color 0.2s ease-in-out, transform 0.1s ease-in-out;
+        }
+
+        .favorite-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .favorite-btn.active {
+            color: #fbbf24;
+            /* amber-400 */
+        }
+
+        /* Mobile Touch Targets */
+        @media (max-width: 640px) {
+            .player-card button {
+                min-height: 44px;
+                min-width: 44px;
+            }
+
+            .player-card input {
+                min-height: 44px;
+                font-size: 16px;
+                /* Prevents zoom on iOS */
+            }
+
+            /* Larger touch targets for small elements */
+            .permanent-delete-btn,
+            .favorite-btn {
+                padding: 8px;
+                min-height: 44px;
+                min-width: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            /* Better button sizing for mobile */
+            .mobile-touch-btn {
+                min-height: 48px;
+                font-size: 14px;
+                padding: 12px 16px;
+            }
+        }
+
+        /* Improve table readability on mobile */
+        @media (max-width: 640px) {
+            .player-selector-table tr {
+                border-bottom: 1px solid #374151;
+            }
+
+            .player-selector-table td {
+                padding: 8px 4px;
+                font-size: 12px;
+            }
+
+            /* List view specific improvements */
+            .player-card {
+                margin-bottom: 8px;
+            }
+
+            /* Better spacing for list view on mobile */
+            .player-card .flex-wrap {
+                justify-content: flex-start;
+            }
         }
     </style>
 </head>
 
 <body class="bg-gray-900 text-white">
 
-    <div class="container mx-auto p-4">
+    <div class="container mx-auto p-2 sm:p-4">
 
         <!-- HEADER FISSO -->
         <div class="sticky-header bg-gray-900/80 backdrop-blur-sm p-4 rounded-lg mb-6 shadow-lg">
-            <div class="flex justify-between items-center mb-4">
-                <h1 class="text-3xl font-bold text-center text-cyan-400">Guida Asta Fantacalcio</h1>
-                <div class="flex gap-2">
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-3">
+                <h1 class="text-2xl sm:text-3xl font-bold text-center text-cyan-400">Guida Asta Fantacalcio</h1>
+                <div class="flex flex-wrap gap-1 sm:gap-2 justify-center">
                     <button id="export-btn"
-                        class="bg-green-800 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg flex items-center text-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20"
-                            fill="currentColor">
+                        class="bg-green-800 hover:bg-green-700 text-white font-bold py-2 px-2 sm:px-4 rounded-lg flex items-center text-xs sm:text-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2"
+                            viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd"
                                 d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
                                 clip-rule="evenodd" />
                         </svg>
-                        Esporta
+                        <span class="hidden sm:inline">Esporta</span>
+                        <span class="sm:hidden">Exp</span>
                     </button>
                     <button id="import-btn"
-                        class="bg-blue-800 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg flex items-center text-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20"
-                            fill="currentColor">
+                        class="bg-blue-800 hover:bg-blue-700 text-white font-bold py-2 px-2 sm:px-4 rounded-lg flex items-center text-xs sm:text-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2"
+                            viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd"
                                 d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 11-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z"
                                 clip-rule="evenodd" />
                         </svg>
-                        Importa
+                        <span class="hidden sm:inline">Importa</span>
+                        <span class="sm:hidden">Imp</span>
                     </button>
                     <button id="reset-btn"
-                        class="bg-red-800 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg flex items-center text-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20"
-                            fill="currentColor">
+                        class="bg-red-800 hover:bg-red-700 text-white font-bold py-2 px-2 sm:px-4 rounded-lg flex items-center text-xs sm:text-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2"
+                            viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd"
                                 d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 110 2H4a1 1 0 01-1-1V4a1 1 0 011-1zm10 15a1 1 0 01-1-1v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 111.885-.666A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 01-1 1z"
                                 clip-rule="evenodd" />
                         </svg>
-                        Reset Asta
+                        <span class="hidden sm:inline">Reset Asta</span>
+                        <span class="sm:hidden">Reset</span>
                     </button>
                 </div>
             </div>
@@ -106,11 +188,15 @@
                 </div>
                 <div class="bg-gray-800 p-3 rounded-lg">
                     <p class="text-sm text-gray-400">Spesa per Ruolo</p>
-                    <div class="flex justify-center items-center space-x-2 text-xs">
-                        <span title="Portieri">P: <span id="spent-P">0</span></span>
-                        <span title="Difensori">D: <span id="spent-D">0</span></span>
-                        <span title="Centrocampisti">C: <span id="spent-C">0</span></span>
-                        <span title="Attaccanti">A: <span id="spent-A">0</span></span>
+                    <div class="flex justify-center items-center space-x-1 sm:space-x-2 text-xs sm:text-sm">
+                        <span title="Portieri" class="text-center">P: <span id="spent-P"
+                                class="font-bold">0</span></span>
+                        <span title="Difensori" class="text-center">D: <span id="spent-D"
+                                class="font-bold">0</span></span>
+                        <span title="Centrocampisti" class="text-center">C: <span id="spent-C"
+                                class="font-bold">0</span></span>
+                        <span title="Attaccanti" class="text-center">A: <span id="spent-A"
+                                class="font-bold">0</span></span>
                     </div>
                 </div>
             </div>
@@ -202,11 +288,11 @@
                     class="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-6 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled>Carica CSV</button>
                 <button id="show-player-selector-btn"
-                    class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg hidden">Seleziona
+                    class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 sm:px-6 rounded-lg hidden text-sm sm:text-base min-h-[48px]">Seleziona
                     Giocatori</button>
             </div>
-            <p class="text-sm text-gray-400 mt-2">Carica il file CSV con le quotazioni ufficiali per importare
-                automaticamente tutti i giocatori.</p>
+            <p class="text-sm text-gray-400 mt-2">Carica qualsiasi file CSV con le quotazioni Fantacalcio. Il file deve
+                contenere colonne per ID, Ruolo, Nome, Squadra, Quotazione e FVM.</p>
         </div>
 
         <!-- TABS PER RUOLI -->
@@ -235,11 +321,12 @@
 
     <!-- MODAL PER SELEZIONARE GIOCATORI DAL CSV -->
     <div id="player-selector-modal"
-        class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
-        <div class="bg-gray-800 rounded-lg p-6 w-full max-w-6xl max-h-[90vh] overflow-hidden shadow-2xl">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold text-cyan-400">Seleziona Giocatori dal CSV</h3>
-                <button id="close-player-selector" class="text-gray-400 hover:text-white">
+        class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden p-2 sm:p-4">
+        <div
+            class="bg-gray-800 rounded-lg p-3 sm:p-6 w-full max-w-full sm:max-w-6xl max-h-[95vh] sm:max-h-[90vh] overflow-hidden shadow-2xl">
+            <div class="flex justify-between items-center mb-3 sm:mb-4">
+                <h3 class="text-lg sm:text-xl font-bold text-cyan-400">Seleziona Giocatori dal CSV</h3>
+                <button id="close-player-selector" class="text-gray-400 hover:text-white p-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -248,38 +335,41 @@
                 </button>
             </div>
 
-            <div class="mb-4 flex gap-4 items-center">
-                <select id="role-filter" class="bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-white">
+            <div class="mb-4 flex flex-col sm:flex-row gap-2 sm:gap-4 items-stretch sm:items-center">
+                <select id="role-filter"
+                    class="bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-white text-sm sm:text-base min-h-[44px]">
                     <option value="">Tutti i ruoli</option>
                     <option value="P">Portieri</option>
                     <option value="D">Difensori</option>
                     <option value="C">Centrocampisti</option>
                     <option value="A">Attaccanti</option>
                 </select>
-                <select id="team-filter" class="bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-white">
+                <select id="team-filter"
+                    class="bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-white text-sm sm:text-base min-h-[44px]">
                     <option value="">Tutte le squadre</option>
                 </select>
                 <input type="text" id="name-filter" placeholder="Cerca per nome..."
-                    class="bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-white flex-grow">
-                <select id="tier-selector" class="bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-white">
+                    class="bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-white flex-grow text-sm sm:text-base min-h-[44px]">
+                <select id="tier-selector"
+                    class="bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-white text-sm sm:text-base min-h-[44px]">
                     <option value="Top">Top</option>
                     <option value="Buoni">Buoni</option>
                     <option value="Scommesse">Scommesse</option>
                 </select>
             </div>
 
-            <div class="overflow-y-auto max-h-96 mb-4">
-                <table class="w-full text-sm">
+            <div class="overflow-x-auto overflow-y-auto max-h-[50vh] sm:max-h-96 mb-3 sm:mb-4">
+                <table class="w-full text-xs sm:text-sm min-w-[600px] player-selector-table">
                     <thead class="bg-gray-700 sticky top-0">
                         <tr>
-                            <th class="px-3 py-2 text-left">
+                            <th class="px-2 sm:px-3 py-2 text-left">
                                 <input type="checkbox" id="select-all-players" class="rounded">
                             </th>
-                            <th class="px-3 py-2 text-left">Nome</th>
-                            <th class="px-3 py-2 text-left">Ruolo</th>
-                            <th class="px-3 py-2 text-left">Squadra</th>
-                            <th class="px-3 py-2 text-left">Quotazione</th>
-                            <th class="px-3 py-2 text-left">FVM</th>
+                            <th class="px-2 sm:px-3 py-2 text-left">Nome</th>
+                            <th class="px-2 sm:px-3 py-2 text-left">Ruolo</th>
+                            <th class="px-2 sm:px-3 py-2 text-left">Squadra</th>
+                            <th class="px-2 sm:px-3 py-2 text-left">Quotazione</th>
+                            <th class="px-2 sm:px-3 py-2 text-left">FVM</th>
                         </tr>
                     </thead>
                     <tbody id="players-table-body">
@@ -288,15 +378,15 @@
                 </table>
             </div>
 
-            <div class="flex justify-between items-center">
-                <span class="text-sm text-gray-400">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-0">
+                <span class="text-xs sm:text-sm text-gray-400 text-center sm:text-left">
                     Selezionati: <span id="selected-count">0</span> giocatori
                 </span>
-                <div class="flex space-x-2">
+                <div class="flex flex-col sm:flex-row gap-2 sm:space-x-2 w-full sm:w-auto">
                     <button id="cancel-player-selection"
-                        class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Annulla</button>
+                        class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded text-sm min-h-[44px]">Annulla</button>
                     <button id="add-selected-players"
-                        class="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded">Aggiungi
+                        class="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded text-sm min-h-[44px]">Aggiungi
                         Selezionati</button>
                 </div>
             </div>
@@ -465,7 +555,7 @@
                 if (line === '') continue;
 
                 const columns = line.split(',');
-                if (columns.length >= 5) {
+                if (columns.length >= 12) {
                     const player = {
                         id: parseInt(columns[0]) || Date.now() + i,
                         role: columns[1] === 'P' ? 'P' : (columns[1] === 'D' ? 'D' : (columns[1] === 'C' ? 'C' : 'A')),
@@ -475,13 +565,14 @@
                         fvm: parseInt(columns[11]) || 0
                     };
 
-                    // Skip players with quotation = 1 (usually bench players)
-                    if (player.qta > 1 && player.nome && player.squadra) {
+                    // Include all players with valid name and team (removed quotation filter)
+                    if (player.nome && player.squadra && player.nome.trim() !== '' && player.squadra.trim() !== '') {
                         players.push(player);
                     }
                 }
             }
 
+            console.log(`Parsed ${players.length} players from CSV`);
             return players;
         }
 
@@ -494,17 +585,33 @@
                 return;
             }
 
+            // Check file type
+            if (!file.name.toLowerCase().endsWith('.csv')) {
+                alert('Seleziona un file CSV valido (.csv)');
+                return;
+            }
+
             const reader = new FileReader();
             reader.onload = function (e) {
-                const csvText = e.target.result;
-                csvPlayersData = parseCSV(csvText);
+                try {
+                    const csvText = e.target.result;
+                    csvPlayersData = parseCSV(csvText);
 
-                if (csvPlayersData.length > 0) {
-                    document.getElementById('show-player-selector-btn').classList.remove('hidden');
-                    alert(`Caricati ${csvPlayersData.length} giocatori dal CSV!`);
-                } else {
-                    alert('Nessun giocatore valido trovato nel CSV');
+                    if (csvPlayersData.length > 0) {
+                        document.getElementById('show-player-selector-btn').classList.remove('hidden');
+                        alert(`✅ Caricati ${csvPlayersData.length} giocatori dal CSV "${file.name}"!`);
+                        console.log('Players loaded:', csvPlayersData.slice(0, 5)); // Log first 5 for debugging
+                    } else {
+                        alert('❌ Nessun giocatore valido trovato nel CSV. Verifica che il formato sia corretto.');
+                    }
+                } catch (error) {
+                    console.error('Error parsing CSV:', error);
+                    alert('❌ Errore nel parsing del CSV. Verifica che il formato sia corretto.');
                 }
+            };
+
+            reader.onerror = function () {
+                alert('❌ Errore nel caricamento del file.');
             };
 
             reader.readAsText(file);
@@ -540,7 +647,14 @@
                 const matchesTeam = !teamFilter || player.squadra === teamFilter;
                 const matchesName = !nameFilter || player.nome.toLowerCase().includes(nameFilter);
 
-                return matchesRole && matchesTeam && matchesName;
+                // Check if player already exists in any tier of any role (exclude already added players)
+                const existsInAnyTier = Object.values(playersData).some(roleData =>
+                    Object.values(roleData).some(tierPlayers =>
+                        tierPlayers.some(p => p.id === player.id)
+                    )
+                );
+
+                return matchesRole && matchesTeam && matchesName && !existsInAnyTier;
             });
         }
 
@@ -554,14 +668,14 @@
                 const row = document.createElement('tr');
                 row.className = 'hover:bg-gray-700';
                 row.innerHTML = `
-                    <td class="px-3 py-2">
-                        <input type="checkbox" class="player-checkbox rounded" data-player-id="${player.id}">
+                    <td class="px-2 sm:px-3 py-2">
+                        <input type="checkbox" class="player-checkbox rounded min-h-[20px] min-w-[20px]" data-player-id="${player.id}">
                     </td>
-                    <td class="px-3 py-2">${player.nome}</td>
-                    <td class="px-3 py-2">${player.role}</td>
-                    <td class="px-3 py-2">${player.squadra}</td>
-                    <td class="px-3 py-2">${player.qta}</td>
-                    <td class="px-3 py-2">${player.fvm}</td>
+                    <td class="px-2 sm:px-3 py-2 text-xs sm:text-sm">${player.nome}</td>
+                    <td class="px-2 sm:px-3 py-2 text-center text-xs sm:text-sm">${player.role}</td>
+                    <td class="px-2 sm:px-3 py-2 text-xs sm:text-sm">${player.squadra}</td>
+                    <td class="px-2 sm:px-3 py-2 text-xs sm:text-sm font-semibold">${player.qta}</td>
+                    <td class="px-2 sm:px-3 py-2 text-xs sm:text-sm">${player.fvm}</td>
                 `;
                 tbody.appendChild(row);
             });
@@ -613,6 +727,8 @@
             if (addedCount > 0) {
                 renderPlayers();
                 saveState();
+                // Update the players table to remove added players from the list
+                populatePlayersTable();
                 alert(`Aggiunti ${addedCount} giocatori alla categoria ${selectedTier}!`);
             }
 
@@ -621,7 +737,7 @@
 
         // --- STATO DELL'APPLICAZIONE (CARICATO O DI DEFAULT) ---
         let playersData = JSON.parse(JSON.stringify(initialPlayersData)); // Deep copy
-        let state = { budget: 500, squad: [], activeRole: 'P', sortOptions: {}, removedPlayers: [] };
+        let state = { budget: 500, squad: [], activeRole: 'P', sortOptions: {}, removedPlayers: [], searchQuery: '', viewMode: 'large', favorites: [] };
         let playerToDelete = { id: null, role: null, tier: null };
 
         // --- ELEMENTI DEL DOM ---
@@ -728,6 +844,43 @@
             location.reload();
         }
 
+        // --- HELPER FUNCTIONS FOR VIEW MODES ---
+        function getTierContainerClass() {
+            switch (state.viewMode) {
+                case 'large':
+                    return 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4';
+                case 'small':
+                    return 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3';
+                case 'list':
+                    return 'space-y-2';
+                default:
+                    return 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4';
+            }
+        }
+
+        function updateViewMode() {
+            // Update button states
+            const buttons = ['view-large', 'view-small', 'view-list'];
+            buttons.forEach(btnId => {
+                const btn = document.getElementById(btnId);
+                if (btn) {
+                    const isActive = (btnId === `view-${state.viewMode}`);
+                    btn.className = `px-3 py-1 text-xs rounded-md transition-colors ${isActive ? 'bg-cyan-600 text-white' : 'text-gray-400 hover:text-white'
+                        }`;
+                }
+            });
+
+            // Update tier containers
+            const roleData = playersData[state.activeRole];
+            for (const tier in roleData) {
+                const tierContainer = document.getElementById(`tier-container-${tier}`);
+                if (tierContainer) {
+                    tierContainer.className = getTierContainerClass();
+                    renderTierContent(tier, roleData[tier]);
+                }
+            }
+        }
+
         // --- FUNZIONI DI RENDER ---
         function renderPlayers() {
             playersContainer.innerHTML = '';
@@ -739,16 +892,182 @@
             budgetEl.innerHTML = `<p class="font-semibold text-cyan-300">${budgetAdvice[state.activeRole]}</p>`;
             playersContainer.appendChild(budgetEl);
 
+            // Add search field
+            const searchEl = document.createElement('div');
+            searchEl.className = 'bg-gray-800 p-4 rounded-lg mb-4';
+            searchEl.innerHTML = `
+                <div class="flex flex-col space-y-3">
+                    <div class="flex items-center space-x-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        <input 
+                            type="text" 
+                            id="player-search-input"
+                            placeholder="Cerca giocatori nella tua lista..." 
+                            value="${state.searchQuery}"
+                            class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                        >
+                        ${state.searchQuery ? `
+                            <button id="clear-search-btn" class="text-gray-400 hover:text-white transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        ` : ''}
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-400">Modalità visualizzazione:</span>
+                        <div class="flex bg-gray-700 rounded-lg p-1">
+                            <button id="view-large" class="px-3 py-1 text-xs rounded-md transition-colors ${state.viewMode === 'large' ? 'bg-cyan-600 text-white' : 'text-gray-400 hover:text-white'}" title="Card Grandi">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                </svg>
+                            </button>
+                            <button id="view-small" class="px-3 py-1 text-xs rounded-md transition-colors ${state.viewMode === 'small' ? 'bg-cyan-600 text-white' : 'text-gray-400 hover:text-white'}" title="Card Piccole">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14v6m-3-3h6M6 10h2a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2zm10 0h2a2 2 0 002-2V6a2 2 0 00-2-2h-2a2 2 0 00-2 2v2a2 2 0 002 2zM6 20h2a2 2 0 002-2v-2a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2z" />
+                                </svg>
+                            </button>
+                            <button id="view-list" class="px-3 py-1 text-xs rounded-md transition-colors ${state.viewMode === 'list' ? 'bg-cyan-600 text-white' : 'text-gray-400 hover:text-white'}" title="Lista">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            playersContainer.appendChild(searchEl);
+
+            // Add event listeners for search
+            const searchInput = document.getElementById('player-search-input');
+            searchInput.addEventListener('input', (e) => {
+                const cursorPosition = e.target.selectionStart;
+                state.searchQuery = e.target.value;
+
+                // Update clear button visibility
+                const searchContainer = searchInput.parentElement;
+                const existingClearBtn = document.getElementById('clear-search-btn');
+
+                if (state.searchQuery && !existingClearBtn) {
+                    // Add clear button
+                    const clearBtn = document.createElement('button');
+                    clearBtn.id = 'clear-search-btn';
+                    clearBtn.className = 'text-gray-400 hover:text-white transition-colors';
+                    clearBtn.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    `;
+                    clearBtn.addEventListener('click', () => {
+                        state.searchQuery = '';
+                        renderPlayers();
+                        saveState();
+                    });
+                    searchContainer.appendChild(clearBtn);
+                } else if (!state.searchQuery && existingClearBtn) {
+                    // Remove clear button
+                    existingClearBtn.remove();
+                }
+
+                // Update only the tier contents and headers
+                const roleData = playersData[state.activeRole];
+                for (const tier in roleData) {
+                    // Update tier header counts
+                    const tierHeaders = document.querySelectorAll(`[data-tier="${tier}"]`);
+                    if (tierHeaders.length > 0) {
+                        const tierHeader = tierHeaders[0].closest('.flex');
+                        const countSpan = tierHeader?.querySelector('span');
+
+                        if (countSpan) {
+                            let filteredCount = roleData[tier].length;
+                            if (state.searchQuery && state.searchQuery.trim() !== '') {
+                                const searchTerm = state.searchQuery.toLowerCase().trim();
+                                filteredCount = roleData[tier].filter(player =>
+                                    player.nome.toLowerCase().includes(searchTerm) ||
+                                    player.squadra.toLowerCase().includes(searchTerm)
+                                ).length;
+                            }
+
+                            countSpan.textContent = state.searchQuery && state.searchQuery.trim() !== '' ?
+                                `${filteredCount}/${roleData[tier].length} giocatori` :
+                                `${roleData[tier].length} giocatori`;
+                        }
+                    }
+
+                    // Update tier content
+                    renderTierContent(tier, roleData[tier]);
+                }
+
+                saveState();
+
+                // Restore cursor position and focus
+                setTimeout(() => {
+                    const newSearchInput = document.getElementById('player-search-input');
+                    if (newSearchInput) {
+                        newSearchInput.focus();
+                        newSearchInput.setSelectionRange(cursorPosition, cursorPosition);
+                    }
+                }, 0);
+            });
+
+            const clearBtn = document.getElementById('clear-search-btn');
+            if (clearBtn) {
+                clearBtn.addEventListener('click', () => {
+                    state.searchQuery = '';
+                    renderPlayers();
+                    saveState();
+                });
+            }
+
+            // Add event listeners for view mode buttons
+            document.getElementById('view-large').addEventListener('click', () => {
+                state.viewMode = 'large';
+                updateViewMode();
+                saveState();
+            });
+
+            document.getElementById('view-small').addEventListener('click', () => {
+                state.viewMode = 'small';
+                updateViewMode();
+                saveState();
+            });
+
+            document.getElementById('view-list').addEventListener('click', () => {
+                state.viewMode = 'list';
+                updateViewMode();
+                saveState();
+            });
+
             for (const tier in roleData) {
                 const sortKey = `${state.activeRole}-${tier}`;
                 if (!state.sortOptions[sortKey]) {
                     state.sortOptions[sortKey] = 'price'; // Default sort
                 }
 
+                // Calculate filtered count for display
+                let filteredCount = roleData[tier].length;
+                if (state.searchQuery && state.searchQuery.trim() !== '') {
+                    const searchTerm = state.searchQuery.toLowerCase().trim();
+                    filteredCount = roleData[tier].filter(player =>
+                        player.nome.toLowerCase().includes(searchTerm) ||
+                        player.squadra.toLowerCase().includes(searchTerm)
+                    ).length;
+                }
+
                 const tierHeader = document.createElement('div');
                 tierHeader.className = 'flex justify-between items-center mt-6 mb-3 border-b border-gray-700 pb-2';
                 tierHeader.innerHTML = `
-                    <h3 class="text-xl font-bold text-amber-400">${tier}</h3>
+                    <div class="flex items-center space-x-3">
+                        <h3 class="text-xl font-bold text-amber-400">${tier}</h3>
+                        <span class="text-sm text-gray-400">
+                            ${state.searchQuery && state.searchQuery.trim() !== '' ?
+                        `${filteredCount}/${roleData[tier].length} giocatori` :
+                        `${roleData[tier].length} giocatori`
+                    }
+                        </span>
+                    </div>
                     <div class="flex space-x-2" data-tier="${tier}">
                         <button class="sort-btn text-xs py-1 px-3 rounded-full bg-gray-700 hover:bg-gray-600 ${state.sortOptions[sortKey] === 'price' ? 'active' : ''}" data-sort="price">Prezzo</button>
                         <button class="sort-btn text-xs py-1 px-3 rounded-full bg-gray-700 hover:bg-gray-600 ${state.sortOptions[sortKey] === 'team' ? 'active' : ''}" data-sort="team">Squadra</button>
@@ -758,7 +1077,7 @@
 
                 const tierContainer = document.createElement('div');
                 tierContainer.id = `tier-container-${tier}`;
-                tierContainer.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4';
+                tierContainer.className = getTierContainerClass();
                 playersContainer.appendChild(tierContainer);
 
                 renderTierContent(tier, roleData[tier]);
@@ -780,7 +1099,17 @@
             const sortKey = `${state.activeRole}-${tier}`;
             const sortType = state.sortOptions[sortKey] || 'price';
 
-            const sortedPlayers = [...players].sort((a, b) => {
+            // Filter players based on search query
+            let filteredPlayers = players;
+            if (state.searchQuery && state.searchQuery.trim() !== '') {
+                const searchTerm = state.searchQuery.toLowerCase().trim();
+                filteredPlayers = players.filter(player =>
+                    player.nome.toLowerCase().includes(searchTerm) ||
+                    player.squadra.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            const sortedPlayers = [...filteredPlayers].sort((a, b) => {
                 if (sortType === 'team') {
                     return a.squadra.localeCompare(b.squadra);
                 }
@@ -794,6 +1123,19 @@
                 const card = createPlayerCard(player, isBoughtByMe, state.activeRole, tier);
                 tierContainer.appendChild(card);
             });
+
+            // Show "no results" message if search yields no results
+            if (state.searchQuery && state.searchQuery.trim() !== '' && sortedPlayers.length === 0) {
+                const noResultsEl = document.createElement('div');
+                noResultsEl.className = 'col-span-full text-center py-8 text-gray-400';
+                noResultsEl.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-4 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    <p>Nessun giocatore trovato per "${state.searchQuery}"</p>
+                `;
+                tierContainer.appendChild(noResultsEl);
+            }
         }
 
         function calculateRecommendedPrice(player, tier) {
@@ -814,13 +1156,41 @@
             const card = document.createElement('div');
             card.id = `player-${player.id}`;
             const isRemoved = state.removedPlayers.includes(player.id);
-            card.className = `player-card bg-gray-800 rounded-lg p-4 shadow-md flex flex-col justify-between relative ${isBoughtByMe ? 'bought-by-me' : ''} ${isRemoved ? 'bought' : ''}`;
             const recommendedPrice = calculateRecommendedPrice(player, tier);
+
+            if (state.viewMode === 'list') {
+                return createListPlayerCard(player, isBoughtByMe, role, tier, isRemoved, recommendedPrice);
+            } else if (state.viewMode === 'small') {
+                return createSmallPlayerCard(player, isBoughtByMe, role, tier, isRemoved, recommendedPrice);
+            } else {
+                return createLargePlayerCard(player, isBoughtByMe, role, tier, isRemoved, recommendedPrice);
+            }
+        }
+
+        function createLargePlayerCard(player, isBoughtByMe, role, tier, isRemoved, recommendedPrice) {
+            const card = document.createElement('div');
+            card.id = `player-${player.id}`;
+            const isFavorite = state.favorites.includes(player.id);
+            // Priorità bordi: bought-by-me (verde) > removed-card (rosso) > favorite-card (dorato)
+            let borderClass = '';
+            if (isBoughtByMe) {
+                borderClass = 'bought-by-me';
+            } else if (isRemoved) {
+                borderClass = 'removed-card';
+            } else if (isFavorite) {
+                borderClass = 'favorite-card';
+            }
+            card.className = `player-card bg-gray-800 rounded-lg p-4 shadow-md flex flex-col justify-between relative ${borderClass} ${isRemoved ? 'bought' : ''}`;
 
             card.innerHTML = `
                 <button class="absolute top-2 right-2 text-red-500 hover:text-red-400 permanent-delete-btn" data-id="${player.id}" data-role="${role}" data-tier="${tier}" data-name="${player.nome}">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </button>
+                <button class="absolute top-2 right-10 favorite-btn ${isFavorite ? 'active' : 'text-gray-400 hover:text-amber-400'}" data-id="${player.id}">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="${isFavorite ? 'currentColor' : 'none'}" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                     </svg>
                 </button>
                 <div>
@@ -838,61 +1208,227 @@
                     <div class="space-y-2">
                          <div>
                             <label for="rec-price-${player.id}" class="text-xs text-gray-400">Prezzo Consigliato:</label>
-                            <input type="number" id="rec-price-${player.id}" value="${recommendedPrice}" class="w-full bg-gray-700 rounded p-1 text-center text-white">
+                            <input type="number" id="rec-price-${player.id}" value="${recommendedPrice}" class="w-full bg-gray-700 rounded p-2 text-center text-white min-h-[44px] text-sm sm:text-base">
                         </div>
                         <div>
                             <label for="paid-price-${player.id}" class="text-xs text-gray-400">Prezzo Pagato:</label>
-                            <input type="number" id="paid-price-${player.id}" value="${player.qta}" class="w-full bg-gray-900 border border-gray-600 rounded p-1 text-center text-white focus:ring-2 focus:ring-cyan-500">
+                            <input type="number" id="paid-price-${player.id}" value="${player.qta}" class="w-full bg-gray-900 border border-gray-600 rounded p-2 text-center text-white focus:ring-2 focus:ring-cyan-500 min-h-[44px] text-sm sm:text-base">
                         </div>
                     </div>
                 </div>
-                <div class="mt-4 flex space-x-2">
-                    <button class="buy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded w-full transition-colors" data-id="${player.id}">Compra</button>
-                    <button class="toggle-remove-btn ${isRemoved ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-red-600 hover:bg-red-700'} text-white font-bold py-2 px-4 rounded w-full transition-colors">${isRemoved ? 'Ripristina' : 'Rimuovi'}</button>
+                <div class="mt-4 flex flex-col sm:flex-row gap-2">
+                    <button class="buy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded w-full transition-colors mobile-touch-btn text-sm sm:text-base" data-id="${player.id}">Compra</button>
+                    <button class="toggle-remove-btn ${isRemoved ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-red-600 hover:bg-red-700'} text-white font-bold py-3 px-4 rounded w-full transition-colors mobile-touch-btn text-sm sm:text-base">${isRemoved ? 'Ripristina' : 'Rimuovi'}</button>
                 </div>
             `;
 
+            addPlayerCardEventListeners(card, player);
+            return card;
+        }
+
+        function createSmallPlayerCard(player, isBoughtByMe, role, tier, isRemoved, recommendedPrice) {
+            const card = document.createElement('div');
+            card.id = `player-${player.id}`;
+            const isFavorite = state.favorites.includes(player.id);
+            // Priorità bordi: bought-by-me (verde) > removed-card (rosso) > favorite-card (dorato)
+            let borderClass = '';
             if (isBoughtByMe) {
-                card.querySelector('.buy-btn').disabled = true;
-                card.querySelector('.buy-btn').textContent = 'Acquistato';
-                card.querySelector('.buy-btn').classList.replace('bg-green-600', 'bg-gray-600');
+                borderClass = 'bought-by-me';
+            } else if (isRemoved) {
+                borderClass = 'removed-card';
+            } else if (isFavorite) {
+                borderClass = 'favorite-card';
+            }
+            card.className = `player-card bg-gray-800 rounded-lg p-3 shadow-md flex flex-col justify-between relative ${borderClass} ${isRemoved ? 'bought' : ''}`;
+
+            card.innerHTML = `
+                <button class="absolute top-1 right-1 text-red-500 hover:text-red-400 permanent-delete-btn" data-id="${player.id}" data-role="${role}" data-tier="${tier}" data-name="${player.nome}">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+                <button class="absolute top-1 right-6 favorite-btn ${isFavorite ? 'active' : 'text-gray-400 hover:text-amber-400'}" data-id="${player.id}">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="${isFavorite ? 'currentColor' : 'none'}" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                    </svg>
+                </button>
+                <div>
+                    <div class="flex items-center mb-2">
+                        <img src="${teamLogos[player.squadra] || 'https://placehold.co/40x40/2d3748/e2e8f0?text=?'}" alt="${player.squadra}" class="w-6 h-6 mr-2 object-contain rounded-full bg-white/10">
+                        <div class="flex-1 min-w-0">
+                            <p class="font-bold text-sm truncate">${player.nome}</p>
+                            <p class="text-xs text-gray-400 truncate">${player.squadra}</p>
+                        </div>
+                    </div>
+                    <div class="text-center mb-2">
+                        <span class="text-xs text-gray-400">Q.ta: </span>
+                        <span class="font-semibold text-cyan-400 text-sm">${player.qta}</span>
+                    </div>
+                    <div class="space-y-1">
+                        <input type="number" id="paid-price-${player.id}" value="${player.qta}" placeholder="Prezzo" class="w-full bg-gray-900 border border-gray-600 rounded p-2 text-center text-white text-xs sm:text-sm focus:ring-1 focus:ring-cyan-500 min-h-[40px]">
+                    </div>
+                </div>
+                <div class="mt-2 flex flex-col sm:flex-row gap-1">
+                    <button class="buy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-2 rounded w-full transition-colors text-xs sm:text-sm mobile-touch-btn" data-id="${player.id}">Compra</button>
+                    <button class="toggle-remove-btn ${isRemoved ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-red-600 hover:bg-red-700'} text-white font-bold py-2 px-2 rounded w-full transition-colors text-xs sm:text-sm mobile-touch-btn">${isRemoved ? 'Ripr.' : 'Rim.'}</button>
+                </div>
+            `;
+
+            addPlayerCardEventListeners(card, player);
+            return card;
+        }
+
+        function createListPlayerCard(player, isBoughtByMe, role, tier, isRemoved, recommendedPrice) {
+            const card = document.createElement('div');
+            card.id = `player-${player.id}`;
+            const isFavorite = state.favorites.includes(player.id);
+            // Priorità bordi: bought-by-me (verde) > removed-card (rosso) > favorite-card (dorato)
+            let borderClass = '';
+            if (isBoughtByMe) {
+                borderClass = 'bought-by-me';
+            } else if (isRemoved) {
+                borderClass = 'removed-card';
+            } else if (isFavorite) {
+                borderClass = 'favorite-card';
+            }
+            card.className = `player-card bg-gray-800 rounded-lg p-3 shadow-md relative ${borderClass} ${isRemoved ? 'bought' : ''}`;
+
+            card.innerHTML = `
+                <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                    <!-- Info del giocatore -->
+                    <div class="flex items-center flex-1 min-w-0">
+                        <button class="favorite-btn ${isFavorite ? 'active' : 'text-gray-400 hover:text-amber-400'} mr-2 p-2" data-id="${player.id}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5" fill="${isFavorite ? 'currentColor' : 'none'}" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                            </svg>
+                        </button>
+                        <img src="${teamLogos[player.squadra] || 'https://placehold.co/40x40/2d3748/e2e8f0?text=?'}" alt="${player.squadra}" class="w-6 h-6 sm:w-8 sm:h-8 mr-2 sm:mr-3 object-contain rounded-full bg-white/10 flex-shrink-0">
+                        <div class="flex-1 min-w-0">
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+                                <p class="font-bold text-sm sm:text-lg truncate">${player.nome}</p>
+                                <div class="flex items-center gap-2 text-xs sm:text-sm">
+                                    <p class="text-gray-400 truncate">${player.squadra}</p>
+                                    <span class="bg-gray-700 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-xs flex-shrink-0">Q.ta: ${player.qta}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Controlli -->
+                    <div class="flex flex-wrap items-center gap-2 justify-end sm:justify-start">
+                        <input type="number" id="paid-price-${player.id}" value="${player.qta}" class="w-16 sm:w-20 bg-gray-900 border border-gray-600 rounded p-2 text-center text-white text-xs sm:text-sm focus:ring-2 focus:ring-cyan-500 min-h-[40px] sm:min-h-[44px]" placeholder="€">
+                        <button class="buy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-2 sm:px-3 rounded transition-colors text-xs sm:text-sm mobile-touch-btn flex-shrink-0" data-id="${player.id}">Compra</button>
+                        <button class="toggle-remove-btn ${isRemoved ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-red-600 hover:bg-red-700'} text-white font-bold py-2 px-2 sm:px-3 rounded transition-colors text-xs sm:text-sm mobile-touch-btn flex-shrink-0">${isRemoved ? 'Ripr.' : 'Rim.'}</button>
+                        <button class="text-red-500 hover:text-red-400 permanent-delete-btn p-2 flex-shrink-0" data-id="${player.id}" data-role="${role}" data-tier="${tier}" data-name="${player.nome}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            addPlayerCardEventListeners(card, player);
+            return card;
+        }
+
+        function addPlayerCardEventListeners(card, player) {
+            const isBoughtByMe = state.squad.find(p => p.id === player.id);
+            const isRemoved = state.removedPlayers.includes(player.id);
+
+            if (isBoughtByMe) {
+                const buyBtn = card.querySelector('.buy-btn');
+                if (buyBtn) {
+                    buyBtn.disabled = true;
+                    buyBtn.textContent = 'Acquistato';
+                    buyBtn.classList.replace('bg-green-600', 'bg-gray-600');
+                }
+
+                // Disabilita anche il pulsante rimuovi/ripristina per i giocatori della squadra
+                const toggleBtn = card.querySelector('.toggle-remove-btn');
+                if (toggleBtn) {
+                    toggleBtn.disabled = true;
+                    toggleBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                    toggleBtn.classList.remove('hover:bg-yellow-700', 'hover:bg-red-700');
+                }
             }
 
             card.querySelector('.buy-btn').addEventListener('click', () => buyPlayer(player.id));
+
             card.querySelector('.toggle-remove-btn').addEventListener('click', (e) => {
                 const card = e.currentTarget.closest('.player-card');
                 const button = e.currentTarget;
                 const playerId = player.id;
+                const isBoughtByMe = state.squad.some(p => p.id === playerId);
+
+                // Previeni l'azione se il giocatore è nella squadra
+                if (isBoughtByMe) {
+                    return;
+                }
 
                 card.classList.toggle('bought');
                 if (card.classList.contains('bought')) {
                     if (!state.removedPlayers.includes(playerId)) state.removedPlayers.push(playerId);
-                    button.textContent = 'Ripristina';
+
+                    // Aggiorna i bordi rispettando la priorità: bought-by-me (verde) > removed-card (rosso)
+                    card.classList.remove('favorite-card');
+                    card.classList.add('removed-card');
+
+                    button.textContent = button.textContent.includes('Ripr') ? 'Ripr.' : 'Ripristina';
                     button.classList.replace('bg-red-600', 'bg-yellow-600');
                     button.classList.replace('hover:bg-red-700', 'hover:bg-yellow-700');
                 } else {
                     state.removedPlayers = state.removedPlayers.filter(id => id !== playerId);
-                    button.textContent = 'Rimuovi';
+
+                    // Ripristina i bordi
+                    card.classList.remove('removed-card');
+                    const isFavorite = state.favorites.includes(playerId);
+                    if (isFavorite) {
+                        card.classList.add('favorite-card');
+                    }
+
+                    button.textContent = button.textContent.includes('Rim') ? 'Rim.' : 'Rimuovi';
                     button.classList.replace('bg-yellow-600', 'bg-red-600');
                     button.classList.replace('hover:bg-yellow-700', 'hover:bg-red-700');
                 }
                 saveState();
             });
+
             card.querySelector('.permanent-delete-btn').addEventListener('click', (e) => {
                 const button = e.currentTarget;
+                const playerId = parseInt(button.dataset.id);
+                const role = button.dataset.role;
+                const tier = button.dataset.tier;
+                const name = button.dataset.name;
+
                 showConfirmModal(
                     'Conferma Eliminazione',
-                    `Sei sicuro di voler eliminare ${button.dataset.name} dalla lista? L'azione è irreversibile.`,
+                    `Sei sicuro di voler eliminare ${name} dalla lista? L'azione è irreversibile.`,
                     'Elimina',
                     () => {
-                        playerToDelete.id = parseInt(button.dataset.id);
-                        playerToDelete.role = button.dataset.role;
-                        playerToDelete.tier = button.dataset.tier;
+                        playerToDelete.id = playerId;
+                        playerToDelete.role = role;
+                        playerToDelete.tier = tier;
                         deletePlayer();
                     }
                 );
             });
-            return card;
+
+            card.querySelector('.favorite-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                toggleFavorite(player.id);
+            });
+        }
+
+        function toggleFavorite(playerId) {
+            const index = state.favorites.indexOf(playerId);
+            if (index > -1) {
+                state.favorites.splice(index, 1);
+            } else {
+                state.favorites.push(playerId);
+            }
+            saveState();
+            renderPlayers(); // Re-render to update the visual state
         }
 
         function updateUI() {
@@ -941,11 +1477,47 @@
             state.budget -= pricePaid;
             state.squad.push({ id: playerId, price: pricePaid });
 
+            // Aggiungi automaticamente il giocatore alla lista dei rimossi
+            if (!state.removedPlayers.includes(playerId)) {
+                state.removedPlayers.push(playerId);
+            }
+
+            // Rimuovi automaticamente il giocatore dai preferiti
+            const favoriteIndex = state.favorites.indexOf(playerId);
+            if (favoriteIndex > -1) {
+                state.favorites.splice(favoriteIndex, 1);
+            }
+
             playerCard.classList.add('bought-by-me');
+            playerCard.classList.add('bought'); // Aggiungi anche la classe 'bought' per l'opacità ridotta
+
+            // Rimuovi il bordo dorato dei preferiti se presente
+            playerCard.classList.remove('favorite-card');
+
             const buyBtn = playerCard.querySelector('.buy-btn');
             buyBtn.disabled = true;
             buyBtn.textContent = 'Acquistato';
             buyBtn.classList.replace('bg-green-600', 'bg-gray-600');
+
+            // Aggiorna il tasto stella per mostrare che non è più preferito
+            const favoriteBtn = playerCard.querySelector('.favorite-btn');
+            if (favoriteBtn) {
+                favoriteBtn.classList.remove('active');
+                favoriteBtn.classList.add('text-gray-400', 'hover:text-amber-400');
+                const star = favoriteBtn.querySelector('svg');
+                if (star) {
+                    star.setAttribute('fill', 'none');
+                }
+            }
+
+            // Aggiorna anche il tasto rimuovi per mostrare "Ripristina"
+            const toggleBtn = playerCard.querySelector('.toggle-remove-btn');
+            if (toggleBtn) {
+                toggleBtn.textContent = toggleBtn.textContent.includes('Ripr') ? 'Ripr.' : 'Ripristina';
+                toggleBtn.classList.replace('bg-red-600', 'bg-yellow-600');
+                toggleBtn.classList.replace('hover:bg-red-700', 'hover:bg-yellow-700');
+            }
+
             updateUI();
             saveState();
         }
@@ -1089,13 +1661,30 @@
             state.squad = state.squad.filter(p => p.id !== playerId);
             state.budget += price;
 
+            // Ripristina automaticamente il giocatore rimuovendolo dalla lista dei rimossi
+            state.removedPlayers = state.removedPlayers.filter(id => id !== playerId);
+
             const playerCard = document.getElementById(`player-${playerId}`);
             if (playerCard) {
                 playerCard.classList.remove('bought-by-me');
+                playerCard.classList.remove('bought'); // Rimuovi anche l'opacità
+                playerCard.classList.remove('removed-card'); // Rimuovi anche il bordo rosso
+
                 const buyBtn = playerCard.querySelector('.buy-btn');
                 buyBtn.disabled = false;
                 buyBtn.textContent = 'Compra';
                 buyBtn.classList.replace('bg-gray-600', 'bg-green-600');
+
+                // Aggiorna il tasto rimuovi per tornare a "Rimuovi" e riabilitarlo
+                const toggleBtn = playerCard.querySelector('.toggle-remove-btn');
+                if (toggleBtn) {
+                    toggleBtn.disabled = false;
+                    toggleBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    toggleBtn.classList.add('hover:bg-red-700'); // Ripristina hover effect
+                    toggleBtn.textContent = toggleBtn.textContent.includes('Ripr') ? 'Rim.' : 'Rimuovi';
+                    toggleBtn.classList.replace('bg-yellow-600', 'bg-red-600');
+                    toggleBtn.classList.replace('hover:bg-yellow-700', 'hover:bg-red-700');
+                }
             }
             updateUI();
             saveState();

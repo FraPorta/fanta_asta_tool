@@ -499,6 +499,32 @@
         </div>
     </div>
 
+    <!-- MODAL PER SPOSTARE GIOCATORE -->
+    <div id="move-player-modal"
+        class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-gray-800 rounded-lg p-6 w-full max-w-md shadow-2xl">
+            <h3 class="text-xl font-bold mb-4 text-purple-400">Sposta Giocatore</h3>
+            <div id="move-player-info" class="mb-4 bg-gray-700 p-4 rounded-lg">
+                <!-- Player info will be inserted here -->
+            </div>
+            <div class="mb-4">
+                <label for="move-to-tier" class="block text-sm font-medium text-gray-300 mb-2">Sposta in categoria:</label>
+                <select id="move-to-tier" class="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-white focus:outline-none focus:ring-purple-500 focus:border-purple-500">
+                    <option value="Top">Top</option>
+                    <option value="Buoni">Buoni</option>
+                    <option value="Scommesse">Scommesse</option>
+                    <option value="Altri">Altri</option>
+                </select>
+            </div>
+            <div class="flex justify-end space-x-4">
+                <button id="cancel-move-btn"
+                    class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Annulla</button>
+                <button id="confirm-move-btn"
+                    class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded">Sposta</button>
+            </div>
+        </div>
+    </div>
+
 
     <script>
         // --- DATABASE GIOCATORI E LOGHI (STATO INIZIALE) ---
@@ -608,6 +634,7 @@
                     if (csvPlayersData.length > 0) {
                         document.getElementById('show-player-selector-btn').classList.remove('hidden');
                         document.getElementById('populate-others-btn').classList.remove('hidden');
+                        updatePopulateButtonText(); // Update button text when CSV is loaded
                         alert(`✅ Caricati ${csvPlayersData.length} giocatori dal CSV "${file.name}"!`);
                         console.log('Players loaded:', csvPlayersData.slice(0, 5)); // Log first 5 for debugging
                         saveState(); // Salva lo stato con i dati CSV
@@ -752,11 +779,13 @@
                 return;
             }
 
+            const activeRole = state.activeRole;
             let addedCount = 0;
 
-            csvPlayersData.forEach(player => {
-                // Check if player already exists in any tier of any role
-                const existsInAnyTier = Object.values(playersData[player.role]).some(tier =>
+            // Filter players by active role only
+            csvPlayersData.filter(player => player.role === activeRole).forEach(player => {
+                // Check if player already exists in any tier of the active role
+                const existsInAnyTier = Object.values(playersData[activeRole]).some(tier =>
                     tier.some(p => p.id === player.id)
                 );
 
@@ -769,7 +798,7 @@
                         role: player.role
                     };
 
-                    playersData[player.role]['Altri'].push(playerForList);
+                    playersData[activeRole]['Altri'].push(playerForList);
                     addedCount++;
                 }
             });
@@ -777,9 +806,19 @@
             if (addedCount > 0) {
                 renderPlayers();
                 saveState();
-                alert(`Aggiunti ${addedCount} giocatori rimanenti nella categoria "Altri"!`);
+                const roleNames = { 'P': 'Portieri', 'D': 'Difensori', 'C': 'Centrocampisti', 'A': 'Attaccanti' };
+                alert(`Aggiunti ${addedCount} ${roleNames[activeRole].toLowerCase()} rimanenti nella categoria "Altri"!`);
             } else {
-                alert('Tutti i giocatori sono già stati aggiunti alle categorie!');
+                const roleNames = { 'P': 'Portieri', 'D': 'Difensori', 'C': 'Centrocampisti', 'A': 'Attaccanti' };
+                alert(`Tutti i ${roleNames[activeRole].toLowerCase()} sono già stati aggiunti alle categorie!`);
+            }
+        }
+
+        function updatePopulateButtonText() {
+            const roleNames = { 'P': 'Portieri', 'D': 'Difensori', 'C': 'Centrocampisti', 'A': 'Attaccanti' };
+            const populateBtn = document.getElementById('populate-others-btn');
+            if (populateBtn) {
+                populateBtn.innerHTML = `Popola "Altri" ${roleNames[state.activeRole]}`;
             }
         }
 
@@ -864,6 +903,16 @@
         // State for import
         let pendingImportData = null;
 
+        // Move player modal elements
+        const movePlayerModal = document.getElementById('move-player-modal');
+        const movePlayerInfo = document.getElementById('move-player-info');
+        const moveToTierSelect = document.getElementById('move-to-tier');
+        const cancelMoveBtn = document.getElementById('cancel-move-btn');
+        const confirmMoveBtn = document.getElementById('confirm-move-btn');
+
+        // State for move player
+        let playerToMove = { id: null, role: null, tier: null, name: null };
+
 
         // --- FUNZIONI DI GESTIONE STATO ---
         function saveState() {
@@ -889,6 +938,7 @@
                         // Mostra i bottoni per aprire il selettore di giocatori e popolare "Altri"
                         document.getElementById('show-player-selector-btn').classList.remove('hidden');
                         document.getElementById('populate-others-btn').classList.remove('hidden');
+                        updatePopulateButtonText(); // Update button text when CSV is restored
                     }
                 } catch (e) {
                     console.error("Errore nel caricamento dello stato, resetto.", e);
@@ -1296,9 +1346,12 @@
                         </div>
                     </div>
                 </div>
-                <div class="mt-4 flex flex-col sm:flex-row gap-2">
-                    <button class="buy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded w-full transition-colors mobile-touch-btn text-sm sm:text-base" data-id="${player.id}">Compra</button>
-                    <button class="toggle-remove-btn ${isRemoved ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-red-600 hover:bg-red-700'} text-white font-bold py-3 px-4 rounded w-full transition-colors mobile-touch-btn text-sm sm:text-base">${isRemoved ? 'Ripristina' : 'Rimuovi'}</button>
+                <div class="mt-4 space-y-2">
+                    <div class="flex flex-col sm:flex-row gap-2">
+                        <button class="buy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded w-full transition-colors mobile-touch-btn text-sm sm:text-base" data-id="${player.id}">Compra</button>
+                        <button class="toggle-remove-btn ${isRemoved ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-red-600 hover:bg-red-700'} text-white font-bold py-3 px-4 rounded w-full transition-colors mobile-touch-btn text-sm sm:text-base">${isRemoved ? 'Ripristina' : 'Rimuovi'}</button>
+                    </div>
+                    <button class="move-player-btn bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded w-full transition-colors mobile-touch-btn text-sm sm:text-base" data-id="${player.id}" data-role="${role}" data-tier="${tier}">Sposta Categoria</button>
                 </div>
             `;
 
@@ -1348,9 +1401,12 @@
                         <input type="number" id="paid-price-${player.id}" value="${player.qta}" placeholder="Prezzo" class="w-full bg-gray-900 border border-gray-600 rounded p-2 text-center text-white text-xs sm:text-sm focus:ring-1 focus:ring-cyan-500 min-h-[40px]">
                     </div>
                 </div>
-                <div class="mt-2 flex flex-col sm:flex-row gap-1">
-                    <button class="buy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-2 rounded w-full transition-colors text-xs sm:text-sm mobile-touch-btn" data-id="${player.id}">Compra</button>
-                    <button class="toggle-remove-btn ${isRemoved ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-red-600 hover:bg-red-700'} text-white font-bold py-2 px-2 rounded w-full transition-colors text-xs sm:text-sm mobile-touch-btn">${isRemoved ? 'Ripr.' : 'Rim.'}</button>
+                <div class="mt-2 space-y-1">
+                    <div class="flex gap-1">
+                        <button class="buy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-2 rounded flex-1 transition-colors text-xs sm:text-sm mobile-touch-btn" data-id="${player.id}">Compra</button>
+                        <button class="toggle-remove-btn ${isRemoved ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-red-600 hover:bg-red-700'} text-white font-bold py-2 px-2 rounded flex-1 transition-colors text-xs sm:text-sm mobile-touch-btn">${isRemoved ? 'Ripr.' : 'Rim.'}</button>
+                    </div>
+                    <button class="move-player-btn bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-2 rounded w-full transition-colors text-xs sm:text-sm mobile-touch-btn" data-id="${player.id}" data-role="${role}" data-tier="${tier}">Sposta</button>
                 </div>
             `;
 
@@ -1399,6 +1455,7 @@
                         <input type="number" id="paid-price-${player.id}" value="${player.qta}" class="w-16 sm:w-20 bg-gray-900 border border-gray-600 rounded p-2 text-center text-white text-xs sm:text-sm focus:ring-2 focus:ring-cyan-500 min-h-[40px] sm:min-h-[44px]" placeholder="€">
                         <button class="buy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-2 sm:px-3 rounded transition-colors text-xs sm:text-sm mobile-touch-btn flex-shrink-0" data-id="${player.id}">Compra</button>
                         <button class="toggle-remove-btn ${isRemoved ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-red-600 hover:bg-red-700'} text-white font-bold py-2 px-2 sm:px-3 rounded transition-colors text-xs sm:text-sm mobile-touch-btn flex-shrink-0">${isRemoved ? 'Ripr.' : 'Rim.'}</button>
+                        <button class="move-player-btn bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-2 sm:px-3 rounded transition-colors text-xs sm:text-sm mobile-touch-btn flex-shrink-0" data-id="${player.id}" data-role="${role}" data-tier="${tier}">Sposta</button>
                         <button class="text-red-500 hover:text-red-400 permanent-delete-btn p-2 flex-shrink-0" data-id="${player.id}" data-role="${role}" data-tier="${tier}" data-name="${player.nome}">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -1498,6 +1555,14 @@
                 e.preventDefault();
                 toggleFavorite(player.id);
             });
+
+            card.querySelector('.move-player-btn').addEventListener('click', (e) => {
+                const button = e.currentTarget;
+                const playerId = parseInt(button.dataset.id);
+                const role = button.dataset.role;
+                const tier = button.dataset.tier;
+                showMovePlayerModal(playerId, role, tier, player.nome);
+            });
         }
 
         function toggleFavorite(playerId) {
@@ -1509,6 +1574,67 @@
             }
             saveState();
             renderPlayers(); // Re-render to update the visual state
+        }
+
+        function showMovePlayerModal(playerId, role, tier, playerName) {
+            playerToMove = { id: playerId, role: role, tier: tier, name: playerName };
+            
+            // Popola le informazioni del giocatore
+            movePlayerInfo.innerHTML = `
+                <div class="flex items-center">
+                    <div>
+                        <p class="font-bold text-white">${playerName}</p>
+                        <p class="text-sm text-gray-400">Attualmente in: ${tier}</p>
+                    </div>
+                </div>
+            `;
+            
+            // Imposta la categoria attuale come selezionata (disabilitata)
+            moveToTierSelect.innerHTML = '';
+            const tiers = ['Top', 'Buoni', 'Scommesse', 'Altri'];
+            tiers.forEach(tierOption => {
+                const option = document.createElement('option');
+                option.value = tierOption;
+                option.textContent = tierOption;
+                if (tierOption === tier) {
+                    option.disabled = true;
+                    option.textContent += ' (attuale)';
+                }
+                moveToTierSelect.appendChild(option);
+            });
+            
+            // Seleziona la prima opzione disponibile
+            const availableOptions = Array.from(moveToTierSelect.options).filter(opt => !opt.disabled);
+            if (availableOptions.length > 0) {
+                availableOptions[0].selected = true;
+            }
+            
+            movePlayerModal.classList.remove('hidden');
+        }
+
+        function movePlayer() {
+            const newTier = moveToTierSelect.value;
+            const { id, role, tier } = playerToMove;
+            
+            // Trova il giocatore nella categoria attuale
+            const currentTierArray = playersData[role][tier];
+            const playerIndex = currentTierArray.findIndex(p => p.id === id);
+            
+            if (playerIndex > -1) {
+                // Rimuovi il giocatore dalla categoria attuale
+                const player = currentTierArray.splice(playerIndex, 1)[0];
+                
+                // Aggiungi il giocatore alla nuova categoria
+                playersData[role][newTier].push(player);
+                
+                // Riaggiorna l'interfaccia
+                renderPlayers();
+                saveState();
+                
+                alert(`${playerToMove.name} spostato da "${tier}" a "${newTier}"!`);
+            }
+            
+            movePlayerModal.classList.add('hidden');
         }
 
         function updateUI() {
@@ -2115,6 +2241,7 @@
             loadState();
             renderPlayers();
             updateUI();
+            updatePopulateButtonText(); // Initialize button text
         });
 
         tabs.forEach(tab => {
@@ -2127,6 +2254,7 @@
                 e.target.classList.add('border-cyan-400', 'text-cyan-400');
                 e.target.classList.remove('border-transparent', 'text-gray-400');
                 state.activeRole = e.target.dataset.role;
+                updatePopulateButtonText(); // Update button text when role changes
                 renderPlayers();
             });
         });
@@ -2195,6 +2323,12 @@
         importFileInput.addEventListener('change', handleImportFile);
         cancelImportBtn.addEventListener('click', cancelImport);
         confirmImportBtn.addEventListener('click', confirmImport);
+
+        // Move player modal event listeners
+        cancelMoveBtn.addEventListener('click', () => {
+            movePlayerModal.classList.add('hidden');
+        });
+        confirmMoveBtn.addEventListener('click', movePlayer);
 
         // CSV Event Listeners
         csvFileInput.addEventListener('change', () => {

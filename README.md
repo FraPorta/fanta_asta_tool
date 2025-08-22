@@ -8,7 +8,9 @@
 
 Un **tool web interattivo** per gestire le aste del Fantacalcio 2025/26. Ottimizzato per desktop e mobile, ti aiuta a organizzare la tua asta con un'interfaccia moderna e funzionalità avanzate.
 
-![Fanta Asta Tool Preview]()
+![Preview 2](resources/squadra.png)
+
+![Fanta Asta Tool Preview](resources/lista.png)
 
 ## ✨ Caratteristiche Principali
 

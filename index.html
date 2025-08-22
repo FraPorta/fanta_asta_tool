@@ -647,7 +647,7 @@
 
         // --- STATO DELL'APPLICAZIONE (CARICATO O DI DEFAULT) ---
         let playersData = JSON.parse(JSON.stringify(initialPlayersData)); // Deep copy
-        let state = { budget: 500, squad: [], activeRole: 'P', sortOptions: {}, removedPlayers: [] };
+        let state = { budget: 500, squad: [], activeRole: 'P', sortOptions: {}, removedPlayers: [], searchQuery: '' };
         let playerToDelete = { id: null, role: null, tier: null };
 
         // --- ELEMENTI DEL DOM ---
@@ -765,16 +765,141 @@
             budgetEl.innerHTML = `<p class="font-semibold text-cyan-300">${budgetAdvice[state.activeRole]}</p>`;
             playersContainer.appendChild(budgetEl);
 
+            // Add search field
+            const searchEl = document.createElement('div');
+            searchEl.className = 'bg-gray-800 p-4 rounded-lg mb-4';
+            searchEl.innerHTML = `
+                <div class="flex items-center space-x-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    <input 
+                        type="text" 
+                        id="player-search-input"
+                        placeholder="Cerca giocatori nella tua lista..." 
+                        value="${state.searchQuery}"
+                        class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                    >
+                    ${state.searchQuery ? `
+                        <button id="clear-search-btn" class="text-gray-400 hover:text-white transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    ` : ''}
+                </div>
+            `;
+            playersContainer.appendChild(searchEl);
+
+            // Add event listeners for search
+            const searchInput = document.getElementById('player-search-input');
+            searchInput.addEventListener('input', (e) => {
+                const cursorPosition = e.target.selectionStart;
+                state.searchQuery = e.target.value;
+                
+                // Update clear button visibility
+                const searchContainer = searchInput.parentElement;
+                const existingClearBtn = document.getElementById('clear-search-btn');
+                
+                if (state.searchQuery && !existingClearBtn) {
+                    // Add clear button
+                    const clearBtn = document.createElement('button');
+                    clearBtn.id = 'clear-search-btn';
+                    clearBtn.className = 'text-gray-400 hover:text-white transition-colors';
+                    clearBtn.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    `;
+                    clearBtn.addEventListener('click', () => {
+                        state.searchQuery = '';
+                        renderPlayers();
+                        saveState();
+                    });
+                    searchContainer.appendChild(clearBtn);
+                } else if (!state.searchQuery && existingClearBtn) {
+                    // Remove clear button
+                    existingClearBtn.remove();
+                }
+                
+                // Update only the tier contents and headers
+                const roleData = playersData[state.activeRole];
+                for (const tier in roleData) {
+                    // Update tier header counts
+                    const tierHeaders = document.querySelectorAll(`[data-tier="${tier}"]`);
+                    if (tierHeaders.length > 0) {
+                        const tierHeader = tierHeaders[0].closest('.flex');
+                        const countSpan = tierHeader?.querySelector('span');
+                        
+                        if (countSpan) {
+                            let filteredCount = roleData[tier].length;
+                            if (state.searchQuery && state.searchQuery.trim() !== '') {
+                                const searchTerm = state.searchQuery.toLowerCase().trim();
+                                filteredCount = roleData[tier].filter(player => 
+                                    player.nome.toLowerCase().includes(searchTerm) || 
+                                    player.squadra.toLowerCase().includes(searchTerm)
+                                ).length;
+                            }
+                            
+                            countSpan.textContent = state.searchQuery && state.searchQuery.trim() !== '' ? 
+                                `${filteredCount}/${roleData[tier].length} giocatori` : 
+                                `${roleData[tier].length} giocatori`;
+                        }
+                    }
+                    
+                    // Update tier content
+                    renderTierContent(tier, roleData[tier]);
+                }
+                
+                saveState();
+                
+                // Restore cursor position and focus
+                setTimeout(() => {
+                    const newSearchInput = document.getElementById('player-search-input');
+                    if (newSearchInput) {
+                        newSearchInput.focus();
+                        newSearchInput.setSelectionRange(cursorPosition, cursorPosition);
+                    }
+                }, 0);
+            });
+
+            const clearBtn = document.getElementById('clear-search-btn');
+            if (clearBtn) {
+                clearBtn.addEventListener('click', () => {
+                    state.searchQuery = '';
+                    renderPlayers();
+                    saveState();
+                });
+            }
+
             for (const tier in roleData) {
                 const sortKey = `${state.activeRole}-${tier}`;
                 if (!state.sortOptions[sortKey]) {
                     state.sortOptions[sortKey] = 'price'; // Default sort
                 }
 
+                // Calculate filtered count for display
+                let filteredCount = roleData[tier].length;
+                if (state.searchQuery && state.searchQuery.trim() !== '') {
+                    const searchTerm = state.searchQuery.toLowerCase().trim();
+                    filteredCount = roleData[tier].filter(player => 
+                        player.nome.toLowerCase().includes(searchTerm) || 
+                        player.squadra.toLowerCase().includes(searchTerm)
+                    ).length;
+                }
+
                 const tierHeader = document.createElement('div');
                 tierHeader.className = 'flex justify-between items-center mt-6 mb-3 border-b border-gray-700 pb-2';
                 tierHeader.innerHTML = `
-                    <h3 class="text-xl font-bold text-amber-400">${tier}</h3>
+                    <div class="flex items-center space-x-3">
+                        <h3 class="text-xl font-bold text-amber-400">${tier}</h3>
+                        <span class="text-sm text-gray-400">
+                            ${state.searchQuery && state.searchQuery.trim() !== '' ? 
+                                `${filteredCount}/${roleData[tier].length} giocatori` : 
+                                `${roleData[tier].length} giocatori`
+                            }
+                        </span>
+                    </div>
                     <div class="flex space-x-2" data-tier="${tier}">
                         <button class="sort-btn text-xs py-1 px-3 rounded-full bg-gray-700 hover:bg-gray-600 ${state.sortOptions[sortKey] === 'price' ? 'active' : ''}" data-sort="price">Prezzo</button>
                         <button class="sort-btn text-xs py-1 px-3 rounded-full bg-gray-700 hover:bg-gray-600 ${state.sortOptions[sortKey] === 'team' ? 'active' : ''}" data-sort="team">Squadra</button>
@@ -806,7 +931,17 @@
             const sortKey = `${state.activeRole}-${tier}`;
             const sortType = state.sortOptions[sortKey] || 'price';
 
-            const sortedPlayers = [...players].sort((a, b) => {
+            // Filter players based on search query
+            let filteredPlayers = players;
+            if (state.searchQuery && state.searchQuery.trim() !== '') {
+                const searchTerm = state.searchQuery.toLowerCase().trim();
+                filteredPlayers = players.filter(player => 
+                    player.nome.toLowerCase().includes(searchTerm) || 
+                    player.squadra.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            const sortedPlayers = [...filteredPlayers].sort((a, b) => {
                 if (sortType === 'team') {
                     return a.squadra.localeCompare(b.squadra);
                 }
@@ -820,6 +955,19 @@
                 const card = createPlayerCard(player, isBoughtByMe, state.activeRole, tier);
                 tierContainer.appendChild(card);
             });
+
+            // Show "no results" message if search yields no results
+            if (state.searchQuery && state.searchQuery.trim() !== '' && sortedPlayers.length === 0) {
+                const noResultsEl = document.createElement('div');
+                noResultsEl.className = 'col-span-full text-center py-8 text-gray-400';
+                noResultsEl.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-4 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    <p>Nessun giocatore trovato per "${state.searchQuery}"</p>
+                `;
+                tierContainer.appendChild(noResultsEl);
+            }
         }
 
         function calculateRecommendedPrice(player, tier) {

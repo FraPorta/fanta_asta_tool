@@ -212,6 +212,18 @@
             .player-card, .fa-btn-primary, .fa-btn-icon { transition: none; }
             .player-card:hover { transform: none; }
         }
+
+        .fa-row {
+            display:flex; align-items:center; gap:12px; padding:11px 14px;
+            background: var(--surface); border:1px solid var(--border); border-radius: var(--radius-md);
+        }
+        .fa-row.is-favorite { box-shadow: inset 3px 0 0 var(--accent); }
+        .fa-row .fa-crest { width:30px; height:30px; }
+        .fa-col { text-align:right; min-width:56px; }
+        .fa-col-k { font-size:9px; letter-spacing:.08em; text-transform:uppercase; color:var(--text-dim); }
+        .fa-col-v { font-size:15px; font-weight:700; color:var(--text); }
+        .fa-col-v.sug { color:#5eead4; }
+        @media (max-width: 640px) { .fa-row { flex-wrap: wrap; } .fa-row .fa-input { width:64px; } }
     </style>
 </head>
 

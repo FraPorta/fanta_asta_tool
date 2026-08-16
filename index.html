@@ -166,6 +166,34 @@
                 justify-content: flex-start;
             }
         }
+
+        .player-card { position: relative; transition: transform .18s ease-out, box-shadow .18s ease-out, opacity .25s ease-out; }
+        .player-card.is-bought   { border-color: var(--bought); opacity: .55; }
+        .player-card.is-bought .buy-btn,
+        .player-card.is-bought input { pointer-events: none; }
+        .player-card.is-removed  { border-color: var(--removed); opacity: .5; }
+        .player-card.is-favorite { box-shadow: 0 0 0 1px var(--accent); }
+        .player-card.is-bought.is-favorite,
+        .player-card.is-removed.is-favorite { box-shadow: none; }
+
+        .fa-btn-primary {
+            background: linear-gradient(180deg, var(--primary), var(--primary-strong));
+            color: #04201d; font-weight: 800; border-radius: var(--radius-sm);
+            padding: 10px 16px; transition: filter .15s ease-out;
+        }
+        .fa-btn-primary:hover:not(:disabled) { filter: brightness(1.08); }
+        .fa-btn-primary:disabled { background: #24324e; color: var(--text-dim); cursor: not-allowed; }
+
+        .fa-btn-icon {
+            width: 32px; height: 32px; border-radius: var(--radius-sm);
+            background: rgba(148,163,184,.08); color: var(--text-dim);
+            display: inline-flex; align-items: center; justify-content: center;
+            transition: background .15s ease-out, color .15s ease-out;
+        }
+        .fa-btn-icon:hover:not(:disabled) { background: rgba(148,163,184,.16); color: var(--text); }
+        .fa-btn-icon:disabled { opacity: .4; cursor: not-allowed; }
+        .fa-btn-icon.is-danger:hover { color: var(--removed); }
+        .fa-btn-icon.is-active { color: var(--accent); }
     </style>
 </head>
 

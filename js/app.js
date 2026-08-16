@@ -1,3 +1,7 @@
+/*
+ *   Copyright (c) 2026 
+ *   All rights reserved.
+ */
 // Logica dell'app (stato, rendering, persistenza). Dipende da js/parser.js.
 // Caricato come classic script dopo js/parser.js.
 
@@ -751,16 +755,9 @@ function createLargePlayerCard(player, isBoughtByMe, role, tier, isRemoved, reco
     const card = document.createElement('div');
     card.id = `player-${player.id}`;
     const isFavorite = state.favorites.includes(player.id);
-    // Priorità bordi: bought-by-me (verde) > removed-card (rosso) > favorite-card (dorato)
-    let borderClass = '';
-    if (isBoughtByMe) {
-        borderClass = 'bought-by-me';
-    } else if (isRemoved) {
-        borderClass = 'removed-card';
-    } else if (isFavorite) {
-        borderClass = 'favorite-card';
-    }
-    card.className = `player-card bg-gray-800 rounded-lg p-4 shadow-md flex flex-col justify-between relative ${borderClass} ${isRemoved ? 'bought' : ''}`;
+    // Priorità stati: acquistato > rimosso > preferito
+    const stateClass = isBoughtByMe ? 'is-bought' : (isRemoved ? 'is-removed' : (isFavorite ? 'is-favorite' : ''));
+    card.className = `player-card bg-gray-800 rounded-lg p-4 shadow-md flex flex-col justify-between relative ${stateClass}`;
 
     card.innerHTML = `
         <button class="absolute top-2 right-2 text-red-500 hover:text-red-400 permanent-delete-btn" data-id="${player.id}" data-role="${role}" data-tier="${tier}" data-name="${player.nome}">
@@ -813,16 +810,9 @@ function createSmallPlayerCard(player, isBoughtByMe, role, tier, isRemoved, reco
     const card = document.createElement('div');
     card.id = `player-${player.id}`;
     const isFavorite = state.favorites.includes(player.id);
-    // Priorità bordi: bought-by-me (verde) > removed-card (rosso) > favorite-card (dorato)
-    let borderClass = '';
-    if (isBoughtByMe) {
-        borderClass = 'bought-by-me';
-    } else if (isRemoved) {
-        borderClass = 'removed-card';
-    } else if (isFavorite) {
-        borderClass = 'favorite-card';
-    }
-    card.className = `player-card bg-gray-800 rounded-lg p-3 shadow-md flex flex-col justify-between relative ${borderClass} ${isRemoved ? 'bought' : ''}`;
+    // Priorità stati: acquistato > rimosso > preferito
+    const stateClass = isBoughtByMe ? 'is-bought' : (isRemoved ? 'is-removed' : (isFavorite ? 'is-favorite' : ''));
+    card.className = `player-card bg-gray-800 rounded-lg p-3 shadow-md flex flex-col justify-between relative ${stateClass}`;
 
     card.innerHTML = `
         <button class="absolute top-1 right-1 text-red-500 hover:text-red-400 permanent-delete-btn" data-id="${player.id}" data-role="${role}" data-tier="${tier}" data-name="${player.nome}">
@@ -868,16 +858,9 @@ function createListPlayerCard(player, isBoughtByMe, role, tier, isRemoved, recom
     const card = document.createElement('div');
     card.id = `player-${player.id}`;
     const isFavorite = state.favorites.includes(player.id);
-    // Priorità bordi: bought-by-me (verde) > removed-card (rosso) > favorite-card (dorato)
-    let borderClass = '';
-    if (isBoughtByMe) {
-        borderClass = 'bought-by-me';
-    } else if (isRemoved) {
-        borderClass = 'removed-card';
-    } else if (isFavorite) {
-        borderClass = 'favorite-card';
-    }
-    card.className = `player-card bg-gray-800 rounded-lg p-3 shadow-md relative ${borderClass} ${isRemoved ? 'bought' : ''}`;
+    // Priorità stati: acquistato > rimosso > preferito
+    const stateClass = isBoughtByMe ? 'is-bought' : (isRemoved ? 'is-removed' : (isFavorite ? 'is-favorite' : ''));
+    card.className = `player-card bg-gray-800 rounded-lg p-3 shadow-md relative ${stateClass}`;
 
     card.innerHTML = `
         <div class="flex flex-col sm:flex-row sm:items-center gap-3">
@@ -928,16 +911,9 @@ function addPlayerCardEventListeners(card, player) {
         if (buyBtn) {
             buyBtn.disabled = true;
             buyBtn.textContent = 'Acquistato';
-            buyBtn.classList.replace('bg-green-600', 'bg-gray-600');
         }
-
-        // Disabilita anche il pulsante rimuovi/ripristina per i giocatori della squadra
         const toggleBtn = card.querySelector('.toggle-remove-btn');
-        if (toggleBtn) {
-            toggleBtn.disabled = true;
-            toggleBtn.classList.add('opacity-50', 'cursor-not-allowed');
-            toggleBtn.classList.remove('hover:bg-yellow-700', 'hover:bg-red-700');
-        }
+        if (toggleBtn) toggleBtn.disabled = true;
     }
 
     card.querySelector('.buy-btn').addEventListener('click', () => buyPlayer(player.id));
@@ -953,30 +929,21 @@ function addPlayerCardEventListeners(card, player) {
             return;
         }
 
-        card.classList.toggle('bought');
-        if (card.classList.contains('bought')) {
+        const nowRemoved = !card.classList.contains('is-removed');
+        card.classList.toggle('is-removed', nowRemoved);
+        card.classList.toggle('is-favorite', !nowRemoved && state.favorites.includes(playerId));
+        if (nowRemoved) {
             if (!state.removedPlayers.includes(playerId)) state.removedPlayers.push(playerId);
-
-            // Aggiorna i bordi rispettando la priorità: bought-by-me (verde) > removed-card (rosso)
-            card.classList.remove('favorite-card');
-            card.classList.add('removed-card');
-
-            button.textContent = button.textContent.includes('Ripr') ? 'Ripr.' : 'Ripristina';
-            button.classList.replace('bg-red-600', 'bg-yellow-600');
-            button.classList.replace('hover:bg-red-700', 'hover:bg-yellow-700');
         } else {
             state.removedPlayers = state.removedPlayers.filter(id => id !== playerId);
-
-            // Ripristina i bordi
-            card.classList.remove('removed-card');
-            const isFavorite = state.favorites.includes(playerId);
-            if (isFavorite) {
-                card.classList.add('favorite-card');
-            }
-
+        }
+        button.title = nowRemoved ? 'Ripristina' : 'Rimuovi dalla lista';
+        button.setAttribute('aria-label', button.title);
+        button.classList.toggle('is-active', nowRemoved);
+        if (nowRemoved) {
+            button.textContent = button.textContent.includes('Ripr') ? 'Ripr.' : 'Ripristina';
+        } else {
             button.textContent = button.textContent.includes('Rim') ? 'Rim.' : 'Rimuovi';
-            button.classList.replace('bg-yellow-600', 'bg-red-600');
-            button.classList.replace('hover:bg-yellow-700', 'hover:bg-red-700');
         }
         saveState();
     });
@@ -1146,9 +1113,11 @@ function buyPlayer(playerId) {
 
     playerCard.classList.add('bought-by-me');
     playerCard.classList.add('bought'); // Aggiungi anche la classe 'bought' per l'opacità ridotta
+    playerCard.classList.add('is-bought');
 
     // Rimuovi il bordo dorato dei preferiti se presente
     playerCard.classList.remove('favorite-card');
+    playerCard.classList.remove('is-favorite');
 
     const buyBtn = playerCard.querySelector('.buy-btn');
     buyBtn.disabled = true;
@@ -1325,6 +1294,7 @@ function sellPlayer(event) {
         playerCard.classList.remove('bought-by-me');
         playerCard.classList.remove('bought'); // Rimuovi anche l'opacità
         playerCard.classList.remove('removed-card'); // Rimuovi anche il bordo rosso
+        playerCard.classList.remove('is-bought', 'is-removed');
 
         const buyBtn = playerCard.querySelector('.buy-btn');
         buyBtn.disabled = false;

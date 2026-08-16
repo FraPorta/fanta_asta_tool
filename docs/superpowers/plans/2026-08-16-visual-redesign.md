@@ -16,6 +16,11 @@
 - **Offline-capable:** no new network requests at runtime. Inter is vendored to `resources/fonts/`.
 - **Every player card variant must keep all five control classes** — `.buy-btn`, `.toggle-remove-btn`, `.move-player-btn`, `.permanent-delete-btn`, `.favorite-btn` — and the input `id="paid-price-${player.id}"`. `addPlayerCardEventListeners` calls `card.querySelector(...)` on each with **no null guard**; a missing control throws a TypeError and the whole grid fails to render.
 - **Tokens are the only place colours are defined.** No new `bg-gray-*`, `bg-green-*`, `bg-red-*`, `text-cyan-*` utilities in redesigned code.
+- **Element ids bound at script parse time must never disappear.** `js/app.js:281-299` runs
+  `document.getElementById(...)` at top level for `players-container`, `remaining-budget`,
+  `squad-count`, `empty-squad-msg`, `squad-P|D|C|A`, `squad-P|D|C|A-section`. `updateUI()` writes to
+  `remainingBudgetEl` and `squadCountEl` with no null guard — if either id is missing the app throws
+  on every state change. Moving an element is fine; dropping its id is not.
 - Language of all user-visible copy stays Italian.
 - Commit after every task with author `FraPorta <francy857@gmail.com>` (repo config already matches).
 
@@ -616,8 +621,8 @@ Replace `index.html:137-205` (the whole `<!-- HEADER FISSO -->` block) with:
     <!-- BARRA SUPERIORE -->
     <header id="fa-topbar">
         <span class="font-extrabold text-[15px]" style="color:var(--primary)">⚽ Guida Asta</span>
-        <span class="fa-chip ok num" id="topbar-budget">€0 / 0</span>
-        <span class="fa-chip num" id="topbar-squad">0/25</span>
+        <span class="fa-chip ok num">€<span id="remaining-budget">500</span> / 500</span>
+        <span class="fa-chip num" id="squad-count">0 / 25</span>
         <div class="ml-auto flex items-center gap-2">
             <button id="export-btn" class="fa-btn-icon" title="Esporta" aria-label="Esporta">💾</button>
             <button id="import-btn" class="fa-btn-icon" title="Importa" aria-label="Importa">📥</button>
@@ -626,7 +631,27 @@ Replace `index.html:137-205` (the whole `<!-- HEADER FISSO -->` block) with:
     </header>
 ```
 
-Keep the ids `export-btn`, `import-btn`, `reset-btn` exactly — `js/app.js` binds them by id. Before deleting the old header, run `grep -n "getElementById('summary" js/app.js` and make sure every id the old header carried that JS still writes to (`summary-spent-P|D|C|A`, budget totals) has a home; move those spans into the rail (Step 4) rather than dropping them.
+**This is the riskiest edit in the plan.** The header being deleted (`index.html:137-205`) carries
+ids that `js/app.js` binds at parse time or writes to without null guards. Every one of them must
+survive the move:
+
+| id | Consumer | New home |
+| --- | --- | --- |
+| `remaining-budget` | `remainingBudgetEl`, written by `updateUI` | top bar chip (above) |
+| `squad-count` | `squadCountEl`, written by `updateUI` | top bar chip (above) |
+| `spent-P`, `spent-D`, `spent-C`, `spent-A` | `updateUI` loop, guarded by `if (spentElement)` | rail slot pills (Step 4) |
+
+Note `updateUI` also does `remainingBudgetEl.classList.toggle('text-red-500' / 'text-green-400', …)`.
+Those two Tailwind utilities are colour classes on an element the token layer now styles: replace
+that pair with `classList.toggle('is-tight', state.budget < 100)` and add
+`#remaining-budget.is-tight { color: var(--removed); }` to the stylesheet, so the sweep in Task 7
+finds nothing left behind.
+
+Before deleting anything, confirm the full list yourself:
+
+```bash
+grep -n "getElementById('" js/app.js | grep -v "player-\|paid-price\|tier-container" | head -40
+```
 
 - [ ] **Step 3: Wrap main and rail**
 
@@ -648,14 +673,14 @@ At the top of `#fa-rail`:
 ```html
         <div>
             <div class="text-[10px] uppercase tracking-widest" style="color:var(--text-dim)">Budget rimanente</div>
-            <div class="text-2xl font-extrabold num" id="rail-budget" style="color:var(--bought)">0</div>
+            <div class="text-2xl font-extrabold num" style="color:var(--bought)">€<span id="rail-budget-mirror">0</span></div>
             <div class="fa-meter mt-2" id="rail-meter"><i style="width:100%"></i></div>
         </div>
         <div class="grid grid-cols-2 gap-2">
-            <div class="fa-slot"><span>P</span><span class="num" id="rail-slot-P">0/3</span></div>
-            <div class="fa-slot"><span>D</span><span class="num" id="rail-slot-D">0/8</span></div>
-            <div class="fa-slot"><span>C</span><span class="num" id="rail-slot-C">0/8</span></div>
-            <div class="fa-slot"><span>A</span><span class="num" id="rail-slot-A">0/6</span></div>
+            <div class="fa-slot"><span>P</span><span class="num"><span id="rail-slot-P">0/3</span> · €<span id="spent-P">0</span></span></div>
+            <div class="fa-slot"><span>D</span><span class="num"><span id="rail-slot-D">0/8</span> · €<span id="spent-D">0</span></span></div>
+            <div class="fa-slot"><span>C</span><span class="num"><span id="rail-slot-C">0/8</span> · €<span id="spent-C">0</span></span></div>
+            <div class="fa-slot"><span>A</span><span class="num"><span id="rail-slot-A">0/6</span> · €<span id="spent-A">0</span></span></div>
         </div>
 ```
 
@@ -663,22 +688,31 @@ At the top of `#fa-rail`:
 
 At the end of `updateUI()` in `js/app.js`, add — reusing the totals `updateUI` already computes (read the function first and reuse its existing variables rather than recomputing):
 
+**Read `updateUI` first.** Two facts the code must respect, both verified in the current source:
+`state.budget` is the **remaining** budget (decremented in `buyPlayer`, restored in `sellPlayer`);
+the total is the hard-coded `500` already used at `js/app.js:1614`. And role counts per player come
+from `getPlayerById(p.id).R`, **not** `p.role` — `updateUI` already computes them into `counts`.
+Reuse that object; do not recompute.
+
+Append at the end of `updateUI()`, after the existing `counts`/`spent` loop and before
+`renderMySquad()`:
+
 ```javascript
-    // Barra superiore e rail
-    const remaining = state.budget - totalSpent;
+    // Rail: barra budget e slot per ruolo. `state.budget` è il RIMANENTE, il totale è 500.
+    const TOTAL_BUDGET = 500;
     const slotsLeft = 25 - state.squad.length;
-    setText('topbar-budget', `€${remaining} / ${state.budget}`);
-    setText('topbar-squad', `${state.squad.length}/25`);
-    setText('rail-budget', `€${remaining}`);
     const meter = document.getElementById('rail-meter');
     if (meter) {
-        meter.querySelector('i').style.width = `${Math.max(0, Math.min(100, (remaining / state.budget) * 100))}%`;
-        meter.classList.toggle('is-tight', remaining < slotsLeft);
+        const pct = Math.max(0, Math.min(100, (state.budget / TOTAL_BUDGET) * 100));
+        meter.querySelector('i').style.width = `${pct}%`;
+        // Allerta: budget rimanente sotto il numero di slot ancora da riempire
+        meter.classList.toggle('is-tight', state.budget < slotsLeft);
     }
-    ['P', 'D', 'C', 'A'].forEach(r => {
-        const max = { P: 3, D: 8, C: 8, A: 6 }[r];
-        setText(`rail-slot-${r}`, `${state.squad.filter(p => p.role === r).length}/${max}`);
-    });
+    const MAX_SLOTS = { P: 3, D: 8, C: 8, A: 6 };
+    for (const role in MAX_SLOTS) {
+        setText(`rail-slot-${role}`, `${counts[role]}/${MAX_SLOTS[role]}`);
+    }
+    setText('rail-budget-mirror', state.budget);
 ```
 
 and add this helper next to `updateUI`:

@@ -48,5 +48,8 @@ const listeners = bodyOf('addPlayerCardEventListeners');
 check('addPlayerCardEventListeners non manipola classi colore',
     !/classList\.(replace|add|remove)\(\s*'(bg|text|hover:bg)-/.test(listeners));
 
+const allHits = [...new Set(SRC.match(LEGACY) || [])];
+check(`js/app.js senza utility colore legacy${allHits.length ? ' — ' + allHits.join(', ') : ''}`, allHits.length === 0);
+
 console.log(failures === 0 ? '\nTutti i test superati.' : `\n${failures} test falliti.`);
 process.exit(failures === 0 ? 0 : 1);

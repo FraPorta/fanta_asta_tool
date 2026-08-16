@@ -158,7 +158,6 @@ function populatePlayersTable() {
 
     filteredPlayers.forEach(player => {
         const row = document.createElement('tr');
-        row.className = 'hover:bg-gray-700';
         row.innerHTML = `
             <td class="px-2 sm:px-3 py-2">
                 <input type="checkbox" class="player-checkbox rounded min-h-[20px] min-w-[20px]" data-player-id="${player.id}">
@@ -451,8 +450,8 @@ function renderPlayers() {
     const budgetAdvice = { P: 'Budget Consigliato: 20-30 (4-6%)', D: 'Budget Consigliato: 40-60 (8-12%)', C: 'Budget Consigliato: 120-150 (24-30%)', A: 'Budget Consigliato: 250-280 (50-56%)' };
 
     const budgetEl = document.createElement('div');
-    budgetEl.className = 'bg-gray-800 p-3 rounded-lg mb-4 text-center';
-    budgetEl.innerHTML = `<p class="font-semibold text-cyan-300">${budgetAdvice[state.activeRole]}</p>`;
+    budgetEl.className = 'fa-surface p-3 mb-4 text-center';
+    budgetEl.innerHTML = `<p class="font-semibold fa-primary-text">${budgetAdvice[state.activeRole]}</p>`;
     playersContainer.appendChild(budgetEl);
 
     // Add search field
@@ -461,7 +460,7 @@ function renderPlayers() {
     searchEl.innerHTML = `
         <div class="flex flex-col space-y-3">
             <div class="flex items-center space-x-3">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 fa-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
                 <input
@@ -472,7 +471,7 @@ function renderPlayers() {
                     class="fa-input w-full text-left"
                 >
                 ${state.searchQuery ? `
-                    <button id="clear-search-btn" class="text-gray-400 hover:text-white transition-colors">
+                    <button id="clear-search-btn" class="fa-fade-link transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
@@ -480,7 +479,7 @@ function renderPlayers() {
                 ` : ''}
             </div>
             <div class="flex items-center justify-between">
-                <span class="text-sm text-gray-400">Modalità visualizzazione:</span>
+                <span class="text-sm fa-muted">Modalità visualizzazione:</span>
                 <div class="flex gap-2">
                     <button id="view-large" class="fa-btn-icon ${state.viewMode === 'large' ? 'is-active' : ''}" title="Card Grandi">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -517,7 +516,7 @@ function renderPlayers() {
             // Add clear button
             const clearBtn = document.createElement('button');
             clearBtn.id = 'clear-search-btn';
-            clearBtn.className = 'text-gray-400 hover:text-white transition-colors';
+            clearBtn.className = 'fa-fade-link transition-colors';
             clearBtn.innerHTML = `
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -632,8 +631,8 @@ function renderPlayers() {
                 </span>
             </div>
             <div class="flex space-x-2" data-tier="${tier}">
-                <button class="sort-btn text-xs py-1 px-3 rounded-full bg-gray-700 hover:bg-gray-600 ${state.sortOptions[sortKey] === 'price' ? 'active' : ''}" data-sort="price">Prezzo</button>
-                <button class="sort-btn text-xs py-1 px-3 rounded-full bg-gray-700 hover:bg-gray-600 ${state.sortOptions[sortKey] === 'team' ? 'active' : ''}" data-sort="team">Squadra</button>
+                <button class="sort-btn fa-tab ${state.sortOptions[sortKey] === 'price' ? 'is-active' : ''}" data-sort="price">Prezzo</button>
+                <button class="sort-btn fa-tab ${state.sortOptions[sortKey] === 'team' ? 'is-active' : ''}" data-sort="team">Squadra</button>
             </div>
         `;
         playersContainer.appendChild(tierHeader);
@@ -648,7 +647,7 @@ function renderPlayers() {
         const addBtnContainer = document.createElement('div');
         addBtnContainer.className = 'flex justify-center items-center mt-4';
         const addBtn = document.createElement('button');
-        addBtn.className = 'bg-cyan-800 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded-full flex items-center transition-colors';
+        addBtn.className = 'fa-btn-primary flex items-center';
         addBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg> Aggiungi Giocatore`;
         addBtn.onclick = () => showAddPlayerModal(state.activeRole, tier);
         addBtnContainer.appendChild(addBtn);
@@ -690,7 +689,7 @@ function renderTierContent(tier, players) {
     // Show "no results" message if search yields no results
     if (state.searchQuery && state.searchQuery.trim() !== '' && sortedPlayers.length === 0) {
         const noResultsEl = document.createElement('div');
-        noResultsEl.className = 'col-span-full text-center py-8 text-gray-400';
+        noResultsEl.className = 'col-span-full text-center py-8 fa-muted';
         noResultsEl.innerHTML = `
             <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-4 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -979,7 +978,7 @@ function showMovePlayerModal(playerId, role, tier, playerName) {
         <div class="flex items-center">
             <div>
                 <p class="font-bold text-white">${playerName}</p>
-                <p class="text-sm text-gray-400">Attualmente in: ${tier}</p>
+                <p class="text-sm fa-muted">Attualmente in: ${tier}</p>
             </div>
         </div>
     `;
@@ -1109,24 +1108,17 @@ function buyPlayer(playerId) {
         state.favorites.splice(favoriteIndex, 1);
     }
 
-    playerCard.classList.add('bought-by-me');
-    playerCard.classList.add('bought'); // Aggiungi anche la classe 'bought' per l'opacità ridotta
     playerCard.classList.add('is-bought');
-
-    // Rimuovi il bordo dorato dei preferiti se presente
-    playerCard.classList.remove('favorite-card');
     playerCard.classList.remove('is-favorite');
 
     const buyBtn = playerCard.querySelector('.buy-btn');
     buyBtn.disabled = true;
     buyBtn.textContent = 'Acquistato';
-    buyBtn.classList.replace('bg-green-600', 'bg-gray-600');
 
     // Aggiorna il tasto stella per mostrare che non è più preferito
     const favoriteBtn = playerCard.querySelector('.favorite-btn');
     if (favoriteBtn) {
-        favoriteBtn.classList.remove('active');
-        favoriteBtn.classList.add('text-gray-400', 'hover:text-amber-400');
+        favoriteBtn.classList.remove('is-active');
         const star = favoriteBtn.querySelector('svg');
         if (star) {
             star.setAttribute('fill', 'none');
@@ -1137,8 +1129,6 @@ function buyPlayer(playerId) {
     const toggleBtn = playerCard.querySelector('.toggle-remove-btn');
     if (toggleBtn) {
         toggleBtn.textContent = toggleBtn.textContent.includes('Ripr') ? 'Ripr.' : 'Ripristina';
-        toggleBtn.classList.replace('bg-red-600', 'bg-yellow-600');
-        toggleBtn.classList.replace('hover:bg-red-700', 'hover:bg-yellow-700');
     }
 
     updateUI();
@@ -1270,25 +1260,17 @@ function sellPlayer(event) {
 
     const playerCard = document.getElementById(`player-${playerId}`);
     if (playerCard) {
-        playerCard.classList.remove('bought-by-me');
-        playerCard.classList.remove('bought'); // Rimuovi anche l'opacità
-        playerCard.classList.remove('removed-card'); // Rimuovi anche il bordo rosso
         playerCard.classList.remove('is-bought', 'is-removed');
 
         const buyBtn = playerCard.querySelector('.buy-btn');
         buyBtn.disabled = false;
         buyBtn.textContent = 'Compra';
-        buyBtn.classList.replace('bg-gray-600', 'bg-green-600');
 
-        // Aggiorna il tasto rimuovi per tornare a "Rimuovi" e riabilitarlo
+        // Aggiorna anche il tasto rimuovi per tornare a "Rimuovi" e riabilitarlo
         const toggleBtn = playerCard.querySelector('.toggle-remove-btn');
         if (toggleBtn) {
             toggleBtn.disabled = false;
-            toggleBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-            toggleBtn.classList.add('hover:bg-red-700'); // Ripristina hover effect
             toggleBtn.textContent = toggleBtn.textContent.includes('Ripr') ? 'Rim.' : 'Rimuovi';
-            toggleBtn.classList.replace('bg-yellow-600', 'bg-red-600');
-            toggleBtn.classList.replace('hover:bg-yellow-700', 'hover:bg-red-700');
         }
     }
     updateUI();
@@ -1301,10 +1283,8 @@ function showAddPlayerModal(role, tier) {
     selectedPlayerFromCSV = null;
 
     // Reset modal state
-    csvModeBtn.classList.add('bg-cyan-600');
-    csvModeBtn.classList.remove('bg-gray-600');
-    manualModeBtn.classList.add('bg-gray-600');
-    manualModeBtn.classList.remove('bg-cyan-600');
+    csvModeBtn.classList.add('is-active');
+    manualModeBtn.classList.remove('is-active');
     csvSelectionMode.classList.remove('hidden');
     manualInputMode.classList.add('hidden');
     selectedCsvPlayer.classList.add('hidden');
@@ -1317,7 +1297,7 @@ function showAddPlayerModal(role, tier) {
 
 function populateCSVPlayersForRole(role) {
     if (csvPlayersData.length === 0) {
-        csvPlayersList.innerHTML = '<p class="text-gray-400 text-sm">Carica prima il listone quotazioni per vedere i giocatori disponibili.</p>';
+        csvPlayersList.innerHTML = '<p class="fa-muted text-sm">Carica prima il listone quotazioni per vedere i giocatori disponibili.</p>';
         return;
     }
 
@@ -1334,7 +1314,7 @@ function populateCSVPlayersForRole(role) {
     });
 
     if (availablePlayers.length === 0) {
-        csvPlayersList.innerHTML = '<p class="text-gray-400 text-sm">Nessun giocatore disponibile per questo ruolo.</p>';
+        csvPlayersList.innerHTML = '<p class="fa-muted text-sm">Nessun giocatore disponibile per questo ruolo.</p>';
         return;
     }
 
@@ -1346,18 +1326,18 @@ function renderAvailablePlayers(players) {
 
     players.forEach(player => {
         const playerDiv = document.createElement('div');
-        playerDiv.className = 'p-2 bg-gray-700 rounded-md hover:bg-gray-600 cursor-pointer player-option';
+        playerDiv.className = 'p-2 fa-option cursor-pointer player-option';
         playerDiv.dataset.playerId = player.id;
 
         playerDiv.innerHTML = `
             <div class="flex justify-between items-center">
                 <div>
                     <div class="font-medium">${player.nome}</div>
-                    <div class="text-sm text-gray-400">${player.squadra}</div>
+                    <div class="text-sm fa-muted player-option-team">${player.squadra}</div>
                 </div>
                 <div class="text-right">
-                    <div class="font-bold text-cyan-400">${player.qta}</div>
-                    ${player.fvm ? `<div class="text-xs text-gray-400">FVM: ${player.fvm}</div>` : ''}
+                    <div class="font-bold fa-primary-text">${player.qta}</div>
+                    ${player.fvm ? `<div class="text-xs fa-muted">FVM: ${player.fvm}</div>` : ''}
                 </div>
             </div>
         `;
@@ -1372,24 +1352,22 @@ function selectPlayerFromCSV(player) {
 
     // Update selection visual
     document.querySelectorAll('.player-option').forEach(el => {
-        el.classList.remove('bg-cyan-600', 'bg-gray-600');
-        el.classList.add('bg-gray-700');
+        el.classList.remove('is-selected');
     });
 
     const selectedDiv = document.querySelector(`[data-player-id="${player.id}"]`);
-    selectedDiv.classList.remove('bg-gray-700');
-    selectedDiv.classList.add('bg-cyan-600');
+    selectedDiv.classList.add('is-selected');
 
     // Show selected player info
     selectedPlayerInfo.innerHTML = `
         <div class="flex justify-between items-center">
             <div>
                 <div class="font-medium">${player.nome}</div>
-                <div class="text-sm text-gray-400">${player.squadra} - ${player.role}</div>
+                <div class="text-sm fa-muted">${player.squadra} - ${player.role}</div>
             </div>
             <div class="text-right">
-                <div class="font-bold text-cyan-400">Q.ta: ${player.qta}</div>
-                ${player.fvm ? `<div class="text-xs text-gray-400">FVM: ${player.fvm}</div>` : ''}
+                <div class="font-bold fa-primary-text">Q.ta: ${player.qta}</div>
+                ${player.fvm ? `<div class="text-xs fa-muted">FVM: ${player.fvm}</div>` : ''}
             </div>
         </div>
     `;
@@ -1403,7 +1381,7 @@ function filterCSVPlayers() {
 
     playerOptions.forEach(option => {
         const playerName = option.querySelector('.font-medium').textContent.toLowerCase();
-        const playerTeam = option.querySelector('.text-gray-400').textContent.toLowerCase();
+        const playerTeam = option.querySelector('.player-option-team').textContent.toLowerCase();
 
         if (playerName.includes(filterValue) || playerTeam.includes(filterValue)) {
             option.style.display = 'block';
@@ -1580,7 +1558,7 @@ function showImportPreview(data) {
     }
 
     importPreview.innerHTML = `
-        <h4 class="font-bold text-cyan-400 mb-3">Anteprima Backup</h4>
+        <h4 class="font-bold fa-primary-text mb-3">Anteprima Backup</h4>
         <div class="space-y-2 text-sm">
             <p><strong>Data:</strong> ${date}</p>
             <p><strong>Giocatori in squadra:</strong> ${squadCount}/25</p>
@@ -1663,8 +1641,8 @@ playersContainer.addEventListener('click', (e) => {
         const sortKey = `${state.activeRole}-${tier}`;
         state.sortOptions[sortKey] = sortType;
 
-        e.target.parentElement.querySelectorAll('.sort-btn').forEach(btn => btn.classList.remove('active'));
-        e.target.classList.add('active');
+        e.target.parentElement.querySelectorAll('.sort-btn').forEach(btn => btn.classList.remove('is-active'));
+        e.target.classList.add('is-active');
 
         renderTierContent(tier, playersData[state.activeRole][tier]);
         saveState();
@@ -1673,19 +1651,15 @@ playersContainer.addEventListener('click', (e) => {
 
 // Add player modal event listeners
 csvModeBtn.addEventListener('click', () => {
-    csvModeBtn.classList.add('bg-cyan-600');
-    csvModeBtn.classList.remove('bg-gray-600');
-    manualModeBtn.classList.add('bg-gray-600');
-    manualModeBtn.classList.remove('bg-cyan-600');
+    csvModeBtn.classList.add('is-active');
+    manualModeBtn.classList.remove('is-active');
     csvSelectionMode.classList.remove('hidden');
     manualInputMode.classList.add('hidden');
 });
 
 manualModeBtn.addEventListener('click', () => {
-    manualModeBtn.classList.add('bg-cyan-600');
-    manualModeBtn.classList.remove('bg-gray-600');
-    csvModeBtn.classList.add('bg-gray-600');
-    csvModeBtn.classList.remove('bg-cyan-600');
+    manualModeBtn.classList.add('is-active');
+    csvModeBtn.classList.remove('is-active');
     manualInputMode.classList.remove('hidden');
     csvSelectionMode.classList.add('hidden');
 });

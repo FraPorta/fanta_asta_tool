@@ -150,13 +150,35 @@ colonne Mantra da ignorare, celle vuote, accenti, equivalenza xlsx/csv. Se nella
 Il tool supporta diverse personalizzazioni tramite modifica del codice:
 
 ### Colori Tema
+Tutti i colori dell'interfaccia sono definiti in un unico punto: il blocco di token CSS
+in cima a `index.html`. Non ci sono utility Tailwind sparse nel markup da rincorrere:
+per personalizzare la palette basta cambiare i valori qui.
+
 ```css
-/* Modifica i colori principali in index.html */
 :root {
-  --primary-color: #06b6d4;    /* Cyan */
-  --success-color: #22c55e;    /* Green */
-  --warning-color: #f59e0b;    /* Amber */
-  --danger-color: #ef4444;     /* Red */
+  --bg:            #080d18;
+  --surface:       #0f1729;
+  --surface-2:     #131d33;
+  --border:        #223050;
+  --text:          #f8fafc;
+  --text-muted:    #8595b0;
+  --text-dim:      #5b6b86;
+
+  --primary:       #14b8a6;
+  --primary-strong:#0d9488;
+  --primary-soft:  #5eead4;
+  --bought:        #22c55e;
+  --removed:       #f43f5e;
+  --accent:        #f59e0b;
+
+  --role-p-bg: #1e3a8a; --role-p-fg: #bfdbfe;
+  --role-d-bg: #065f46; --role-d-fg: #a7f3d0;
+  --role-c-bg: #78350f; --role-c-fg: #fde68a;
+  --role-a-bg: #7f1d1d; --role-a-fg: #fecaca;
+
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 16px;
 }
 ```
 
@@ -197,9 +219,9 @@ function calculateRecommendedPrice(player, tier) {
 - **Soluzione**: Font-size 16px già implementato
 
 ### Modalità Offline
-- **Stato**: Tailwind, SheetJS e i loghi delle squadre sono salvati in `resources/`,
-  quindi l'asta funziona anche senza rete. Resta remoto solo il font Inter
-  (in mancanza di rete si usa il sans-serif di sistema).
+- **Stato**: Tailwind, SheetJS, i loghi delle squadre e il font Inter (pesi 400/500/600/700/800,
+  in `resources/fonts/`) sono tutti salvati in locale: nessuna richiesta di rete viene fatta
+  a runtime, l'asta funziona interamente offline.
 
 ### File Grandi
 - **Problema**: Performance su listoni molto grandi (>5MB)

@@ -88,6 +88,7 @@ function loadCSVData() {
             if (csvPlayersData.length > 0) {
                 document.getElementById('show-player-selector-btn').classList.remove('hidden');
                 document.getElementById('populate-others-btn').classList.remove('hidden');
+                document.getElementById('loader-empty')?.classList.add('hidden');
                 updatePopulateButtonText(); // Update button text when the list is loaded
                 alert(`✅ Caricati ${csvPlayersData.length} giocatori da "${file.name}"!`);
                 console.log('Players loaded:', csvPlayersData.slice(0, 5)); // Log first 5 for debugging
@@ -392,6 +393,7 @@ function loadState() {
                 // Mostra i bottoni per aprire il selettore di giocatori e popolare "Altri"
                 document.getElementById('show-player-selector-btn').classList.remove('hidden');
                 document.getElementById('populate-others-btn').classList.remove('hidden');
+                document.getElementById('loader-empty')?.classList.add('hidden');
                 updatePopulateButtonText(); // Update button text when CSV is restored
             }
         } catch (e) {
@@ -1230,44 +1232,25 @@ function renderMySquad() {
 }
 
 function createSquadPlayerCard(playerInfo, price, playerId, role) {
-    const roleColors = {
-        P: 'border-blue-500 bg-blue-900/10',
-        D: 'border-green-500 bg-green-900/10',
-        C: 'border-yellow-500 bg-yellow-900/10',
-        A: 'border-red-500 bg-red-900/10'
-    };
-
-    const priceColors = {
-        P: 'text-blue-400',
-        D: 'text-green-400',
-        C: 'text-yellow-400',
-        A: 'text-red-400'
-    };
-
     const squadCard = document.createElement('div');
-    squadCard.className = `bg-gray-800 rounded-lg p-3 shadow-md border-l-4 ${roleColors[role]} hover:bg-gray-750 transition-colors`;
+    squadCard.className = 'fa-row';
+    squadCard.style.padding = '8px 10px';
+    squadCard.style.gap = '8px';
 
     squadCard.innerHTML = `
-        <div class="flex items-center justify-between">
-            <div class="flex items-center flex-1">
-                <img src="${teamLogos[playerInfo.squadra] || TEAM_LOGO_PLACEHOLDER}" 
-                     alt="${playerInfo.squadra}" 
-                     class="w-8 h-8 mr-3 object-contain rounded-full bg-white/10">
-                <div class="flex-1">
-                    <div class="flex items-center gap-2">
-                        <p class="font-semibold text-white">${playerInfo.nome}</p>
-                        <span class="px-2 py-1 text-xs font-bold rounded-full bg-gray-700 text-gray-300">${role}</span>
-                    </div>
-                    <p class="text-sm text-gray-400">${playerInfo.squadra} • Q.ta: ${playerInfo.qta}</p>
-                </div>
+        <img src="${teamLogos[playerInfo.squadra] || TEAM_LOGO_PLACEHOLDER}"
+             alt="${playerInfo.squadra}"
+             class="fa-crest">
+        <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2">
+                <p class="fa-name" style="font-size:13px;">${playerInfo.nome}</p>
+                <span class="fa-role" data-role="${role}">${role}</span>
             </div>
-            <div class="text-right ml-3">
-                <p class="font-bold text-lg ${priceColors[role]}">€${price}</p>
-                <button class="sell-btn text-xs text-red-500 hover:text-red-400 font-medium" 
-                        data-id="${playerId}" data-price="${price}">
-                    Vendi
-                </button>
-            </div>
+            <p class="fa-sub">${playerInfo.squadra} • Qt.A ${playerInfo.qta}</p>
+        </div>
+        <div class="flex flex-col items-end gap-1">
+            <p class="num" style="font-weight:700; color:var(--text);">€${price}</p>
+            <button class="sell-btn fa-btn-icon is-danger" data-id="${playerId}" data-price="${price}" title="Vendi" aria-label="Vendi">✕</button>
         </div>
     `;
 

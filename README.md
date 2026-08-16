@@ -64,6 +64,8 @@ start index.html # Windows
 xdg-open index.html # Linux
 ```
 
+> ℹ️ Se il browser blocca il caricamento degli script locali, usa il Metodo 3 (server locale).
+
 ### Metodo 3: Server Locale
 ```bash
 # Con Python 3
@@ -106,19 +108,42 @@ npx serve .
 | **HTML5**           | -        | Struttura semantica           |
 | **CSS3**            | -        | Styling avanzato e animazioni |
 | **JavaScript ES6+** | -        | Logica applicativa            |
-| **Tailwind CSS**    | 3.x      | Framework CSS utility-first   |
+| **Tailwind CSS**    | 3.4.16   | Framework CSS utility-first (in locale) |
+| **SheetJS**         | 0.20.3   | Lettura listone .xlsx / .csv (in locale) |
 | **Web APIs**        | -        | localStorage, File API        |
 
 ## 📂 Struttura del Progetto
 
 ```
 fanta_asta_tool/
-├── 📄 index.html                          # App principale (SPA)
-├── 📁 resources/                          # Immagini + libreria SheetJS (xlsx.mini.min.js)
-├── 📝 README.md                           # Documentazione
-├── ⚖️ LICENSE                             # Licenza Apache 2.0
-└── 🔧 .git/                              # Controllo versione
+├── 📄 index.html              # Markup della SPA
+├── 📁 js/
+│   ├── parser.js              # Lettura listone .xlsx/.csv (nessuna dipendenza dal DOM)
+│   └── app.js                 # Stato, rendering, persistenza
+├── 📁 test/
+│   └── parser.test.js         # Test del parser: `node test/parser.test.js`
+├── 📁 resources/
+│   ├── tailwind.min.js        # Tailwind (copia locale)
+│   ├── xlsx.mini.min.js       # SheetJS (copia locale)
+│   ├── logos/                 # Loghi Serie A 2026/27
+│   └── *.png                  # Screenshot del README
+├── 📝 README.md
+├── ⚖️ LICENSE
+└── 🔧 .git/
 ```
+
+> ℹ️ Il progetto resta senza build step: apri `index.html` con un server statico
+> (`python3 -m http.server`) e apri l'indirizzo nel browser.
+
+## ✅ Test
+
+```bash
+node test/parser.test.js
+```
+
+Copre il parsing del listone: intestazione in posizione variabile, ordine delle colonne,
+colonne Mantra da ignorare, celle vuote, accenti, equivalenza xlsx/csv. Se nella cartella
+è presente un file `Quotazioni_Fantacalcio_*.xlsx` viene validato anche quello.
 
 ## 🎨 Personalizzazione
 
@@ -172,8 +197,9 @@ function calculateRecommendedPrice(player, tier) {
 - **Soluzione**: Font-size 16px già implementato
 
 ### Modalità Offline
-- **Problema**: Tailwind CSS richiede connessione internet
-- **Soluzione**: In sviluppo versione con CSS inline
+- **Stato**: Tailwind, SheetJS e i loghi delle squadre sono salvati in `resources/`,
+  quindi l'asta funziona anche senza rete. Resta remoto solo il font Inter
+  (in mancanza di rete si usa il sans-serif di sistema).
 
 ### File Grandi
 - **Problema**: Performance su listoni molto grandi (>5MB)

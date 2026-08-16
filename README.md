@@ -6,7 +6,7 @@
 [![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?logo=tailwind-css&logoColor=white)](#)
 [![Mobile Responsive](https://img.shields.io/badge/Mobile-Responsive-green)](#)
 
-Un **tool web interattivo** per gestire le aste del Fantacalcio 2025/26. Ottimizzato per desktop e mobile, ti aiuta a organizzare la tua asta con un'interfaccia moderna e funzionalità avanzate.
+Un **tool web interattivo** per gestire le aste del Fantacalcio 2026/27. Ottimizzato per desktop e mobile, ti aiuta a organizzare la tua asta con un'interfaccia moderna e funzionalità avanzate.
 
 ![Preview 2](resources/squadra.png)
 
@@ -15,7 +15,7 @@ Un **tool web interattivo** per gestire le aste del Fantacalcio 2025/26. Ottimiz
 ## ✨ Caratteristiche Principali
 
 ### 🎯 **Gestione Asta Completa**
-- **Importazione CSV**: Carica le quotazioni ufficiali Fantacalcio 2025/26
+- **Importazione XLSX/CSV**: Carica il listone ufficiale Fantacalcio 2026/27 (.xlsx o .csv)
 - **Ricerca Intelligente**: Filtra per nome, ruolo, squadra e tier
 - **Selezione Multipla**: Aggiungi più giocatori contemporaneamente
 - **Prezzi Suggeriti**: Calcolo automatico prezzi consigliati per tier
@@ -64,6 +64,8 @@ start index.html # Windows
 xdg-open index.html # Linux
 ```
 
+> ℹ️ Se il browser blocca il caricamento degli script locali, usa il Metodo 3 (server locale).
+
 ### Metodo 3: Server Locale
 ```bash
 # Con Python 3
@@ -78,7 +80,7 @@ npx serve .
 ## 📖 Guida all'Uso
 
 ### 1️⃣ **Importazione Giocatori**
-1. Clicca **"Seleziona Giocatori"** per aprire il selettore CSV
+1. Clicca **"Seleziona Giocatori"** per aprire il selettore del listone
 2. Usa i filtri per trovare i giocatori desiderati
 3. Seleziona i checkbox e clicca **"Aggiungi Selezionati"**
 4. Scegli il tier appropriato (Top/Buoni/Scommesse)
@@ -106,32 +108,77 @@ npx serve .
 | **HTML5**           | -        | Struttura semantica           |
 | **CSS3**            | -        | Styling avanzato e animazioni |
 | **JavaScript ES6+** | -        | Logica applicativa            |
-| **Tailwind CSS**    | 3.x      | Framework CSS utility-first   |
+| **Tailwind CSS**    | 3.4.16   | Framework CSS utility-first (in locale) |
+| **SheetJS**         | 0.20.3   | Lettura listone .xlsx / .csv (in locale) |
 | **Web APIs**        | -        | localStorage, File API        |
 
 ## 📂 Struttura del Progetto
 
 ```
 fanta_asta_tool/
-├── 📄 index.html                          # App principale (SPA)
-├── 📊 Quotazioni_Fantacalcio_2025_26.csv  # Dataset giocatori ufficiale
-├── 📝 README.md                           # Documentazione
-├── ⚖️ LICENSE                             # Licenza Apache 2.0
-└── 🔧 .git/                              # Controllo versione
+├── 📄 index.html              # Markup della SPA
+├── 📁 js/
+│   ├── parser.js              # Lettura listone .xlsx/.csv (nessuna dipendenza dal DOM)
+│   └── app.js                 # Stato, rendering, persistenza
+├── 📁 test/
+│   └── parser.test.js         # Test del parser: `node test/parser.test.js`
+├── 📁 resources/
+│   ├── tailwind.min.js        # Tailwind (copia locale)
+│   ├── xlsx.mini.min.js       # SheetJS (copia locale)
+│   ├── logos/                 # Loghi Serie A 2026/27
+│   └── *.png                  # Screenshot del README
+├── 📝 README.md
+├── ⚖️ LICENSE
+└── 🔧 .git/
 ```
+
+> ℹ️ Il progetto resta senza build step: apri `index.html` con un server statico
+> (`python3 -m http.server`) e apri l'indirizzo nel browser.
+
+## ✅ Test
+
+```bash
+node test/parser.test.js
+```
+
+Copre il parsing del listone: intestazione in posizione variabile, ordine delle colonne,
+colonne Mantra da ignorare, celle vuote, accenti, equivalenza xlsx/csv. Se nella cartella
+è presente un file `Quotazioni_Fantacalcio_*.xlsx` viene validato anche quello.
 
 ## 🎨 Personalizzazione
 
 Il tool supporta diverse personalizzazioni tramite modifica del codice:
 
 ### Colori Tema
+Tutti i colori dell'interfaccia sono definiti in un unico punto: il blocco di token CSS
+in cima a `index.html`. Non ci sono utility Tailwind sparse nel markup da rincorrere:
+per personalizzare la palette basta cambiare i valori qui.
+
 ```css
-/* Modifica i colori principali in index.html */
 :root {
-  --primary-color: #06b6d4;    /* Cyan */
-  --success-color: #22c55e;    /* Green */
-  --warning-color: #f59e0b;    /* Amber */
-  --danger-color: #ef4444;     /* Red */
+  --bg:            #080d18;
+  --surface:       #0f1729;
+  --surface-2:     #131d33;
+  --border:        #223050;
+  --text:          #f8fafc;
+  --text-muted:    #8595b0;
+  --text-dim:      #5b6b86;
+
+  --primary:       #14b8a6;
+  --primary-strong:#0d9488;
+  --primary-soft:  #5eead4;
+  --bought:        #22c55e;
+  --removed:       #f43f5e;
+  --accent:        #f59e0b;
+
+  --role-p-bg: #1e3a8a; --role-p-fg: #bfdbfe;
+  --role-d-bg: #065f46; --role-d-fg: #a7f3d0;
+  --role-c-bg: #78350f; --role-c-fg: #fde68a;
+  --role-a-bg: #7f1d1d; --role-a-fg: #fecaca;
+
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 16px;
 }
 ```
 
@@ -172,11 +219,12 @@ function calculateRecommendedPrice(player, tier) {
 - **Soluzione**: Font-size 16px già implementato
 
 ### Modalità Offline
-- **Problema**: Tailwind CSS richiede connessione internet
-- **Soluzione**: In sviluppo versione con CSS inline
+- **Stato**: Tailwind, SheetJS, i loghi delle squadre e il font Inter (pesi 400/500/600/700/800,
+  in `resources/fonts/`) sono tutti salvati in locale: nessuna richiesta di rete viene fatta
+  a runtime, l'asta funziona interamente offline.
 
-### File CSV Grandi
-- **Problema**: Performance su file CSV molto grandi (>5MB)
+### File Grandi
+- **Problema**: Performance su listoni molto grandi (>5MB)
 - **Soluzione**: Paginazione in sviluppo
 
 ## 🤝 Contribuire
@@ -221,6 +269,6 @@ Distribuito sotto licenza **Apache 2.0**. Vedi `LICENSE` per maggiori informazio
 
 Made with ❤️ for the Fantacalcio community
 
-[![Fantacalcio](https://img.shields.io/badge/⚽-Fantacalcio%202025%2F26-green?style=for-the-badge)](https://www.fantacalcio.it/)
+[![Fantacalcio](https://img.shields.io/badge/⚽-Fantacalcio%202026%2F27-green?style=for-the-badge)](https://www.fantacalcio.it/)
 
 </div>

@@ -736,6 +736,32 @@ function calculateRecommendedPrice(player, tier) {
     return Math.round(qta * roleMultiplier);
 }
 
+// Icone dei controlli secondari della card (stella, rimuovi, sposta, elimina).
+const CARD_ICONS = {
+    star: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />',
+    eyeOff: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />',
+    move: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />',
+    trash: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />'
+};
+
+function cardIconButton({ cls, icon, title, filled = false, size = 16, data = '' }) {
+    return `<button type="button" class="fa-btn-icon ${cls}" title="${title}" aria-label="${title}" ${data}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" fill="${filled ? 'currentColor' : 'none'}" viewBox="0 0 24 24" stroke="currentColor">${CARD_ICONS[icon]}</svg>
+    </button>`;
+}
+
+// Controlli secondari comuni a tutte le varianti di card. L'ordine dei pulsanti è
+// stella · rimuovi/ripristina · sposta · elimina.
+function cardSecondaryControls(player, role, tier, isRemoved, isFavorite) {
+    const d = `data-id="${player.id}" data-role="${role}" data-tier="${tier}"`;
+    return [
+        cardIconButton({ cls: `favorite-btn ${isFavorite ? 'is-active' : ''}`, icon: 'star', title: isFavorite ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti', filled: isFavorite, data: `data-id="${player.id}"` }),
+        cardIconButton({ cls: `toggle-remove-btn ${isRemoved ? 'is-active' : ''}`, icon: 'eyeOff', title: isRemoved ? 'Ripristina' : 'Rimuovi dalla lista' }),
+        cardIconButton({ cls: 'move-player-btn', icon: 'move', title: 'Sposta categoria', data: d }),
+        cardIconButton({ cls: 'permanent-delete-btn is-danger', icon: 'trash', title: 'Elimina definitivamente', data: `${d} data-name="${player.nome}"` })
+    ].join('');
+}
+
 function createPlayerCard(player, isBoughtByMe = false, role, tier) {
     const card = document.createElement('div');
     card.id = `player-${player.id}`;
@@ -757,48 +783,30 @@ function createLargePlayerCard(player, isBoughtByMe, role, tier, isRemoved, reco
     const isFavorite = state.favorites.includes(player.id);
     // Priorità stati: acquistato > rimosso > preferito
     const stateClass = isBoughtByMe ? 'is-bought' : (isRemoved ? 'is-removed' : (isFavorite ? 'is-favorite' : ''));
-    card.className = `player-card bg-gray-800 rounded-lg p-4 shadow-md flex flex-col justify-between relative ${stateClass}`;
+    card.className = `player-card fa-card ${stateClass}`;
+    card.dataset.tier = tier;
 
     card.innerHTML = `
-        <button class="absolute top-2 right-2 text-red-500 hover:text-red-400 permanent-delete-btn" data-id="${player.id}" data-role="${role}" data-tier="${tier}" data-name="${player.nome}">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-        </button>
-        <button class="absolute top-2 right-10 favorite-btn ${isFavorite ? 'active' : 'text-gray-400 hover:text-amber-400'}" data-id="${player.id}">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="${isFavorite ? 'currentColor' : 'none'}" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-            </svg>
-        </button>
-        <div>
-            <div class="flex items-center mb-3">
-                <img src="${teamLogos[player.squadra] || TEAM_LOGO_PLACEHOLDER}" alt="${player.squadra}" class="w-8 h-8 mr-3 object-contain rounded-full bg-white/10">
-                <div>
-                    <p class="font-bold text-lg">${player.nome}</p>
-                    <p class="text-sm text-gray-400">${player.squadra}</p>
-                </div>
-            </div>
-            <div class="flex justify-between items-center text-sm mb-3">
-                <span class="text-gray-400">Quotazione:</span>
-                <span class="font-semibold text-cyan-400">${player.qta}</span>
-            </div>
-            <div class="space-y-2">
-                 <div>
-                    <label for="rec-price-${player.id}" class="text-xs text-gray-400">Prezzo Consigliato:</label>
-                    <input type="number" id="rec-price-${player.id}" value="${recommendedPrice}" class="w-full bg-gray-700 rounded p-2 text-center text-white min-h-[44px] text-sm sm:text-base">
-                </div>
-                <div>
-                    <label for="paid-price-${player.id}" class="text-xs text-gray-400">Prezzo Pagato:</label>
-                    <input type="number" id="paid-price-${player.id}" value="${player.qta}" class="w-full bg-gray-900 border border-gray-600 rounded p-2 text-center text-white focus:ring-2 focus:ring-cyan-500 min-h-[44px] text-sm sm:text-base">
-                </div>
+        <div class="flex items-start gap-3">
+            <img src="${teamLogos[player.squadra] || TEAM_LOGO_PLACEHOLDER}" alt="${player.squadra}" class="fa-crest">
+            <div class="min-w-0">
+                <div class="fa-name truncate">${player.nome}</div>
+                <div class="fa-sub"><span class="fa-role" data-role="${player.role}">${player.role}</span>${player.squadra}</div>
             </div>
         </div>
-        <div class="mt-4 space-y-2">
-            <div class="flex flex-col sm:flex-row gap-2">
-                <button class="buy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded w-full transition-colors mobile-touch-btn text-sm sm:text-base" data-id="${player.id}">Compra</button>
-                <button class="toggle-remove-btn ${isRemoved ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-red-600 hover:bg-red-700'} text-white font-bold py-3 px-4 rounded w-full transition-colors mobile-touch-btn text-sm sm:text-base">${isRemoved ? 'Ripristina' : 'Rimuovi'}</button>
+        <div>
+            <div class="flex items-baseline gap-2">
+                <span class="fa-hero num">${recommendedPrice}</span>
+                <span class="fa-hero-label">consigliato</span>
             </div>
-            <button class="move-player-btn bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded w-full transition-colors mobile-touch-btn text-sm sm:text-base" data-id="${player.id}" data-role="${role}" data-tier="${tier}">Sposta Categoria</button>
+            <div class="fa-meta">Quotazione <b class="num">${player.qta}</b> · FVM <span class="num">${player.fvm ?? 0}</span></div>
+        </div>
+        <div class="flex items-center gap-2">
+            <input type="number" id="paid-price-${player.id}" value="${player.qta}" class="fa-input num" aria-label="Prezzo pagato">
+            <button type="button" class="buy-btn fa-btn-primary flex-1" data-id="${player.id}">Compra</button>
+        </div>
+        <div class="flex items-center gap-1.5">
+            ${cardSecondaryControls(player, role, tier, isRemoved, isFavorite)}
         </div>
     `;
 
@@ -812,41 +820,30 @@ function createSmallPlayerCard(player, isBoughtByMe, role, tier, isRemoved, reco
     const isFavorite = state.favorites.includes(player.id);
     // Priorità stati: acquistato > rimosso > preferito
     const stateClass = isBoughtByMe ? 'is-bought' : (isRemoved ? 'is-removed' : (isFavorite ? 'is-favorite' : ''));
-    card.className = `player-card bg-gray-800 rounded-lg p-3 shadow-md flex flex-col justify-between relative ${stateClass}`;
+    card.className = `player-card fa-card compact ${stateClass}`;
+    card.dataset.tier = tier;
 
     card.innerHTML = `
-        <button class="absolute top-1 right-1 text-red-500 hover:text-red-400 permanent-delete-btn" data-id="${player.id}" data-role="${role}" data-tier="${tier}" data-name="${player.nome}">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-        </button>
-        <button class="absolute top-1 right-6 favorite-btn ${isFavorite ? 'active' : 'text-gray-400 hover:text-amber-400'}" data-id="${player.id}">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="${isFavorite ? 'currentColor' : 'none'}" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-            </svg>
-        </button>
-        <div>
-            <div class="flex items-center mb-2">
-                <img src="${teamLogos[player.squadra] || TEAM_LOGO_PLACEHOLDER}" alt="${player.squadra}" class="w-6 h-6 mr-2 object-contain rounded-full bg-white/10">
-                <div class="flex-1 min-w-0">
-                    <p class="font-bold text-sm truncate">${player.nome}</p>
-                    <p class="text-xs text-gray-400 truncate">${player.squadra}</p>
-                </div>
-            </div>
-            <div class="text-center mb-2">
-                <span class="text-xs text-gray-400">Q.ta: </span>
-                <span class="font-semibold text-cyan-400 text-sm">${player.qta}</span>
-            </div>
-            <div class="space-y-1">
-                <input type="number" id="paid-price-${player.id}" value="${player.qta}" placeholder="Prezzo" class="w-full bg-gray-900 border border-gray-600 rounded p-2 text-center text-white text-xs sm:text-sm focus:ring-1 focus:ring-cyan-500 min-h-[40px]">
+        <div class="flex items-start gap-3">
+            <img src="${teamLogos[player.squadra] || TEAM_LOGO_PLACEHOLDER}" alt="${player.squadra}" class="fa-crest">
+            <div class="min-w-0">
+                <div class="fa-name truncate">${player.nome}</div>
+                <div class="fa-sub"><span class="fa-role" data-role="${player.role}">${player.role}</span>${player.squadra}</div>
             </div>
         </div>
-        <div class="mt-2 space-y-1">
-            <div class="flex gap-1">
-                <button class="buy-btn bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-2 rounded flex-1 transition-colors text-xs sm:text-sm mobile-touch-btn" data-id="${player.id}">Compra</button>
-                <button class="toggle-remove-btn ${isRemoved ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-red-600 hover:bg-red-700'} text-white font-bold py-2 px-2 rounded flex-1 transition-colors text-xs sm:text-sm mobile-touch-btn">${isRemoved ? 'Ripr.' : 'Rim.'}</button>
+        <div>
+            <div class="flex items-baseline gap-2">
+                <span class="fa-hero num">${recommendedPrice}</span>
+                <span class="fa-hero-label">consigliato</span>
             </div>
-            <button class="move-player-btn bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-2 rounded w-full transition-colors text-xs sm:text-sm mobile-touch-btn" data-id="${player.id}" data-role="${role}" data-tier="${tier}">Sposta</button>
+            <div class="fa-meta">Qt. <b class="num">${player.qta}</b></div>
+        </div>
+        <div class="flex items-center gap-2">
+            <input type="number" id="paid-price-${player.id}" value="${player.qta}" class="fa-input num" aria-label="Prezzo pagato">
+            <button type="button" class="buy-btn fa-btn-primary flex-1" data-id="${player.id}">Compra</button>
+        </div>
+        <div class="flex items-center gap-1.5">
+            ${cardSecondaryControls(player, role, tier, isRemoved, isFavorite)}
         </div>
     `;
 

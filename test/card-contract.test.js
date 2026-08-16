@@ -25,8 +25,15 @@ const CREATORS = ['createLargePlayerCard', 'createSmallPlayerCard', 'createListP
 console.log('contratto controlli card');
 for (const creator of CREATORS) {
     const body = bodyOf(creator);
+    // Le card griglia (Grande/Piccola) delegano i quattro controlli secondari
+    // (stella, rimuovi, sposta, elimina) all'helper condiviso cardSecondaryControls,
+    // riusato anche da createListPlayerCard (Task 4). Se il creator chiama l'helper,
+    // il grep deve guardare anche dentro l'helper: il controllo runtime che conta
+    // davvero (querySelector senza null-check in addPlayerCardEventListeners) è
+    // comunque soddisfatto dal markup prodotto a runtime.
+    const searchable = body.includes('cardSecondaryControls(') ? body + bodyOf('cardSecondaryControls') : body;
     for (const control of CONTROLS) {
-        check(`${creator} contiene .${control}`, body.includes(control));
+        check(`${creator} contiene .${control}`, searchable.includes(control));
     }
     check(`${creator} contiene input paid-price`, body.includes('paid-price-${player.id}'));
 }

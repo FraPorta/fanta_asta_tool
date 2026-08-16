@@ -56,11 +56,6 @@
             transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, opacity 0.3s;
         }
 
-        .player-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-
         .sticky-header {
             position: sticky;
             top: 0;
@@ -68,36 +63,10 @@
             /* Lower than modal */
         }
 
-        .bought {
-            opacity: 0.4;
-        }
-
-        .bought .buy-btn,
-        .bought input {
-            pointer-events: none;
-        }
-
-        .bought-by-me {
-            border: 2px solid #22c55e;
-            /* green-500 */
-        }
-
-        .removed-card {
-            border: 2px solid #ef4444;
-            /* red-500 */
-            box-shadow: 0 0 0 1px #ef4444, 0 10px 15px -3px rgba(239, 68, 68, 0.2);
-        }
-
         .sort-btn.active {
             background-color: #0891b2;
             /* cyan-600 */
             color: white;
-        }
-
-        .favorite-card {
-            border: 2px solid #fbbf24;
-            /* amber-400 */
-            box-shadow: 0 0 0 1px #fbbf24, 0 10px 15px -3px rgba(251, 191, 36, 0.2);
         }
 
         .favorite-btn {
@@ -194,6 +163,55 @@
         .fa-btn-icon:disabled { opacity: .4; cursor: not-allowed; }
         .fa-btn-icon.is-danger:hover { color: var(--removed); }
         .fa-btn-icon.is-active { color: var(--accent); }
+
+        .fa-card {
+            position: relative; overflow: hidden;
+            background: linear-gradient(160deg, var(--surface-2), #0d1526);
+            border: 1px solid var(--border); border-radius: var(--radius-lg);
+            padding: 15px; display: flex; flex-direction: column; gap: 12px;
+        }
+        .fa-card::before { content:''; position:absolute; inset:0 0 auto 0; height:3px; background: var(--tier-accent, #475569); }
+        .fa-card::after {
+            content:''; position:absolute; right:-40px; top:-40px; width:130px; height:130px; border-radius:50%;
+            background: radial-gradient(circle, var(--tier-glow, transparent), transparent 70%); pointer-events:none;
+        }
+        .fa-card > * { position: relative; }
+
+        .fa-card[data-tier="Top"]        { --tier-accent: linear-gradient(90deg,#f59e0b,#fb7185); --tier-glow: rgba(245,158,11,.16); }
+        .fa-card[data-tier="Buoni"]      { --tier-accent: linear-gradient(90deg,#14b8a6,#38bdf8); --tier-glow: rgba(20,184,166,.14); }
+        .fa-card[data-tier="Scommesse"]  { --tier-accent: linear-gradient(90deg,#a78bfa,#6366f1); --tier-glow: rgba(167,139,250,.14); }
+        .fa-card[data-tier="Altri"]      { --tier-accent: #475569; --tier-glow: transparent; }
+
+        .fa-crest { width:34px; height:34px; border-radius:var(--radius-sm); object-fit:contain; background:rgba(255,255,255,.06); flex-shrink:0; }
+        .fa-name  { font-size:16px; font-weight:750; letter-spacing:-.01em; color:var(--text); line-height:1.2; }
+        .fa-sub   { font-size:11px; color:var(--text-muted); display:flex; align-items:center; gap:6px; margin-top:3px; }
+        .fa-role  { font-size:10px; font-weight:800; padding:1px 6px; border-radius:6px; }
+        .fa-role[data-role="P"] { background:var(--role-p-bg); color:var(--role-p-fg); }
+        .fa-role[data-role="D"] { background:var(--role-d-bg); color:var(--role-d-fg); }
+        .fa-role[data-role="C"] { background:var(--role-c-bg); color:var(--role-c-fg); }
+        .fa-role[data-role="A"] { background:var(--role-a-bg); color:var(--role-a-fg); }
+        .fa-hero  { font-size:30px; font-weight:800; line-height:1; letter-spacing:-.02em; color:var(--text); }
+        .fa-hero-label { font-size:12px; color:var(--text-muted); font-weight:600; }
+        .fa-meta  { font-size:11px; color:var(--text-muted); }
+        .fa-meta b { color:#5eead4; font-weight:700; }
+        .fa-input {
+            width:74px; background:rgba(2,6,23,.6); border:1px solid #2b3a5c; border-radius:var(--radius-sm);
+            padding:9px; color:var(--text); text-align:center; font-weight:700; min-height:44px;
+        }
+        .fa-input:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 2px rgba(20,184,166,.25); }
+
+        .fa-card.compact { padding:11px; gap:8px; }
+        .fa-card.compact .fa-hero { font-size:22px; }
+        .fa-card.compact .fa-name { font-size:14px; }
+        .fa-card.compact .fa-crest { width:26px; height:26px; }
+
+        @media (hover: hover) {
+            .player-card:hover { transform: translateY(-3px); box-shadow: 0 12px 24px -12px rgba(0,0,0,.7); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .player-card, .fa-btn-primary, .fa-btn-icon { transition: none; }
+            .player-card:hover { transform: none; }
+        }
     </style>
 </head>
 

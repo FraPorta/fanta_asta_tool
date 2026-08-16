@@ -427,8 +427,7 @@ function updateViewMode() {
         const btn = document.getElementById(btnId);
         if (btn) {
             const isActive = (btnId === `view-${state.viewMode}`);
-            btn.className = `px-3 py-1 text-xs rounded-md transition-colors ${isActive ? 'bg-cyan-600 text-white' : 'text-gray-400 hover:text-white'
-                }`;
+            btn.className = `fa-btn-icon ${isActive ? 'is-active' : ''}`;
         }
     });
 
@@ -456,19 +455,19 @@ function renderPlayers() {
 
     // Add search field
     const searchEl = document.createElement('div');
-    searchEl.className = 'bg-gray-800 p-4 rounded-lg mb-4';
+    searchEl.className = 'fa-surface p-3 mb-4';
     searchEl.innerHTML = `
         <div class="flex flex-col space-y-3">
             <div class="flex items-center space-x-3">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
-                <input 
-                    type="text" 
+                <input
+                    type="text"
                     id="player-search-input"
-                    placeholder="Cerca giocatori nella tua lista..." 
+                    placeholder="Cerca giocatori nella tua lista..."
                     value="${state.searchQuery}"
-                    class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                    class="fa-input w-full text-left"
                 >
                 ${state.searchQuery ? `
                     <button id="clear-search-btn" class="text-gray-400 hover:text-white transition-colors">
@@ -480,18 +479,18 @@ function renderPlayers() {
             </div>
             <div class="flex items-center justify-between">
                 <span class="text-sm text-gray-400">Modalità visualizzazione:</span>
-                <div class="flex bg-gray-700 rounded-lg p-1">
-                    <button id="view-large" class="px-3 py-1 text-xs rounded-md transition-colors ${state.viewMode === 'large' ? 'bg-cyan-600 text-white' : 'text-gray-400 hover:text-white'}" title="Card Grandi">
+                <div class="flex gap-2">
+                    <button id="view-large" class="fa-btn-icon ${state.viewMode === 'large' ? 'is-active' : ''}" title="Card Grandi">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                         </svg>
                     </button>
-                    <button id="view-small" class="px-3 py-1 text-xs rounded-md transition-colors ${state.viewMode === 'small' ? 'bg-cyan-600 text-white' : 'text-gray-400 hover:text-white'}" title="Card Piccole">
+                    <button id="view-small" class="fa-btn-icon ${state.viewMode === 'small' ? 'is-active' : ''}" title="Card Piccole">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14v6m-3-3h6M6 10h2a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2zm10 0h2a2 2 0 002-2V6a2 2 0 00-2-2h-2a2 2 0 00-2 2v2a2 2 0 002 2zM6 20h2a2 2 0 002-2v-2a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 002 2z" />
                         </svg>
                     </button>
-                    <button id="view-list" class="px-3 py-1 text-xs rounded-md transition-colors ${state.viewMode === 'list' ? 'bg-cyan-600 text-white' : 'text-gray-400 hover:text-white'}" title="Lista">
+                    <button id="view-list" class="fa-btn-icon ${state.viewMode === 'list' ? 'is-active' : ''}" title="Lista">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
                         </svg>
@@ -619,11 +618,11 @@ function renderPlayers() {
         }
 
         const tierHeader = document.createElement('div');
-        tierHeader.className = 'flex justify-between items-center mt-6 mb-3 border-b border-gray-700 pb-2';
+        tierHeader.className = 'flex justify-between items-center';
         tierHeader.innerHTML = `
-            <div class="flex items-center space-x-3">
-                <h3 class="text-xl font-bold text-amber-400">${tier}</h3>
-                <span class="text-sm text-gray-400">
+            <div class="fa-tier-head">
+                <h3>${tier}</h3>
+                <span class="count">
                     ${state.searchQuery && state.searchQuery.trim() !== '' ?
                 `${filteredCount}/${roleData[tier].length} giocatori` :
                 `${roleData[tier].length} giocatori`
@@ -1031,10 +1030,14 @@ function movePlayer() {
     movePlayerModal.classList.add('hidden');
 }
 
+function setText(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value;
+}
+
 function updateUI() {
     remainingBudgetEl.textContent = state.budget;
-    remainingBudgetEl.classList.toggle('text-red-500', state.budget < 100);
-    remainingBudgetEl.classList.toggle('text-green-400', state.budget >= 100);
+    remainingBudgetEl.classList.toggle('is-tight', state.budget < 100);
     squadCountEl.textContent = `${state.squad.length} / 25`;
 
     const counts = { P: 0, D: 0, C: 0, A: 0 };
@@ -1056,6 +1059,22 @@ function updateUI() {
             spentElement.textContent = spent[role];
         }
     }
+
+    // Rail: barra budget e slot per ruolo. `state.budget` è il RIMANENTE, il totale è 500.
+    const TOTAL_BUDGET = 500;
+    const slotsLeft = 25 - state.squad.length;
+    const meter = document.getElementById('rail-meter');
+    if (meter) {
+        const pct = Math.max(0, Math.min(100, (state.budget / TOTAL_BUDGET) * 100));
+        meter.querySelector('i').style.width = `${pct}%`;
+        // Allerta: budget rimanente sotto il numero di slot ancora da riempire
+        meter.classList.toggle('is-tight', state.budget < slotsLeft);
+    }
+    const MAX_SLOTS = { P: 3, D: 8, C: 8, A: 6 };
+    for (const role in MAX_SLOTS) {
+        setText(`rail-slot-${role}`, `${counts[role]}/${MAX_SLOTS[role]}`);
+    }
+    setText('rail-budget-mirror', state.budget);
 
     renderMySquad();
 }
@@ -1645,11 +1664,9 @@ tabs.forEach(tab => {
     tab.addEventListener('click', e => {
         e.preventDefault();
         tabs.forEach(t => {
-            t.classList.remove('border-cyan-400', 'text-cyan-400');
-            t.classList.add('border-transparent', 'text-gray-400');
+            t.classList.remove('is-active');
         });
-        e.target.classList.add('border-cyan-400', 'text-cyan-400');
-        e.target.classList.remove('border-transparent', 'text-gray-400');
+        e.target.classList.add('is-active');
         state.activeRole = e.target.dataset.role;
         updatePopulateButtonText(); // Update button text when role changes
         renderPlayers();

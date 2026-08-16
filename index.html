@@ -225,200 +225,179 @@
         .fa-col-v { font-size:15px; font-weight:700; color:var(--text); }
         .fa-col-v.sug { color: var(--primary-soft); }
         @media (max-width: 640px) { .fa-row { flex-wrap: wrap; } .fa-row .fa-input { width:64px; } }
+
+        #fa-topbar {
+            position: sticky; top: 0; z-index: 40;
+            display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+            padding: 10px 16px; background: rgba(15,23,41,.92); backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--border);
+        }
+        .fa-chip { padding:4px 10px; border-radius:999px; font-size:11px; font-weight:600; background:#1a2440; color:var(--text-muted); }
+        .fa-chip.ok   { background:rgba(45,212,191,.13); color:#5eead4; }
+        .fa-chip.warn { background:rgba(245,158,11,.14); color:#fcd34d; }
+        #remaining-budget.is-tight { color: var(--removed); }
+
+        .fa-shell { display:block; }
+        @media (min-width: 1280px) {
+            .fa-shell { display:grid; grid-template-columns: minmax(0,1fr) 320px; gap:20px; align-items:start; }
+            #fa-rail { position: sticky; top: 68px; max-height: calc(100vh - 88px); overflow-y: auto; }
+        }
+        .fa-meter { height:7px; border-radius:4px; background:#1a2440; overflow:hidden; }
+        .fa-meter > i { display:block; height:100%; background:linear-gradient(90deg,var(--primary),var(--bought)); transition:width .3s ease-out; }
+        .fa-meter.is-tight > i { background:linear-gradient(90deg,var(--accent),var(--removed)); }
+        .fa-slot { display:flex; align-items:center; justify-content:space-between; padding:6px 9px; border-radius:var(--radius-sm); background:#111c33; font-size:11px; }
+
+        .fa-tabs { display:flex; gap:8px; flex-wrap:wrap; position:sticky; top:56px; z-index:30;
+                   padding:10px 0; background:var(--bg); }
+        .fa-tab { padding:6px 14px; border-radius:999px; font-size:12px; font-weight:600;
+                  background:#111c33; color:var(--text-muted); border:1px solid var(--border); }
+        .fa-tab.is-active { background:var(--primary-strong); color:#fff; border-color:transparent; }
+        .fa-tier-head { display:flex; align-items:baseline; gap:10px; margin:20px 0 10px; }
+        .fa-tier-head h3 { font-size:14px; font-weight:750; color:var(--text); letter-spacing:-.01em; }
+        .fa-tier-head .count { font-size:11px; color:var(--text-dim); }
     </style>
 </head>
 
 <body>
 
-    <div class="container mx-auto p-2 sm:p-4">
-
-        <!-- HEADER FISSO -->
-        <div class="sticky-header bg-gray-900/80 backdrop-blur-sm p-4 rounded-lg mb-6 shadow-lg">
-            <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-3">
-                <h1 class="text-2xl sm:text-3xl font-bold text-center text-cyan-400">Guida Asta Fantacalcio</h1>
-                <div class="flex flex-wrap gap-1 sm:gap-2 justify-center">
-                    <button id="export-btn"
-                        class="bg-green-800 hover:bg-green-700 text-white font-bold py-2 px-2 sm:px-4 rounded-lg flex items-center text-xs sm:text-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2"
-                            viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd"
-                                d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
-                                clip-rule="evenodd" />
-                        </svg>
-                        <span class="hidden sm:inline">Esporta</span>
-                        <span class="sm:hidden">Exp</span>
-                    </button>
-                    <button id="import-btn"
-                        class="bg-blue-800 hover:bg-blue-700 text-white font-bold py-2 px-2 sm:px-4 rounded-lg flex items-center text-xs sm:text-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2"
-                            viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd"
-                                d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 11-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z"
-                                clip-rule="evenodd" />
-                        </svg>
-                        <span class="hidden sm:inline">Importa</span>
-                        <span class="sm:hidden">Imp</span>
-                    </button>
-                    <button id="reset-btn"
-                        class="bg-red-800 hover:bg-red-700 text-white font-bold py-2 px-2 sm:px-4 rounded-lg flex items-center text-xs sm:text-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2"
-                            viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd"
-                                d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 110 2H4a1 1 0 01-1-1V4a1 1 0 011-1zm10 15a1 1 0 01-1-1v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 111.885-.666A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 01-1 1z"
-                                clip-rule="evenodd" />
-                        </svg>
-                        <span class="hidden sm:inline">Reset Asta</span>
-                        <span class="sm:hidden">Reset</span>
-                    </button>
-                </div>
-            </div>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                <div class="bg-gray-800 p-3 rounded-lg">
-                    <p class="text-sm text-gray-400">Budget Totale</p>
-                    <p class="text-2xl font-bold">500</p>
-                </div>
-                <div class="bg-gray-800 p-3 rounded-lg">
-                    <p class="text-sm text-gray-400">Budget Rimanente</p>
-                    <p id="remaining-budget" class="text-2xl font-bold text-green-400">500</p>
-                </div>
-                <div class="bg-gray-800 p-3 rounded-lg">
-                    <p class="text-sm text-gray-400">Giocatori in Rosa</p>
-                    <p id="squad-count" class="text-2xl font-bold">0 / 25</p>
-                </div>
-                <div class="bg-gray-800 p-3 rounded-lg">
-                    <p class="text-sm text-gray-400">Spesa per Ruolo</p>
-                    <div class="flex justify-center items-center space-x-1 sm:space-x-2 text-xs sm:text-sm">
-                        <span title="Portieri" class="text-center">P: <span id="spent-P"
-                                class="font-bold">0</span></span>
-                        <span title="Difensori" class="text-center">D: <span id="spent-D"
-                                class="font-bold">0</span></span>
-                        <span title="Centrocampisti" class="text-center">C: <span id="spent-C"
-                                class="font-bold">0</span></span>
-                        <span title="Attaccanti" class="text-center">A: <span id="spent-A"
-                                class="font-bold">0</span></span>
-                    </div>
-                </div>
-            </div>
+    <!-- BARRA SUPERIORE -->
+    <header id="fa-topbar">
+        <span class="font-extrabold text-[15px]" style="color:var(--primary)">⚽ Guida Asta</span>
+        <span class="fa-chip ok num">€<span id="remaining-budget">500</span> / 500</span>
+        <span class="fa-chip num" id="squad-count">0 / 25</span>
+        <div class="ml-auto flex items-center gap-2">
+            <button id="export-btn" class="fa-btn-icon" title="Esporta" aria-label="Esporta">💾</button>
+            <button id="import-btn" class="fa-btn-icon" title="Importa" aria-label="Importa">📥</button>
+            <button id="reset-btn" class="fa-btn-icon is-danger" title="Reset asta" aria-label="Reset asta">↺</button>
         </div>
+    </header>
 
-        <!-- LA MIA SQUADRA -->
-        <div class="mb-6">
-            <h2 class="text-2xl font-semibold mb-3 text-amber-400">La Mia Squadra</h2>
-            <div id="empty-squad-msg" class="text-gray-400 text-center py-8">Nessun giocatore acquistato.</div>
+    <div class="fa-shell max-w-[1600px] mx-auto p-4">
+        <main id="fa-main">
 
-            <!-- PORTIERI -->
-            <div id="squad-P-section" class="mb-6 hidden">
-                <h3 class="text-lg font-semibold mb-3 text-cyan-300 flex items-center">
-                    <span class="bg-blue-600 text-white px-2 py-1 rounded-full text-sm mr-3">P</span>
-                    Portieri (<span id="squad-count-P">0</span>/3)
-                    <span class="ml-auto text-sm text-gray-400">Speso: <span id="squad-spent-P"
-                            class="text-cyan-400 font-bold">0</span></span>
-                </h3>
-                <div id="squad-P" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
-            </div>
-
-            <!-- DIFENSORI -->
-            <div id="squad-D-section" class="mb-6 hidden">
-                <h3 class="text-lg font-semibold mb-3 text-green-300 flex items-center">
-                    <span class="bg-green-600 text-white px-2 py-1 rounded-full text-sm mr-3">D</span>
-                    Difensori (<span id="squad-count-D">0</span>/8)
-                    <span class="ml-auto text-sm text-gray-400">Speso: <span id="squad-spent-D"
-                            class="text-green-400 font-bold">0</span></span>
-                </h3>
-                <div id="squad-D" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
-            </div>
-
-            <!-- CENTROCAMPISTI -->
-            <div id="squad-C-section" class="mb-6 hidden">
-                <h3 class="text-lg font-semibold mb-3 text-yellow-300 flex items-center">
-                    <span class="bg-yellow-600 text-white px-2 py-1 rounded-full text-sm mr-3">C</span>
-                    Centrocampisti (<span id="squad-count-C">0</span>/8)
-                    <span class="ml-auto text-sm text-gray-400">Speso: <span id="squad-spent-C"
-                            class="text-yellow-400 font-bold">0</span></span>
-                </h3>
-                <div id="squad-C" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
-            </div>
-
-            <!-- ATTACCANTI -->
-            <div id="squad-A-section" class="mb-6 hidden">
-                <h3 class="text-lg font-semibold mb-3 text-red-300 flex items-center">
-                    <span class="bg-red-600 text-white px-2 py-1 rounded-full text-sm mr-3">A</span>
-                    Attaccanti (<span id="squad-count-A">0</span>/6)
-                    <span class="ml-auto text-sm text-gray-400">Speso: <span id="squad-spent-A"
-                            class="text-red-400 font-bold">0</span></span>
-                </h3>
-                <div id="squad-A" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
-            </div>
-
-            <!-- RIEPILOGO TOTALE -->
-            <div id="squad-summary" class="mt-6 bg-gray-800 p-4 rounded-lg hidden">
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                    <div class="bg-blue-900/30 p-3 rounded-lg border border-blue-600/30">
-                        <p class="text-sm text-blue-300">Portieri</p>
-                        <p class="text-lg font-bold text-blue-400"><span id="summary-count-P">0</span>/3</p>
-                        <p class="text-xs text-gray-400">€ <span id="summary-spent-P">0</span></p>
-                    </div>
-                    <div class="bg-green-900/30 p-3 rounded-lg border border-green-600/30">
-                        <p class="text-sm text-green-300">Difensori</p>
-                        <p class="text-lg font-bold text-green-400"><span id="summary-count-D">0</span>/8</p>
-                        <p class="text-xs text-gray-400">€ <span id="summary-spent-D">0</span></p>
-                    </div>
-                    <div class="bg-yellow-900/30 p-3 rounded-lg border border-yellow-600/30">
-                        <p class="text-sm text-yellow-300">Centrocampisti</p>
-                        <p class="text-lg font-bold text-yellow-400"><span id="summary-count-C">0</span>/8</p>
-                        <p class="text-xs text-gray-400">€ <span id="summary-spent-C">0</span></p>
-                    </div>
-                    <div class="bg-red-900/30 p-3 rounded-lg border border-red-600/30">
-                        <p class="text-sm text-red-300">Attaccanti</p>
-                        <p class="text-lg font-bold text-red-400"><span id="summary-count-A">0</span>/6</p>
-                        <p class="text-xs text-gray-400">€ <span id="summary-spent-A">0</span></p>
-                    </div>
+            <!-- CSV LOADER -->
+            <div class="mb-6 bg-gray-800 p-4 rounded-lg">
+                <h2 class="text-xl font-semibold mb-3 text-amber-400">Carica Quotazioni (XLSX / CSV)</h2>
+                <div class="flex flex-col md:flex-row gap-4 items-center">
+                    <input type="file" id="csv-file-input" accept=".xlsx,.csv"
+                        class="block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-cyan-600 file:text-white hover:file:bg-cyan-700">
+                    <button id="load-csv-btn"
+                        class="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-6 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled>Carica Listone</button>
+                    <button id="show-player-selector-btn"
+                        class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 sm:px-6 rounded-lg hidden text-sm sm:text-base min-h-[48px]">Seleziona
+                        Giocatori</button>
+                    <button id="populate-others-btn"
+                        class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-4 sm:px-6 rounded-lg hidden text-sm sm:text-base min-h-[48px]">Popola
+                        "Altri"</button>
                 </div>
+                <p class="text-sm text-gray-400 mt-2">Carica il listone ufficiale Fantacalcio in formato .xlsx o .csv. Il file deve
+                    contenere le colonne Id, R, Nome, Squadra, Qt.A e FVM.</p>
             </div>
-        </div>
 
-        <!-- CSV LOADER -->
-        <div class="mb-6 bg-gray-800 p-4 rounded-lg">
-            <h2 class="text-xl font-semibold mb-3 text-amber-400">Carica Quotazioni (XLSX / CSV)</h2>
-            <div class="flex flex-col md:flex-row gap-4 items-center">
-                <input type="file" id="csv-file-input" accept=".xlsx,.csv"
-                    class="block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-cyan-600 file:text-white hover:file:bg-cyan-700">
-                <button id="load-csv-btn"
-                    class="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-6 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled>Carica Listone</button>
-                <button id="show-player-selector-btn"
-                    class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 sm:px-6 rounded-lg hidden text-sm sm:text-base min-h-[48px]">Seleziona
-                    Giocatori</button>
-                <button id="populate-others-btn"
-                    class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-4 sm:px-6 rounded-lg hidden text-sm sm:text-base min-h-[48px]">Popola
-                    "Altri"</button>
-            </div>
-            <p class="text-sm text-gray-400 mt-2">Carica il listone ufficiale Fantacalcio in formato .xlsx o .csv. Il file deve
-                contenere le colonne Id, R, Nome, Squadra, Qt.A e FVM.</p>
-        </div>
-
-        <!-- TABS PER RUOLI -->
-        <div class="mb-4 border-b border-gray-700">
-            <nav class="flex flex-wrap -mb-px" id="role-tabs">
-                <a href="#"
-                    class="role-tab text-lg font-medium text-center py-2 px-4 border-b-2 border-cyan-400 text-cyan-400"
-                    data-role="P">Portieri</a>
-                <a href="#"
-                    class="role-tab text-lg font-medium text-center py-2 px-4 border-b-2 border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500"
-                    data-role="D">Difensori</a>
-                <a href="#"
-                    class="role-tab text-lg font-medium text-center py-2 px-4 border-b-2 border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500"
-                    data-role="C">Centrocampisti</a>
-                <a href="#"
-                    class="role-tab text-lg font-medium text-center py-2 px-4 border-b-2 border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500"
-                    data-role="A">Attaccanti</a>
+            <!-- TABS PER RUOLI -->
+            <nav class="fa-tabs" id="role-tabs">
+                <a href="#" class="role-tab fa-tab is-active" data-role="P">Portieri</a>
+                <a href="#" class="role-tab fa-tab" data-role="D">Difensori</a>
+                <a href="#" class="role-tab fa-tab" data-role="C">Centrocampisti</a>
+                <a href="#" class="role-tab fa-tab" data-role="A">Attaccanti</a>
             </nav>
-        </div>
 
-        <!-- CONTENUTO RUOLI -->
-        <div id="players-container">
-            <!-- I giocatori verranno inseriti qui da JavaScript -->
-        </div>
+            <!-- CONTENUTO RUOLI -->
+            <div id="players-container">
+                <!-- I giocatori verranno inseriti qui da JavaScript -->
+            </div>
+        </main>
+
+        <aside id="fa-rail" class="fa-surface p-4 space-y-4">
+            <div>
+                <div class="text-[10px] uppercase tracking-widest" style="color:var(--text-dim)">Budget rimanente</div>
+                <div class="text-2xl font-extrabold num" style="color:var(--bought)">€<span id="rail-budget-mirror">0</span></div>
+                <div class="fa-meter mt-2" id="rail-meter"><i style="width:100%"></i></div>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+                <div class="fa-slot"><span>P</span><span class="num"><span id="rail-slot-P">0/3</span> · €<span id="spent-P">0</span></span></div>
+                <div class="fa-slot"><span>D</span><span class="num"><span id="rail-slot-D">0/8</span> · €<span id="spent-D">0</span></span></div>
+                <div class="fa-slot"><span>C</span><span class="num"><span id="rail-slot-C">0/8</span> · €<span id="spent-C">0</span></span></div>
+                <div class="fa-slot"><span>A</span><span class="num"><span id="rail-slot-A">0/6</span> · €<span id="spent-A">0</span></span></div>
+            </div>
+
+            <!-- LA MIA SQUADRA -->
+            <div>
+                <h2 class="text-lg font-semibold mb-3 text-amber-400">La Mia Squadra</h2>
+                <div id="empty-squad-msg" class="text-gray-400 text-center py-8">Nessun giocatore acquistato.</div>
+
+                <!-- PORTIERI -->
+                <div id="squad-P-section" class="mb-6 hidden">
+                    <h3 class="text-lg font-semibold mb-3 text-cyan-300 flex items-center">
+                        <span class="bg-blue-600 text-white px-2 py-1 rounded-full text-sm mr-3">P</span>
+                        Portieri (<span id="squad-count-P">0</span>/3)
+                        <span class="ml-auto text-sm text-gray-400">Speso: <span id="squad-spent-P"
+                                class="text-cyan-400 font-bold">0</span></span>
+                    </h3>
+                    <div id="squad-P" class="grid grid-cols-1 gap-3"></div>
+                </div>
+
+                <!-- DIFENSORI -->
+                <div id="squad-D-section" class="mb-6 hidden">
+                    <h3 class="text-lg font-semibold mb-3 text-green-300 flex items-center">
+                        <span class="bg-green-600 text-white px-2 py-1 rounded-full text-sm mr-3">D</span>
+                        Difensori (<span id="squad-count-D">0</span>/8)
+                        <span class="ml-auto text-sm text-gray-400">Speso: <span id="squad-spent-D"
+                                class="text-green-400 font-bold">0</span></span>
+                    </h3>
+                    <div id="squad-D" class="grid grid-cols-1 gap-3"></div>
+                </div>
+
+                <!-- CENTROCAMPISTI -->
+                <div id="squad-C-section" class="mb-6 hidden">
+                    <h3 class="text-lg font-semibold mb-3 text-yellow-300 flex items-center">
+                        <span class="bg-yellow-600 text-white px-2 py-1 rounded-full text-sm mr-3">C</span>
+                        Centrocampisti (<span id="squad-count-C">0</span>/8)
+                        <span class="ml-auto text-sm text-gray-400">Speso: <span id="squad-spent-C"
+                                class="text-yellow-400 font-bold">0</span></span>
+                    </h3>
+                    <div id="squad-C" class="grid grid-cols-1 gap-3"></div>
+                </div>
+
+                <!-- ATTACCANTI -->
+                <div id="squad-A-section" class="mb-6 hidden">
+                    <h3 class="text-lg font-semibold mb-3 text-red-300 flex items-center">
+                        <span class="bg-red-600 text-white px-2 py-1 rounded-full text-sm mr-3">A</span>
+                        Attaccanti (<span id="squad-count-A">0</span>/6)
+                        <span class="ml-auto text-sm text-gray-400">Speso: <span id="squad-spent-A"
+                                class="text-red-400 font-bold">0</span></span>
+                    </h3>
+                    <div id="squad-A" class="grid grid-cols-1 gap-3"></div>
+                </div>
+
+                <!-- RIEPILOGO TOTALE -->
+                <div id="squad-summary" class="mt-6 bg-gray-800 p-4 rounded-lg hidden">
+                    <div class="grid grid-cols-2 gap-4 text-center">
+                        <div class="bg-blue-900/30 p-3 rounded-lg border border-blue-600/30">
+                            <p class="text-sm text-blue-300">Portieri</p>
+                            <p class="text-lg font-bold text-blue-400"><span id="summary-count-P">0</span>/3</p>
+                            <p class="text-xs text-gray-400">€ <span id="summary-spent-P">0</span></p>
+                        </div>
+                        <div class="bg-green-900/30 p-3 rounded-lg border border-green-600/30">
+                            <p class="text-sm text-green-300">Difensori</p>
+                            <p class="text-lg font-bold text-green-400"><span id="summary-count-D">0</span>/8</p>
+                            <p class="text-xs text-gray-400">€ <span id="summary-spent-D">0</span></p>
+                        </div>
+                        <div class="bg-yellow-900/30 p-3 rounded-lg border border-yellow-600/30">
+                            <p class="text-sm text-yellow-300">Centrocampisti</p>
+                            <p class="text-lg font-bold text-yellow-400"><span id="summary-count-C">0</span>/8</p>
+                            <p class="text-xs text-gray-400">€ <span id="summary-spent-C">0</span></p>
+                        </div>
+                        <div class="bg-red-900/30 p-3 rounded-lg border border-red-600/30">
+                            <p class="text-sm text-red-300">Attaccanti</p>
+                            <p class="text-lg font-bold text-red-400"><span id="summary-count-A">0</span>/6</p>
+                            <p class="text-xs text-gray-400">€ <span id="summary-spent-A">0</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
     </div>
 
     <!-- MODAL PER SELEZIONARE GIOCATORI DAL CSV -->

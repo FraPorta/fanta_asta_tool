@@ -1,3 +1,7 @@
+/*
+ *   Copyright (c) 2026 
+ *   All rights reserved.
+ */
 // Test del parser del listone. Nessuna dipendenza esterna: `node test/parser.test.js`.
 // Carica js/parser.js e resources/xlsx.mini.min.js in un contesto isolato (niente DOM).
 const fs = require('fs');

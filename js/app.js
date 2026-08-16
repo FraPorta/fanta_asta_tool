@@ -302,8 +302,6 @@ const squadContainers = {
     A: document.getElementById('squad-A')
 };
 
-const squadSummary = document.getElementById('squad-summary');
-
 const tabs = document.querySelectorAll('.role-tab');
 const addPlayerModal = document.getElementById('add-player-modal');
 const addPlayerForm = document.getElementById('add-player-form');
@@ -838,11 +836,11 @@ function createSmallPlayerCard(player, isBoughtByMe, role, tier, isRemoved, reco
             </div>
             <div class="fa-meta">Qt. <b class="num">${player.qta}</b></div>
         </div>
-        <div class="flex items-center gap-2">
+        <div class="fa-buy-row flex items-center gap-2">
             <input type="number" id="paid-price-${player.id}" value="${player.qta}" class="fa-input num" aria-label="Prezzo pagato">
             <button type="button" class="buy-btn fa-btn-primary flex-1" data-id="${player.id}">Compra</button>
         </div>
-        <div class="flex items-center gap-1.5">
+        <div class="fa-ctl-row flex items-center gap-1.5">
             ${cardSecondaryControls(player, role, tier, isRemoved, isFavorite)}
         </div>
     `;
@@ -917,11 +915,6 @@ function addPlayerCardEventListeners(card, player) {
         button.title = nowRemoved ? 'Ripristina' : 'Rimuovi dalla lista';
         button.setAttribute('aria-label', button.title);
         button.classList.toggle('is-active', nowRemoved);
-        if (nowRemoved) {
-            button.textContent = button.textContent.includes('Ripr') ? 'Ripr.' : 'Ripristina';
-        } else {
-            button.textContent = button.textContent.includes('Rim') ? 'Rim.' : 'Rimuovi';
-        }
         saveState();
     });
 
@@ -1037,8 +1030,12 @@ function setText(id, value) {
 }
 
 function updateUI() {
+    // Allerta budget: unica regola: il rimanente scende sotto il numero di slot ancora da riempire.
+    const slotsLeft = 25 - state.squad.length;
+    const isBudgetTight = state.budget < slotsLeft;
+
     remainingBudgetEl.textContent = state.budget;
-    remainingBudgetEl.classList.toggle('is-tight', state.budget < 100);
+    remainingBudgetEl.classList.toggle('is-tight', isBudgetTight);
     squadCountEl.textContent = `${state.squad.length} / 25`;
 
     const counts = { P: 0, D: 0, C: 0, A: 0 };
@@ -1063,13 +1060,12 @@ function updateUI() {
 
     // Rail: barra budget e slot per ruolo. `state.budget` è il RIMANENTE, il totale è 500.
     const TOTAL_BUDGET = 500;
-    const slotsLeft = 25 - state.squad.length;
     const meter = document.getElementById('rail-meter');
     if (meter) {
         const pct = Math.max(0, Math.min(100, (state.budget / TOTAL_BUDGET) * 100));
         meter.querySelector('i').style.width = `${pct}%`;
-        // Allerta: budget rimanente sotto il numero di slot ancora da riempire
-        meter.classList.toggle('is-tight', state.budget < slotsLeft);
+        // Allerta: stessa regola del numero in barra superiore (vedi isBudgetTight)
+        meter.classList.toggle('is-tight', isBudgetTight);
     }
     const MAX_SLOTS = { P: 3, D: 8, C: 8, A: 6 };
     for (const role in MAX_SLOTS) {
@@ -1125,12 +1121,6 @@ function buyPlayer(playerId) {
         }
     }
 
-    // Aggiorna anche il tasto rimuovi per mostrare "Ripristina"
-    const toggleBtn = playerCard.querySelector('.toggle-remove-btn');
-    if (toggleBtn) {
-        toggleBtn.textContent = toggleBtn.textContent.includes('Ripr') ? 'Ripr.' : 'Ripristina';
-    }
-
     updateUI();
     saveState();
 }
@@ -1149,11 +1139,6 @@ function renderMySquad() {
     // Show/hide empty message
     const hasPlayers = state.squad.length > 0;
     emptySquadMsgEl.style.display = hasPlayers ? 'none' : 'block';
-
-    // Check if squadSummary exists before using it
-    if (squadSummary) {
-        squadSummary.classList.toggle('hidden', !hasPlayers);
-    }
 
     // Clear all role containers - check if they exist first
     Object.values(squadContainers).forEach(container => {
@@ -1210,20 +1195,11 @@ function renderMySquad() {
             section.classList.add('hidden');
         }
     });
-
-    // Update summary
-    Object.keys(counts).forEach(role => {
-        const summaryCountElement = document.getElementById(`summary-count-${role}`);
-        const summarySpentElement = document.getElementById(`summary-spent-${role}`);
-
-        if (summaryCountElement) summaryCountElement.textContent = counts[role];
-        if (summarySpentElement) summarySpentElement.textContent = spent[role];
-    });
 }
 
 function createSquadPlayerCard(playerInfo, price, playerId, role) {
     const squadCard = document.createElement('div');
-    squadCard.className = 'fa-row';
+    squadCard.className = 'fa-row fa-squad-row';
     squadCard.style.padding = '8px 10px';
     squadCard.style.gap = '8px';
 
@@ -1266,11 +1242,10 @@ function sellPlayer(event) {
         buyBtn.disabled = false;
         buyBtn.textContent = 'Compra';
 
-        // Aggiorna anche il tasto rimuovi per tornare a "Rimuovi" e riabilitarlo
+        // Riabilita il tasto rimuovi (icona: nessun testo da aggiornare)
         const toggleBtn = playerCard.querySelector('.toggle-remove-btn');
         if (toggleBtn) {
             toggleBtn.disabled = false;
-            toggleBtn.textContent = toggleBtn.textContent.includes('Ripr') ? 'Rim.' : 'Rimuovi';
         }
     }
     updateUI();
@@ -1588,6 +1563,15 @@ function confirmImport() {
 
         if (pendingImportData.csvPlayersData) {
             csvPlayersData = [...pendingImportData.csvPlayersData];
+        }
+
+        // Allinea lo stato del loader agli altri percorsi (loadCSVData / loadState):
+        // nascondi l'empty state e mostra i bottoni dipendenti dal listone.
+        if (csvPlayersData.length > 0) {
+            document.getElementById('show-player-selector-btn').classList.remove('hidden');
+            document.getElementById('populate-others-btn').classList.remove('hidden');
+            document.getElementById('loader-empty')?.classList.add('hidden');
+            updatePopulateButtonText();
         }
 
         // Save to localStorage

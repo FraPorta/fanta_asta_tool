@@ -21,7 +21,8 @@
             --border:        #223050;
             --text:          #f8fafc;
             --text-muted:    #8595b0;
-            --text-dim:      #5b6b86;
+            /* AA su tutte le superfici scure: 5.47:1 su --bg, 5.03:1 su --surface, 4.73:1 su --surface-2 */
+            --text-dim:      #7789a6;
 
             --primary:       #14b8a6;
             --primary-strong:#0d9488;
@@ -34,6 +35,10 @@
             --role-d-bg: #065f46; --role-d-fg: #a7f3d0;
             --role-c-bg: #78350f; --role-c-fg: #fde68a;
             --role-a-bg: #7f1d1d; --role-a-fg: #fecaca;
+
+            /* Altezza fissa della barra superiore: unica sorgente per gli offset sticky
+               (.fa-tabs e #fa-rail). Vedi #fa-topbar: 10 + 32 + 10 + 1 = 53px <= 56px. */
+            --topbar-h: 56px;
 
             --radius-sm: 10px;
             --radius-md: 14px;
@@ -87,34 +92,8 @@
             border-radius: var(--radius-md);
         }
 
-        .player-card {
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, opacity 0.3s;
-        }
-
-        .sticky-header {
-            position: sticky;
-            top: 0;
-            z-index: 40;
-            /* Lower than modal */
-        }
-
-        .sort-btn.active {
-            background-color: #0891b2;
-            /* cyan-600 */
-            color: white;
-        }
-
-        .favorite-btn {
-            transition: color 0.2s ease-in-out, transform 0.1s ease-in-out;
-        }
-
         .favorite-btn:hover {
             transform: scale(1.1);
-        }
-
-        .favorite-btn.active {
-            color: #fbbf24;
-            /* amber-400 */
         }
 
         /* Mobile Touch Targets */
@@ -141,11 +120,14 @@
                 justify-content: center;
             }
 
-            /* Better button sizing for mobile */
-            .mobile-touch-btn {
-                min-height: 48px;
-                font-size: 14px;
-                padding: 12px 16px;
+            /* Le card "Piccola" stanno su due colonne anche a 375px: le righe di controllo
+               (input+Compra e i quattro pulsanti icona da 44px) non ci stanno in larghezza,
+               e .fa-card ha overflow:hidden. Lasciandole andare a capo ogni controllo resta
+               raggiungibile senza toccare i target da 44px. flex-wrap è permissivo: quando
+               lo spazio basta (>= ~480px di viewport) le righe restano su una riga sola. */
+            .fa-card.compact .fa-buy-row,
+            .fa-card.compact .fa-ctl-row {
+                flex-wrap: wrap;
             }
         }
 
@@ -165,10 +147,6 @@
                 margin-bottom: 8px;
             }
 
-            /* Better spacing for list view on mobile */
-            .player-card .flex-wrap {
-                justify-content: flex-start;
-            }
         }
 
         .player-card { position: relative; transition: transform .18s ease-out, box-shadow .18s ease-out, opacity .25s ease-out; }
@@ -186,18 +164,22 @@
             padding: 10px 16px; transition: filter .15s ease-out;
         }
         .fa-btn-primary:hover:not(:disabled) { filter: brightness(1.08); }
-        .fa-btn-primary:disabled { background: #24324e; color: var(--text-dim); cursor: not-allowed; }
+        /* "Acquistato": 16.04:1 in isolamento, 5.57:1 una volta composto con opacity:.55 di .is-bought. */
+        .fa-btn-primary:disabled { background: var(--surface-2); color: var(--text); cursor: not-allowed; }
 
         .fa-btn-icon {
             width: 32px; height: 32px; border-radius: var(--radius-sm);
             background: rgba(148,163,184,.08); color: var(--text-dim);
             display: inline-flex; align-items: center; justify-content: center;
-            transition: background .15s ease-out, color .15s ease-out;
+            transition: background .15s ease-out, color .15s ease-out, transform .1s ease-out;
         }
         .fa-btn-icon:hover:not(:disabled) { background: rgba(148,163,184,.16); color: var(--text); }
         .fa-btn-icon:disabled { opacity: .4; cursor: not-allowed; }
         .fa-btn-icon.is-danger:hover { color: var(--removed); }
-        .fa-btn-icon.is-active { color: var(--accent); }
+        /* Un colore per significato: ambra = preferito, rosso = rimosso, teal = modalità attiva. */
+        .favorite-btn.is-active { color: var(--accent); }
+        .toggle-remove-btn.is-active { color: var(--removed); }
+        #view-large.is-active, #view-small.is-active, #view-list.is-active { color: var(--primary); }
 
         .fa-btn-secondary {
             background: var(--surface-2); color: var(--text); border: 1px solid var(--border);
@@ -225,7 +207,7 @@
         .fa-card[data-tier="Altri"]      { --tier-accent: #475569; --tier-glow: transparent; }
 
         .fa-crest { width:34px; height:34px; border-radius:var(--radius-sm); object-fit:contain; background:rgba(255,255,255,.06); flex-shrink:0; }
-        .fa-name  { font-size:16px; font-weight:750; letter-spacing:-.01em; color:var(--text); line-height:1.2; }
+        .fa-name  { font-size:16px; font-weight:700; letter-spacing:-.01em; color:var(--text); line-height:1.2; }
         .fa-sub   { font-size:11px; color:var(--text-muted); display:flex; align-items:center; gap:6px; margin-top:3px; }
         .fa-role  { font-size:10px; font-weight:800; padding:1px 6px; border-radius:6px; }
         .fa-role[data-role="P"] { background:var(--role-p-bg); color:var(--role-p-fg); }
@@ -266,35 +248,64 @@
         .fa-col-v { font-size:15px; font-weight:700; color:var(--text); }
         .fa-col-v.sug { color: var(--primary-soft); }
         @media (max-width: 640px) { .fa-row { flex-wrap: wrap; } .fa-row .fa-input { width:64px; } }
+        /* Le righe della squadra vivono dentro il rail (.fa-surface): serve una superficie diversa. */
+        .fa-squad-row { background: var(--surface-2); }
 
+        /* Altezza deterministica: niente wrap, contenuto piu' alto = 32px (i pulsanti ghost),
+           quindi 10 + 32 + 10 + 1(border) = 53px, entro --topbar-h (56px). */
         #fa-topbar {
             position: sticky; top: 0; z-index: 40;
-            display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+            display: flex; align-items: center; gap: 10px; flex-wrap: nowrap; overflow: hidden;
+            min-height: var(--topbar-h); box-sizing: border-box;
             padding: 10px 16px; background: rgba(15,23,41,.92); backdrop-filter: blur(8px);
             border-bottom: 1px solid var(--border);
         }
-        .fa-chip { padding:4px 10px; border-radius:999px; font-size:11px; font-weight:600; background:#1a2440; color:var(--text-muted); }
+        #fa-topbar .fa-topbar-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        #fa-topbar .fa-chip, #fa-topbar .fa-btn-ghost { flex-shrink: 0; }
+        .fa-chip { padding:4px 10px; border-radius:999px; font-size:11px; font-weight:600; background:#1a2440; color:var(--text-muted); white-space:nowrap; }
         .fa-chip.ok   { background:rgba(45,212,191,.13); color:#5eead4; }
-        .fa-chip.warn { background:rgba(245,158,11,.14); color:#fcd34d; }
         #remaining-budget.is-tight { color: var(--removed); }
+
+        /* Azioni della barra superiore: icona + etichetta (etichetta nascosta sotto 640px). */
+        .fa-btn-ghost {
+            display: inline-flex; align-items: center; gap: 6px;
+            height: 32px; padding: 0 10px; border-radius: var(--radius-sm);
+            font-size: 12px; font-weight: 700; white-space: nowrap;
+            background: rgba(148,163,184,.08); color: var(--text);
+            border: 1px solid var(--border);
+            transition: background .15s ease-out, border-color .15s ease-out, color .15s ease-out;
+        }
+        .fa-btn-ghost:hover { background: rgba(148,163,184,.16); border-color: var(--primary); color: var(--primary-soft); }
+        .fa-btn-ghost .fa-btn-ghost-label { display: none; }
+        @media (min-width: 640px) { .fa-btn-ghost .fa-btn-ghost-label { display: inline; } }
+        /* Il reset e' distruttivo: trattamento distinto dagli altri due. */
+        .fa-btn-ghost.is-destructive {
+            color: var(--removed);
+            border-color: color-mix(in srgb, var(--removed) 55%, transparent);
+            background: color-mix(in srgb, var(--removed) 12%, transparent);
+        }
+        .fa-btn-ghost.is-destructive:hover {
+            color: #fff; border-color: var(--removed);
+            background: color-mix(in srgb, var(--removed) 75%, transparent);
+        }
 
         .fa-shell { display:block; }
         @media (min-width: 1280px) {
             .fa-shell { display:grid; grid-template-columns: minmax(0,1fr) 320px; gap:20px; align-items:start; }
-            #fa-rail { position: sticky; top: 68px; max-height: calc(100vh - 88px); overflow-y: auto; }
+            #fa-rail { position: sticky; top: calc(var(--topbar-h) + 12px); max-height: calc(100vh - var(--topbar-h) - 32px); overflow-y: auto; }
         }
         .fa-meter { height:7px; border-radius:4px; background:#1a2440; overflow:hidden; }
         .fa-meter > i { display:block; height:100%; background:linear-gradient(90deg,var(--primary),var(--bought)); transition:width .3s ease-out; }
         .fa-meter.is-tight > i { background:linear-gradient(90deg,var(--accent),var(--removed)); }
         .fa-slot { display:flex; align-items:center; justify-content:space-between; padding:6px 9px; border-radius:var(--radius-sm); background:#111c33; font-size:11px; }
 
-        .fa-tabs { display:flex; gap:8px; flex-wrap:wrap; position:sticky; top:56px; z-index:30;
+        .fa-tabs { display:flex; gap:8px; flex-wrap:wrap; position:sticky; top:var(--topbar-h); z-index:30;
                    padding:10px 0; background:var(--bg); }
         .fa-tab { padding:6px 14px; border-radius:999px; font-size:12px; font-weight:600;
                   background:#111c33; color:var(--text-muted); border:1px solid var(--border); }
         .fa-tab.is-active { background:var(--primary-strong); color:#fff; border-color:transparent; }
         .fa-tier-head { display:flex; align-items:baseline; gap:10px; margin:20px 0 10px; }
-        .fa-tier-head h3 { font-size:14px; font-weight:750; color:var(--text); letter-spacing:-.01em; }
+        .fa-tier-head h3 { font-size:14px; font-weight:700; color:var(--text); letter-spacing:-.01em; }
         .fa-tier-head .count { font-size:11px; color:var(--text-dim); }
 
         .fa-modal-backdrop { background: rgba(2,6,23,.72); backdrop-filter: blur(6px); }
@@ -311,13 +322,19 @@
 
     <!-- BARRA SUPERIORE -->
     <header id="fa-topbar">
-        <span class="font-extrabold text-[15px]" style="color:var(--primary)">⚽ Guida Asta</span>
+        <span class="fa-topbar-title font-extrabold text-[15px]" style="color:var(--primary)">⚽ Guida Asta</span>
         <span class="fa-chip ok num">€<span id="remaining-budget">500</span> / 500</span>
         <span class="fa-chip num" id="squad-count">0 / 25</span>
-        <div class="ml-auto flex items-center gap-2">
-            <button id="export-btn" class="fa-btn-icon" title="Esporta" aria-label="Esporta">💾</button>
-            <button id="import-btn" class="fa-btn-icon" title="Importa" aria-label="Importa">📥</button>
-            <button id="reset-btn" class="fa-btn-icon is-danger" title="Reset asta" aria-label="Reset asta">↺</button>
+        <div class="ml-auto flex items-center gap-2 shrink-0">
+            <button id="export-btn" class="fa-btn-ghost" title="Esporta" aria-label="Esporta">
+                <span aria-hidden="true">💾</span><span class="fa-btn-ghost-label">Esporta</span>
+            </button>
+            <button id="import-btn" class="fa-btn-ghost" title="Importa" aria-label="Importa">
+                <span aria-hidden="true">📥</span><span class="fa-btn-ghost-label">Importa</span>
+            </button>
+            <button id="reset-btn" class="fa-btn-ghost is-destructive" title="Reset asta" aria-label="Reset asta">
+                <span aria-hidden="true">↺</span><span class="fa-btn-ghost-label">Reset</span>
+            </button>
         </div>
     </header>
 
@@ -423,31 +440,6 @@
                     <div id="squad-A" class="grid grid-cols-1 gap-3"></div>
                 </div>
 
-                <!-- RIEPILOGO TOTALE -->
-                <div id="squad-summary" class="mt-6 fa-surface p-4 hidden">
-                    <div class="grid grid-cols-2 gap-4 text-center">
-                        <div class="fa-role-tile p-3" data-role="P">
-                            <p class="text-sm fa-role-tile-title">Portieri</p>
-                            <p class="text-lg font-bold fa-role-tile-value"><span id="summary-count-P">0</span>/3</p>
-                            <p class="text-xs fa-muted">€ <span id="summary-spent-P">0</span></p>
-                        </div>
-                        <div class="fa-role-tile p-3" data-role="D">
-                            <p class="text-sm fa-role-tile-title">Difensori</p>
-                            <p class="text-lg font-bold fa-role-tile-value"><span id="summary-count-D">0</span>/8</p>
-                            <p class="text-xs fa-muted">€ <span id="summary-spent-D">0</span></p>
-                        </div>
-                        <div class="fa-role-tile p-3" data-role="C">
-                            <p class="text-sm fa-role-tile-title">Centrocampisti</p>
-                            <p class="text-lg font-bold fa-role-tile-value"><span id="summary-count-C">0</span>/8</p>
-                            <p class="text-xs fa-muted">€ <span id="summary-spent-C">0</span></p>
-                        </div>
-                        <div class="fa-role-tile p-3" data-role="A">
-                            <p class="text-sm fa-role-tile-title">Attaccanti</p>
-                            <p class="text-lg font-bold fa-role-tile-value"><span id="summary-count-A">0</span>/6</p>
-                            <p class="text-xs fa-muted">€ <span id="summary-spent-A">0</span></p>
-                        </div>
-                    </div>
-                </div>
             </div>
         </aside>
     </div>

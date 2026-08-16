@@ -233,7 +233,7 @@
             .player-card:hover { transform: translateY(-3px); box-shadow: 0 12px 24px -12px rgba(0,0,0,.7); }
         }
         @media (prefers-reduced-motion: reduce) {
-            .player-card, .fa-btn-primary, .fa-btn-icon { transition: none; }
+            .player-card, .fa-btn-primary, .fa-btn-icon, .fa-btn-ghost { transition: none; }
             .player-card:hover { transform: none; }
         }
 
@@ -260,6 +260,9 @@
             padding: 10px 16px; background: rgba(15,23,41,.92); backdrop-filter: blur(8px);
             border-bottom: 1px solid var(--border);
         }
+        /* Sotto i 400px comprimiamo padding e gap orizzontali: la riga (che non va a capo)
+           deve restare intera fino a 320px, altrimenti overflow:hidden taglierebbe il Reset. */
+        @media (max-width: 400px) { #fa-topbar { padding: 10px 10px; gap: 6px; } }
         #fa-topbar .fa-topbar-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         #fa-topbar .fa-chip, #fa-topbar .fa-btn-ghost { flex-shrink: 0; }
         .fa-chip { padding:4px 10px; border-radius:999px; font-size:11px; font-weight:600; background:#1a2440; color:var(--text-muted); white-space:nowrap; }

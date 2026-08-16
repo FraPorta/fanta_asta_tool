@@ -7,10 +7,49 @@
     <title>Guida Asta Fantacalcio 2026/27</title>
     <script src="resources/tailwind.min.js"></script>
     <script src="resources/xlsx.mini.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        @font-face { font-family:'Inter'; font-weight:400; font-display:swap; src:url('resources/fonts/inter-400.woff2') format('woff2'); }
+        @font-face { font-family:'Inter'; font-weight:600; font-display:swap; src:url('resources/fonts/inter-600.woff2') format('woff2'); }
+        @font-face { font-family:'Inter'; font-weight:700; font-display:swap; src:url('resources/fonts/inter-700.woff2') format('woff2'); }
+        @font-face { font-family:'Inter'; font-weight:800; font-display:swap; src:url('resources/fonts/inter-800.woff2') format('woff2'); }
+
+        :root {
+            --bg:            #080d18;
+            --surface:       #0f1729;
+            --surface-2:     #131d33;
+            --border:        #223050;
+            --text:          #f8fafc;
+            --text-muted:    #8595b0;
+            --text-dim:      #5b6b86;
+
+            --primary:       #14b8a6;
+            --primary-strong:#0d9488;
+            --bought:        #22c55e;
+            --removed:       #f43f5e;
+            --accent:        #f59e0b;
+
+            --role-p-bg: #1e3a8a; --role-p-fg: #bfdbfe;
+            --role-d-bg: #065f46; --role-d-fg: #a7f3d0;
+            --role-c-bg: #78350f; --role-c-fg: #fde68a;
+            --role-a-bg: #7f1d1d; --role-a-fg: #fecaca;
+
+            --radius-sm: 10px;
+            --radius-md: 14px;
+            --radius-lg: 16px;
+        }
+
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .num { font-variant-numeric: tabular-nums; }
+
+        .fa-surface {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
         }
 
         .player-card {
@@ -130,7 +169,7 @@
     </style>
 </head>
 
-<body class="bg-gray-900 text-white">
+<body>
 
     <div class="container mx-auto p-2 sm:p-4">
 

@@ -165,6 +165,13 @@
         .fa-btn-icon.is-danger:hover { color: var(--removed); }
         .fa-btn-icon.is-active { color: var(--accent); }
 
+        .fa-btn-secondary {
+            background: var(--surface-2); color: var(--text); border: 1px solid var(--border);
+            border-radius: var(--radius-sm); font-weight: 700; transition: border-color .15s ease-out, color .15s ease-out;
+        }
+        .fa-btn-secondary:hover:not(:disabled) { border-color: var(--primary); color: var(--primary-soft); }
+        .fa-btn-secondary:disabled { opacity: .5; cursor: not-allowed; }
+
         .fa-card {
             position: relative; overflow: hidden;
             background: linear-gradient(160deg, var(--surface-2), #0d1526);
@@ -294,13 +301,13 @@
                     <input type="file" id="csv-file-input" accept=".xlsx,.csv"
                         class="block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-cyan-600 file:text-white hover:file:bg-cyan-700">
                     <button id="load-csv-btn"
-                        class="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-6 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="fa-btn-primary"
                         disabled>Carica Listone</button>
                     <button id="show-player-selector-btn"
-                        class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 sm:px-6 rounded-lg hidden text-sm sm:text-base min-h-[48px]">Seleziona
+                        class="fa-btn-secondary py-3 px-4 sm:px-6 hidden text-sm sm:text-base min-h-[48px]">Seleziona
                         Giocatori</button>
                     <button id="populate-others-btn"
-                        class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-4 sm:px-6 rounded-lg hidden text-sm sm:text-base min-h-[48px]">Popola
+                        class="fa-btn-secondary py-3 px-4 sm:px-6 hidden text-sm sm:text-base min-h-[48px]">Popola
                         "Altri"</button>
                 </div>
                 <p class="text-sm text-gray-400 mt-2">Il file deve contenere le colonne Id, R, Nome, Squadra, Qt.A e FVM.</p>

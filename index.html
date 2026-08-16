@@ -4,8 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guida Asta Fantacalcio 2025/26</title>
+    <title>Guida Asta Fantacalcio 2026/27</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="resources/xlsx.mini.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -280,13 +281,13 @@
 
         <!-- CSV LOADER -->
         <div class="mb-6 bg-gray-800 p-4 rounded-lg">
-            <h2 class="text-xl font-semibold mb-3 text-amber-400">Carica Quotazioni CSV</h2>
+            <h2 class="text-xl font-semibold mb-3 text-amber-400">Carica Quotazioni (XLSX / CSV)</h2>
             <div class="flex flex-col md:flex-row gap-4 items-center">
-                <input type="file" id="csv-file-input" accept=".csv"
+                <input type="file" id="csv-file-input" accept=".xlsx,.csv"
                     class="block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-cyan-600 file:text-white hover:file:bg-cyan-700">
                 <button id="load-csv-btn"
                     class="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-6 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled>Carica CSV</button>
+                    disabled>Carica Listone</button>
                 <button id="show-player-selector-btn"
                     class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 sm:px-6 rounded-lg hidden text-sm sm:text-base min-h-[48px]">Seleziona
                     Giocatori</button>
@@ -294,8 +295,8 @@
                     class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-4 sm:px-6 rounded-lg hidden text-sm sm:text-base min-h-[48px]">Popola
                     "Altri"</button>
             </div>
-            <p class="text-sm text-gray-400 mt-2">Carica qualsiasi file CSV con le quotazioni Fantacalcio. Il file deve
-                contenere colonne per ID, Ruolo, Nome, Squadra, Quotazione e FVM.</p>
+            <p class="text-sm text-gray-400 mt-2">Carica il listone ufficiale Fantacalcio in formato .xlsx o .csv. Il file deve
+                contenere le colonne Id, R, Nome, Squadra, Qt.A e FVM.</p>
         </div>
 
         <!-- TABS PER RUOLI -->
@@ -328,7 +329,7 @@
         <div
             class="bg-gray-800 rounded-lg p-3 sm:p-6 w-full max-w-full sm:max-w-6xl max-h-[95vh] sm:max-h-[90vh] overflow-hidden shadow-2xl">
             <div class="flex justify-between items-center mb-3 sm:mb-4">
-                <h3 class="text-lg sm:text-xl font-bold text-cyan-400">Seleziona Giocatori dal CSV</h3>
+                <h3 class="text-lg sm:text-xl font-bold text-cyan-400">Seleziona Giocatori dal Listone</h3>
                 <button id="close-player-selector" class="text-gray-400 hover:text-white p-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
@@ -406,7 +407,7 @@
             <!-- Toggle between CSV and Manual input -->
             <div class="mb-4 flex space-x-2">
                 <button type="button" id="csv-mode-btn"
-                    class="flex-1 py-2 px-4 bg-cyan-600 text-white rounded font-medium">Da CSV</button>
+                    class="flex-1 py-2 px-4 bg-cyan-600 text-white rounded font-medium">Da Listone</button>
                 <button type="button" id="manual-mode-btn"
                     class="flex-1 py-2 px-4 bg-gray-600 text-white rounded font-medium">Manuale</button>
             </div>
@@ -421,7 +422,7 @@
                 </div>
                 <div class="mb-4 max-h-48 overflow-y-auto">
                     <div id="csv-players-list" class="space-y-2">
-                        <p class="text-gray-400 text-sm">Carica prima un file CSV per vedere i giocatori disponibili.
+                        <p class="text-gray-400 text-sm">Carica prima il listone quotazioni per vedere i giocatori disponibili.
                         </p>
                     </div>
                 </div>
@@ -578,36 +579,93 @@
             'Verona': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRmXu6r1es26xlsMiRKRQwMLFJPTVQqID_C4g&s'
         };
 
-        // --- FUNZIONI CSV ---
-        function parseCSV(csvText) {
-            const lines = csvText.split('\n');
+        // --- FUNZIONI QUOTAZIONI (CSV / XLSX) ---
+        // Colonne richieste nel listone ufficiale (classic, non Mantra).
+        // Il match è esatto dopo trim: "FVM M" e "Qt.A M" sono le colonne Mantra e vanno ignorate.
+        const REQUIRED_COLUMNS = ['R', 'Nome', 'Squadra', 'Qt.A'];
+
+        function normalizeHeader(value) {
+            return String(value == null ? '' : value).trim();
+        }
+
+        // Il file ufficiale ha una riga di titolo prima dell'intestazione: cerchiamo
+        // la riga che contiene davvero le colonne, invece di assumerne la posizione.
+        function findHeaderRowIndex(rows) {
+            const limit = Math.min(rows.length, 10);
+            for (let i = 0; i < limit; i++) {
+                const headers = (rows[i] || []).map(normalizeHeader);
+                if (headers.includes('Nome') && headers.includes('Squadra')) return i;
+            }
+            return -1;
+        }
+
+        function buildHeaderMap(headerRow) {
+            const map = {};
+            headerRow.forEach((cell, index) => {
+                const name = normalizeHeader(cell);
+                if (name !== '' && !(name in map)) map[name] = index;
+            });
+            return map;
+        }
+
+        function toNumber(value, fallback) {
+            const text = String(value == null ? '' : value).trim();
+            if (text === '') return fallback; // cella vuota: Number('') sarebbe 0
+            const num = Number(text.replace(',', '.'));
+            return Number.isFinite(num) ? num : fallback;
+        }
+
+        // rows = array di array (una riga per elemento), come restituito da SheetJS
+        function parseQuotazioniRows(rows) {
+            const headerIndex = findHeaderRowIndex(rows);
+            if (headerIndex === -1) return null;
+
+            const headers = buildHeaderMap(rows[headerIndex]);
+            const missing = REQUIRED_COLUMNS.filter(col => !(col in headers));
+            if (missing.length > 0) {
+                throw new Error(`Colonne mancanti nel file: ${missing.join(', ')}`);
+            }
+
             const players = [];
+            for (let i = headerIndex + 1; i < rows.length; i++) {
+                const row = rows[i] || [];
+                const nome = normalizeHeader(row[headers['Nome']]);
+                const squadra = normalizeHeader(row[headers['Squadra']]);
+                if (nome === '' || squadra === '') continue;
 
-            // Skip the header lines (first 2 lines)
-            for (let i = 2; i < lines.length; i++) {
-                const line = lines[i].trim();
-                if (line === '') continue;
+                const rawRole = normalizeHeader(row[headers['R']]).toUpperCase();
+                players.push({
+                    id: toNumber(row[headers['Id']], null) || Date.now() + i,
+                    role: ['P', 'D', 'C'].includes(rawRole) ? rawRole : 'A',
+                    nome: nome,
+                    squadra: squadra,
+                    qta: toNumber(row[headers['Qt.A']], 1) || 1, // quotazione minima 1, come nel listone ufficiale
+                    fvm: 'FVM' in headers ? toNumber(row[headers['FVM']], 0) : 0
+                });
+            }
 
-                const columns = line.split(',');
-                if (columns.length >= 12) {
-                    const player = {
-                        id: parseInt(columns[0]) || Date.now() + i,
-                        role: columns[1] === 'P' ? 'P' : (columns[1] === 'D' ? 'D' : (columns[1] === 'C' ? 'C' : 'A')),
-                        nome: columns[3],
-                        squadra: columns[4],
-                        qta: parseInt(columns[5]) || 1,
-                        fvm: parseInt(columns[11]) || 0
-                    };
+            console.log(`Parsed ${players.length} players from quotazioni file`);
+            return players;
+        }
 
-                    // Include all players with valid name and team (removed quotation filter)
-                    if (player.nome && player.squadra && player.nome.trim() !== '' && player.squadra.trim() !== '') {
-                        players.push(player);
-                    }
+        // SheetJS legge sia .xlsx/.xls sia .csv: un solo percorso di parsing per entrambi.
+        function parseQuotazioniFile(arrayBuffer) {
+            // codepage 65001: i CSV vengono decodificati come UTF-8 (accenti nei nomi)
+            const workbook = XLSX.read(new Uint8Array(arrayBuffer), { type: 'array', codepage: 65001 });
+            let lastError = null;
+
+            for (const sheetName of workbook.SheetNames) {
+                const rows = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { header: 1, raw: true, blankrows: false });
+                try {
+                    const players = parseQuotazioniRows(rows);
+                    if (players && players.length > 0) return players;
+                } catch (error) {
+                    lastError = error; // intestazione trovata ma incompleta: proviamo il foglio successivo
                 }
             }
 
-            console.log(`Parsed ${players.length} players from CSV`);
-            return players;
+            if (lastError) throw lastError;
+            throw new Error('Nessuna intestazione con le colonne "Nome" e "Squadra" trovata nel file.');
         }
 
         function loadCSVData() {
@@ -615,35 +673,39 @@
             const file = fileInput.files[0];
 
             if (!file) {
-                alert('Seleziona un file CSV prima di caricarlo');
+                alert('Seleziona un file prima di caricarlo');
                 return;
             }
 
             // Check file type
-            if (!file.name.toLowerCase().endsWith('.csv')) {
-                alert('Seleziona un file CSV valido (.csv)');
+            if (!/\.(csv|xlsx)$/i.test(file.name)) {
+                alert('Seleziona un file valido (.xlsx o .csv)');
+                return;
+            }
+
+            if (typeof XLSX === 'undefined') {
+                alert('❌ Libreria di lettura file non caricata. Ricarica la pagina.');
                 return;
             }
 
             const reader = new FileReader();
             reader.onload = function (e) {
                 try {
-                    const csvText = e.target.result;
-                    csvPlayersData = parseCSV(csvText);
+                    csvPlayersData = parseQuotazioniFile(e.target.result);
 
                     if (csvPlayersData.length > 0) {
                         document.getElementById('show-player-selector-btn').classList.remove('hidden');
                         document.getElementById('populate-others-btn').classList.remove('hidden');
-                        updatePopulateButtonText(); // Update button text when CSV is loaded
-                        alert(`✅ Caricati ${csvPlayersData.length} giocatori dal CSV "${file.name}"!`);
+                        updatePopulateButtonText(); // Update button text when the list is loaded
+                        alert(`✅ Caricati ${csvPlayersData.length} giocatori da "${file.name}"!`);
                         console.log('Players loaded:', csvPlayersData.slice(0, 5)); // Log first 5 for debugging
-                        saveState(); // Salva lo stato con i dati CSV
+                        saveState(); // Salva lo stato con i dati caricati
                     } else {
-                        alert('❌ Nessun giocatore valido trovato nel CSV. Verifica che il formato sia corretto.');
+                        alert('❌ Nessun giocatore valido trovato nel file. Verifica che il formato sia corretto.');
                     }
                 } catch (error) {
-                    console.error('Error parsing CSV:', error);
-                    alert('❌ Errore nel parsing del CSV. Verifica che il formato sia corretto.');
+                    console.error('Error parsing quotazioni file:', error);
+                    alert(`❌ Errore nel parsing del file: ${error.message}`);
                 }
             };
 
@@ -651,7 +713,7 @@
                 alert('❌ Errore nel caricamento del file.');
             };
 
-            reader.readAsText(file);
+            reader.readAsArrayBuffer(file);
         }
 
         function showPlayerSelector() {
@@ -775,7 +837,7 @@
 
         function populateOthersCategory() {
             if (csvPlayersData.length === 0) {
-                alert('Carica prima un file CSV!');
+                alert('Carica prima il listone quotazioni!');
                 return;
             }
 
@@ -1918,7 +1980,7 @@
 
         function populateCSVPlayersForRole(role) {
             if (csvPlayersData.length === 0) {
-                csvPlayersList.innerHTML = '<p class="text-gray-400 text-sm">Carica prima un file CSV per vedere i giocatori disponibili.</p>';
+                csvPlayersList.innerHTML = '<p class="text-gray-400 text-sm">Carica prima il listone quotazioni per vedere i giocatori disponibili.</p>';
                 return;
             }
 

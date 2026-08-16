@@ -6,7 +6,7 @@
 [![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?logo=tailwind-css&logoColor=white)](#)
 [![Mobile Responsive](https://img.shields.io/badge/Mobile-Responsive-green)](#)
 
-Un **tool web interattivo** per gestire le aste del Fantacalcio 2025/26. Ottimizzato per desktop e mobile, ti aiuta a organizzare la tua asta con un'interfaccia moderna e funzionalità avanzate.
+Un **tool web interattivo** per gestire le aste del Fantacalcio 2026/27. Ottimizzato per desktop e mobile, ti aiuta a organizzare la tua asta con un'interfaccia moderna e funzionalità avanzate.
 
 ![Preview 2](resources/squadra.png)
 
@@ -15,7 +15,7 @@ Un **tool web interattivo** per gestire le aste del Fantacalcio 2025/26. Ottimiz
 ## ✨ Caratteristiche Principali
 
 ### 🎯 **Gestione Asta Completa**
-- **Importazione CSV**: Carica le quotazioni ufficiali Fantacalcio 2025/26
+- **Importazione XLSX/CSV**: Carica il listone ufficiale Fantacalcio 2026/27 (.xlsx o .csv)
 - **Ricerca Intelligente**: Filtra per nome, ruolo, squadra e tier
 - **Selezione Multipla**: Aggiungi più giocatori contemporaneamente
 - **Prezzi Suggeriti**: Calcolo automatico prezzi consigliati per tier
@@ -78,7 +78,7 @@ npx serve .
 ## 📖 Guida all'Uso
 
 ### 1️⃣ **Importazione Giocatori**
-1. Clicca **"Seleziona Giocatori"** per aprire il selettore CSV
+1. Clicca **"Seleziona Giocatori"** per aprire il selettore del listone
 2. Usa i filtri per trovare i giocatori desiderati
 3. Seleziona i checkbox e clicca **"Aggiungi Selezionati"**
 4. Scegli il tier appropriato (Top/Buoni/Scommesse)
@@ -114,7 +114,7 @@ npx serve .
 ```
 fanta_asta_tool/
 ├── 📄 index.html                          # App principale (SPA)
-├── 📊 Quotazioni_Fantacalcio_2025_26.csv  # Dataset giocatori ufficiale
+├── 📁 resources/                          # Immagini + libreria SheetJS (xlsx.mini.min.js)
 ├── 📝 README.md                           # Documentazione
 ├── ⚖️ LICENSE                             # Licenza Apache 2.0
 └── 🔧 .git/                              # Controllo versione
@@ -175,8 +175,8 @@ function calculateRecommendedPrice(player, tier) {
 - **Problema**: Tailwind CSS richiede connessione internet
 - **Soluzione**: In sviluppo versione con CSS inline
 
-### File CSV Grandi
-- **Problema**: Performance su file CSV molto grandi (>5MB)
+### File Grandi
+- **Problema**: Performance su listoni molto grandi (>5MB)
 - **Soluzione**: Paginazione in sviluppo
 
 ## 🤝 Contribuire
@@ -221,6 +221,6 @@ Distribuito sotto licenza **Apache 2.0**. Vedi `LICENSE` per maggiori informazio
 
 Made with ❤️ for the Fantacalcio community
 
-[![Fantacalcio](https://img.shields.io/badge/⚽-Fantacalcio%202025%2F26-green?style=for-the-badge)](https://www.fantacalcio.it/)
+[![Fantacalcio](https://img.shields.io/badge/⚽-Fantacalcio%202026%2F27-green?style=for-the-badge)](https://www.fantacalcio.it/)
 
 </div>

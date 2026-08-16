@@ -839,6 +839,32 @@ git commit -m "Allinea modali, loader e rosa ai nuovi token"
 - Modify: `index.html`, `js/app.js`, `README.md`
 - Modify: `test/card-contract.test.js` (extend the colour sweep to the whole file)
 
+- [ ] **Step 0: Vendor the missing Inter weight 500**
+
+Task 1 vendored 400/600/700/800, but the markup uses `font-medium` (weight 500) in ~12 places,
+which currently falls back to 400. Download the 500 slice the same way Task 1 did (same script,
+same old-Chrome User-Agent that yields static per-weight files rather than one variable font),
+save it as `resources/fonts/inter-500.woff2`, and add the matching rule next to the others:
+
+```css
+@font-face { font-family:'Inter'; font-weight:500; font-display:swap; src:url('resources/fonts/inter-500.woff2') format('woff2'); }
+```
+
+Verify all five files are distinct: `md5sum resources/fonts/*.woff2 | sort | uniq -c -w32`
+must show five separate hashes.
+
+- [ ] **Step 0b: Remove the dead legacy class mutations**
+
+`buyPlayer` (`js/app.js` ~1111-1140) and `sellPlayer` (~1291-1309) still add/remove the class names
+`bought`, `bought-by-me`, `removed-card`, `favorite-card` and still call
+`classList.replace('bg-green-600', …)`. Task 3 deleted the CSS for all of them and the new markup
+never carries those classes, so every one of these calls is a no-op. Delete them, keeping the
+`is-bought` / `is-removed` / `is-favorite` mutations that Task 2 added in the same functions.
+
+After deleting, buy a player and sell it back in the browser to confirm the card still dims and
+un-dims — these two functions patch the DOM in place without a re-render, so a wrong deletion here
+shows up immediately.
+
 - [ ] **Step 1: Find leftover legacy utilities**
 
 ```bash

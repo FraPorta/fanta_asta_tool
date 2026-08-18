@@ -868,7 +868,7 @@ function createListPlayerCard(player, isBoughtByMe, role, tier, isRemoved, recom
         <div class="fa-col"><div class="fa-col-k">Cons.</div><div class="fa-col-v sug num">${recommendedPrice}</div></div>
         <input type="number" id="paid-price-${player.id}" value="${player.qta}" class="fa-input num" aria-label="Prezzo pagato">
         <button type="button" class="buy-btn fa-btn-primary" data-id="${player.id}">Compra</button>
-        <div class="flex items-center gap-1.5">
+        <div class="fa-ctl-row flex items-center gap-1.5">
             ${cardSecondaryControls(player, role, tier, isRemoved, isFavorite)}
         </div>
     `;

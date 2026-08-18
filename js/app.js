@@ -411,7 +411,11 @@ function getTierContainerClass() {
         case 'large':
             return 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4';
         case 'small':
-            return 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3';
+            // Colonne guidate dal contenitore, non dalla viewport: sopra i 1280px
+            // la rail laterale si porta via 340px proprio dove le utility
+            // xl:grid-cols-* aumenterebbero le colonne. Vedi .fa-grid-small e
+            // test/layout-widths.test.js.
+            return 'fa-grid-small';
         case 'list':
             return 'space-y-2';
         default:

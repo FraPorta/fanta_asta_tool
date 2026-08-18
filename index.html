@@ -268,6 +268,7 @@
         .fa-chip { padding:4px 10px; border-radius:999px; font-size:11px; font-weight:600; background:#1a2440; color:var(--text-muted); white-space:nowrap; }
         .fa-chip.ok   { background:rgba(45,212,191,.13); color:#5eead4; }
         #remaining-budget.is-tight { color: var(--removed); }
+        #mobile-summary-budget.is-tight { color: var(--removed); }
 
         /* Azioni della barra superiore: icona + etichetta (etichetta nascosta sotto 640px). */
         .fa-btn-ghost {
@@ -318,6 +319,157 @@
         .fa-modal-foot { bottom:0; border-top:1px solid var(--border); }
         .fa-empty { text-align:center; padding:48px 24px; color:var(--text-muted); }
         .fa-empty h3 { font-size:18px; font-weight:700; color:var(--text); margin-bottom:6px; }
+
+        /* =====================================================================
+           PASSO MOBILE (sotto 1280px). Tutto qui dentro e' nuovo (id/classi mai
+           usati sopra i 1280px) oppure vive dentro @media (max-width:...): il
+           desktop (>=1280px) non deve cambiare di un pixel. Le regole "base"
+           fuori media query qui sotto riguardano SOLO elementi nuovi (il
+           pulsante riassunto e il backdrop del pannello) e li tengono
+           display:none finche' un @media piu' stretto non li riattiva: zero
+           effetto sopra 1280px per costruzione, non solo per assenza di trigger.
+           ===================================================================== */
+
+        /* Pulsante "riassunto" della topbar: sostituisce i chip statici sotto i
+           1280px (vedi override che li nasconde nel media query qui sotto).
+           Nuovo elemento: la display:none di base non tocca nulla del layout
+           desktop esistente, che continua a usare i chip statici invariati. */
+        .fa-summary-toggle {
+            display: none;
+        }
+        .fa-summary-chevron { transition: transform .18s ease-out; flex-shrink: 0; }
+
+        /* Backdrop del pannello: nuovo elemento, invisibile finche' il media
+           query mobile non lo riattiva. */
+        #mobile-rail-backdrop { display: none; }
+
+        @media (max-width: 1279.98px) {
+            /* --- Topbar: il pulsante riassunto rimpiazza i due chip statici --- */
+            #topbar-summary-static,
+            #fa-topbar > #squad-count {
+                display: none;
+            }
+            .fa-summary-toggle {
+                display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0;
+                background: transparent; border: 0; padding: 0; cursor: pointer;
+            }
+            .fa-summary-toggle[aria-expanded="true"] .fa-summary-chevron { transform: rotate(180deg); }
+
+            /* --- Pannello budget/rosa: da colonna sticky a pannello a scomparsa.
+               position:fixed lo toglie dal flusso di .fa-shell sia aperto che
+               chiuso (non serve display:none per "non occupare spazio"): questo
+               ci lascia liberi di animare con opacity/transform invece dello
+               scatto secco di display, e di rispettare il reduced-motion sotto. */
+            #fa-rail {
+                position: fixed;
+                top: calc(var(--topbar-h) + env(safe-area-inset-top));
+                left: 0; right: 0;
+                z-index: 45;
+                max-height: 70vh;
+                overflow-y: auto;
+                border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+                border-top: 0;
+                margin: 0;
+                padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+                box-shadow: 0 20px 40px -16px rgba(0,0,0,.6);
+                opacity: 0;
+                transform: translateY(-8px);
+                visibility: hidden;
+                pointer-events: none;
+                transition: opacity .18s ease-out, transform .18s ease-out, visibility 0s linear .18s;
+            }
+            #fa-rail.is-open {
+                opacity: 1;
+                transform: translateY(0);
+                visibility: visible;
+                pointer-events: auto;
+                transition: opacity .18s ease-out, transform .18s ease-out, visibility 0s linear 0s;
+            }
+
+            /* display:block qui dentro (non serve altrove) toglie effetto alla
+               display:none di base solo sotto i 1280px: il box resta sempre
+               presente ma invisibile/non cliccabile (opacity+pointer-events)
+               finche' non arriva .is-open, cosi' la dissolvenza si vede sia
+               all'apertura che alla chiusura. */
+            #mobile-rail-backdrop {
+                display: block;
+                position: fixed; inset: 0; z-index: 44;
+                background: rgba(2,6,23,.62); backdrop-filter: blur(2px);
+                opacity: 0; pointer-events: none;
+                transition: opacity .18s ease-out;
+            }
+            #mobile-rail-backdrop.is-open { opacity: 1; pointer-events: auto; }
+
+            body.fa-rail-open { overflow: hidden; }
+
+            /* --- Barra superiore: margine per la safe-area su dispositivi con notch.
+               #fa-topbar cresce di env(safe-area-inset-top): per restare coerenti
+               (vedi commento su --topbar-h in :root) .fa-tabs, che sotto e' sticky
+               a top:var(--topbar-h) per regola base, riceve qui lo stesso conteggio
+               in piu', altrimenti su un device con notch le tab sticky finirebbero
+               sotto la topbar allargata. */
+            #fa-topbar { padding-top: calc(10px + env(safe-area-inset-top)); }
+            .fa-tabs { top: calc(var(--topbar-h) + env(safe-area-inset-top)); }
+
+            /* --- Card: il numero "hero" da 30px e' troppo su schermi stretti --- */
+            .fa-card .fa-hero { font-size: 24px; }
+            .fa-card.compact .fa-hero { font-size: 20px; }
+
+            /* Le righe di controllo (prezzo+Compra, azioni icona) vanno a capo in
+               TUTTE le varianti card sotto i 1280px, non solo in "compact": senza
+               questo, sugli schermi stretti .fa-card (overflow:hidden) taglia i
+               pulsanti da 44px invece di lasciarli scendere a riga nuova. */
+            .fa-card .fa-buy-row,
+            .fa-card .fa-ctl-row {
+                flex-wrap: wrap;
+            }
+
+            /* Vista lista: il nome tiene una larghezza minima cosi' non si
+               schiaccia a pochi caratteri quando le colonne Qt./Cons. e i
+               controlli vanno a capo sotto di lui. */
+            .fa-row-name { min-width: 120px; }
+            .fa-row { gap: 8px; }
+        }
+
+        @media (max-width: 400px) {
+            /* Sotto i 400px il pulsante riassunto perde il testo "/25" implicito
+               nel mirror e stringe i gap, per restare nel budget orizzontale gia'
+               verificato per #fa-topbar (vedi commento su #fa-topbar sopra). */
+            .fa-summary-toggle { gap: 4px; }
+            .fa-summary-toggle .fa-chip { padding: 4px 8px; }
+            .fa-row { padding: 10px; gap: 6px; }
+            .fa-row .fa-col { min-width: 44px; }
+        }
+
+        @media (max-width: 1279.98px) and (prefers-reduced-motion: reduce) {
+            #fa-rail, #mobile-rail-backdrop, .fa-summary-chevron { transition: none; }
+        }
+
+        /* --- Modali: su schermi bassi devono scorrere internamente, mai far
+           scorrere la pagina sotto. #player-selector-modal gestisce gia' da se'
+           altezza/overflow via classi Tailwind (max-h-[..vh] + overflow-hidden
+           sul modal, overflow-y sulla tabella interna): lo escludiamo per non
+           litigare con quel tuning gia' funzionante. Per gli altri 4 modali,
+           che non avevano alcun vincolo, aggiungiamo lo stesso comportamento.
+           Selettori a due classi/id per battere in specificita' le utility
+           Tailwind (p-*, ecc.) a prescindere dall'ordine di inserimento nel
+           <head> del CSS generato dal Play CDN. */
+        @media (max-width: 1279.98px) {
+            #add-player-modal .fa-modal,
+            #confirm-modal .fa-modal,
+            #import-confirm-modal .fa-modal,
+            #move-player-modal .fa-modal {
+                max-height: calc(100vh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+                overflow-y: auto;
+            }
+            #add-player-modal .fa-modal-foot,
+            #confirm-modal .fa-modal-foot,
+            #import-confirm-modal .fa-modal-foot,
+            #move-player-modal .fa-modal-foot,
+            #player-selector-modal .fa-modal-foot {
+                padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+            }
+        }
     </style>
 </head>
 
@@ -326,8 +478,18 @@
     <!-- BARRA SUPERIORE -->
     <header id="fa-topbar">
         <span class="fa-topbar-title font-extrabold text-[15px]" style="color:var(--primary)">⚽ Guida Asta</span>
-        <span class="fa-chip ok num">€<span id="remaining-budget">500</span> / 500</span>
+        <span class="fa-chip ok num" id="topbar-summary-static">€<span id="remaining-budget">500</span> / 500</span>
         <span class="fa-chip num" id="squad-count">0 / 25</span>
+        <button type="button" id="mobile-summary-toggle" class="fa-summary-toggle" aria-expanded="false"
+            aria-controls="fa-rail" aria-label="Mostra budget e rosa">
+            <span class="fa-chip ok num">€<span id="mobile-summary-budget">500</span></span>
+            <span class="fa-chip num" id="mobile-summary-count">0/25</span>
+            <svg class="fa-summary-chevron" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="14"
+                height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 9l6 6 6-6" />
+            </svg>
+        </button>
         <div class="ml-auto flex items-center gap-2 shrink-0">
             <button id="export-btn" class="fa-btn-ghost" title="Esporta" aria-label="Esporta">
                 <span aria-hidden="true">💾</span><span class="fa-btn-ghost-label">Esporta</span>
@@ -340,6 +502,9 @@
             </button>
         </div>
     </header>
+
+    <!-- Backdrop del pannello budget/rosa (solo sotto 1280px, vedi #mobile-rail-backdrop in CSS) -->
+    <div id="mobile-rail-backdrop" class="hidden" aria-hidden="true"></div>
 
     <div class="fa-shell max-w-[1600px] mx-auto p-4">
         <main id="fa-main">

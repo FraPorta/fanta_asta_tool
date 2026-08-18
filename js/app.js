@@ -799,11 +799,11 @@ function createLargePlayerCard(player, isBoughtByMe, role, tier, isRemoved, reco
             </div>
             <div class="fa-meta">Quotazione <b class="num">${player.qta}</b> · FVM <span class="num">${player.fvm ?? 0}</span></div>
         </div>
-        <div class="flex items-center gap-2">
+        <div class="fa-buy-row flex items-center gap-2">
             <input type="number" id="paid-price-${player.id}" value="${player.qta}" class="fa-input num" aria-label="Prezzo pagato">
             <button type="button" class="buy-btn fa-btn-primary flex-1" data-id="${player.id}">Compra</button>
         </div>
-        <div class="flex items-center gap-1.5">
+        <div class="fa-ctl-row flex items-center gap-1.5">
             ${cardSecondaryControls(player, role, tier, isRemoved, isFavorite)}
         </div>
     `;
@@ -860,7 +860,7 @@ function createListPlayerCard(player, isBoughtByMe, role, tier, isRemoved, recom
 
     card.innerHTML = `
         <img src="${teamLogos[player.squadra] || TEAM_LOGO_PLACEHOLDER}" alt="${player.squadra}" class="fa-crest">
-        <div class="min-w-0 flex-1">
+        <div class="fa-row-name min-w-0 flex-1">
             <div class="fa-name truncate" style="font-size:14px">${player.nome}</div>
             <div class="fa-sub"><span class="fa-role" data-role="${player.role}">${player.role}</span>${player.squadra}</div>
         </div>
@@ -1037,6 +1037,13 @@ function updateUI() {
     remainingBudgetEl.textContent = state.budget;
     remainingBudgetEl.classList.toggle('is-tight', isBudgetTight);
     squadCountEl.textContent = `${state.squad.length} / 25`;
+
+    // Mirror per il pulsante "riassunto" della topbar mobile (nascosto sopra i
+    // 1280px, vedi index.html): stessi numeri dei chip statici, non li sostituisce.
+    setText('mobile-summary-budget', state.budget);
+    setText('mobile-summary-count', `${state.squad.length}/25`);
+    const mobileSummaryBudget = document.getElementById('mobile-summary-budget');
+    if (mobileSummaryBudget) mobileSummaryBudget.classList.toggle('is-tight', isBudgetTight);
 
     const counts = { P: 0, D: 0, C: 0, A: 0 };
     const spent = { P: 0, D: 0, C: 0, A: 0 };
@@ -1712,6 +1719,66 @@ selectAllPlayersBtn.addEventListener('change', (e) => {
     checkboxes.forEach(cb => cb.checked = e.target.checked);
     updateSelectedCount();
 });
+
+// --- Pannello mobile budget/rosa (sotto i 1280px) ---------------------------
+// #fa-rail resta sempre nel DOM (getElementById a parse time + updateUI senza
+// null check dipendono da questo): qui lo apriamo/chiudiamo solo con classi.
+(function initMobileRailPanel() {
+    const toggleBtn = document.getElementById('mobile-summary-toggle');
+    const rail = document.getElementById('fa-rail');
+    const backdrop = document.getElementById('mobile-rail-backdrop');
+    const MOBILE_QUERY = '(max-width: 1279.98px)';
+
+    if (!toggleBtn || !rail || !backdrop) return;
+
+    function isPanelOpen() {
+        return rail.classList.contains('is-open');
+    }
+
+    function openPanel() {
+        rail.classList.add('is-open');
+        backdrop.classList.add('is-open');
+        toggleBtn.setAttribute('aria-expanded', 'true');
+        document.body.classList.add('fa-rail-open');
+    }
+
+    function closePanel({ restoreFocus = false } = {}) {
+        rail.classList.remove('is-open');
+        backdrop.classList.remove('is-open');
+        toggleBtn.setAttribute('aria-expanded', 'false');
+        document.body.classList.remove('fa-rail-open');
+        if (restoreFocus) toggleBtn.focus();
+    }
+
+    toggleBtn.addEventListener('click', () => {
+        if (isPanelOpen()) {
+            closePanel();
+        } else {
+            openPanel();
+        }
+    });
+
+    backdrop.addEventListener('click', () => closePanel());
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && isPanelOpen()) {
+            closePanel({ restoreFocus: true });
+        }
+    });
+
+    // Se il viewport supera la soglia desktop mentre il pannello e' aperto
+    // (rotazione, resize finestra), lo richiudiamo: sopra i 1280px il pannello
+    // non deve mai risultare "aperto" ne' bloccare lo scroll del body.
+    const mql = window.matchMedia(MOBILE_QUERY);
+    const handleBreakpointChange = (e) => {
+        if (!e.matches && isPanelOpen()) closePanel();
+    };
+    if (mql.addEventListener) {
+        mql.addEventListener('change', handleBreakpointChange);
+    } else if (mql.addListener) {
+        mql.addListener(handleBreakpointChange); // Safari < 14
+    }
+})();
 
 // Update count when individual checkboxes change
 document.addEventListener('change', (e) => {

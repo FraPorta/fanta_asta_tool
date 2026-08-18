@@ -12,27 +12,55 @@ const initialPlayersData = {
         'Top': [],
         'Buoni': [],
         'Scommesse': [],
+        'Titolari cheap': [],
         'Altri': []
     },
     'D': {
         'Top': [],
         'Buoni': [],
         'Scommesse': [],
+        'Titolari cheap': [],
         'Altri': []
     },
     'C': {
         'Top': [],
         'Buoni': [],
         'Scommesse': [],
+        'Titolari cheap': [],
         'Altri': []
     },
     'A': {
         'Top': [],
         'Buoni': [],
         'Scommesse': [],
+        'Titolari cheap': [],
         'Altri': []
     }
 };
+// Ordine canonico delle categorie: e' l'ordine in cui compaiono a schermo.
+const TIER_ORDER = Object.keys(initialPlayersData.P);
+
+// Gli id HTML non possono contenere spazi ("Titolari cheap"): serve uno slug stabile.
+function tierSlug(tier) {
+    return tier.replace(/\s+/g, '-');
+}
+
+// Uno stato salvato prima dell'aggiunta di una categoria non la contiene: senza
+// questa migrazione la sezione non verrebbe disegnata e spostarci un giocatore
+// farebbe fallire renderTierContent (contenitore inesistente). I giocatori gia'
+// presenti non vengono toccati, le categorie sconosciute vengono conservate in coda.
+function ensureTiers(data) {
+    if (!data) return data;
+    for (const role in initialPlayersData) {
+        const saved = data[role] || {};
+        const migrated = {};
+        for (const tier of TIER_ORDER) migrated[tier] = Array.isArray(saved[tier]) ? saved[tier] : [];
+        for (const tier in saved) if (!(tier in migrated)) migrated[tier] = saved[tier];
+        data[role] = migrated;
+    }
+    return data;
+}
+
 // Loghi Serie A 2026/27, salvati in locale: nessuna dipendenza di rete durante l'asta.
 // Squadra non presente -> placeholder (vedi fallback nei render delle card).
 const TEAM_LOGO_PLACEHOLDER = "data:image/svg+xml;utf8,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 40 40%27%3E%3Crect width=%2740%27 height=%2740%27 rx=%2720%27 fill=%27%232d3748%27/%3E%3Ctext x=%2720%27 y=%2727%27 font-family=%27sans-serif%27 font-size=%2720%27 fill=%27%23e2e8f0%27 text-anchor=%27middle%27%3E?%3C/text%3E%3C/svg%3E";
@@ -382,7 +410,7 @@ function loadState() {
         try {
             const appState = JSON.parse(savedData);
             state = appState.state;
-            playersData = appState.playersData;
+            playersData = ensureTiers(appState.playersData);
             
             // Carica anche i dati CSV se disponibili
             if (appState.csvPlayersData && appState.csvPlayersData.length > 0) {
@@ -411,7 +439,11 @@ function getTierContainerClass() {
         case 'large':
             return 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4';
         case 'small':
-            return 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3';
+            // Colonne guidate dal contenitore, non dalla viewport: sopra i 1280px
+            // la rail laterale si porta via 340px proprio dove le utility
+            // xl:grid-cols-* aumenterebbero le colonne. Vedi .fa-grid-small e
+            // test/layout-widths.test.js.
+            return 'fa-grid-small';
         case 'list':
             return 'space-y-2';
         default:
@@ -433,7 +465,7 @@ function updateViewMode() {
     // Update tier containers
     const roleData = playersData[state.activeRole];
     for (const tier in roleData) {
-        const tierContainer = document.getElementById(`tier-container-${tier}`);
+        const tierContainer = document.getElementById(`tier-container-${tierSlug(tier)}`);
         if (tierContainer) {
             tierContainer.className = getTierContainerClass();
             renderTierContent(tier, roleData[tier]);
@@ -444,6 +476,11 @@ function updateViewMode() {
 // --- FUNZIONI DI RENDER ---
 function renderPlayers() {
     playersContainer.innerHTML = '';
+    // Difesa in profondita': lo stato puo' arrivare da un salvataggio precedente
+    // all'aggiunta di una categoria per strade diverse da loadState (import, stato
+    // gia' in memoria). Normalizzare qui costa nulla ed evita che una categoria
+    // manchi a schermo senza alcun errore visibile.
+    ensureTiers(playersData);
     const roleData = playersData[state.activeRole];
     const budgetAdvice = { P: 'Budget Consigliato: 20-30 (4-6%)', D: 'Budget Consigliato: 40-60 (8-12%)', C: 'Budget Consigliato: 120-150 (24-30%)', A: 'Budget Consigliato: 250-280 (50-56%)' };
 
@@ -636,7 +673,7 @@ function renderPlayers() {
         playersContainer.appendChild(tierHeader);
 
         const tierContainer = document.createElement('div');
-        tierContainer.id = `tier-container-${tier}`;
+        tierContainer.id = `tier-container-${tierSlug(tier)}`;
         tierContainer.className = getTierContainerClass();
         playersContainer.appendChild(tierContainer);
 
@@ -654,7 +691,13 @@ function renderPlayers() {
 }
 
 function renderTierContent(tier, players) {
-    const tierContainer = document.getElementById(`tier-container-${tier}`);
+    const tierContainer = document.getElementById(`tier-container-${tierSlug(tier)}`);
+    // Senza questa guardia una categoria priva di contenitore (stato non migrato)
+    // fa fallire l'intero render invece di saltare la sola sezione.
+    if (!tierContainer) {
+        console.warn(`Contenitore mancante per la categoria "${tier}": sezione saltata.`);
+        return;
+    }
     tierContainer.innerHTML = '';
     const sortKey = `${state.activeRole}-${tier}`;
     const sortType = state.sortOptions[sortKey] || 'price';
@@ -721,6 +764,14 @@ function calculateRecommendedPrice(player, tier) {
             'D': 1.2,    // Difensori: 1.2x
             'C': 1.5,    // Centrocampisti: 1.5x
             'A': 2.0     // Attaccanti: 2x
+        },
+        'Titolari cheap': {
+            // Titolari a poco prezzo: il consigliato resta vicino alla quotazione,
+            // cosi' il posto da titolare si paga senza farsi trascinare al rialzo.
+            'P': 1.1,
+            'D': 1.2,
+            'C': 1.3,
+            'A': 1.4
         },
         'Altri': {
             'P': 1.0,    // Portieri: prezzo base
@@ -978,7 +1029,7 @@ function showMovePlayerModal(playerId, role, tier, playerName) {
     
     // Imposta la categoria attuale come selezionata (disabilitata)
     moveToTierSelect.innerHTML = '';
-    const tiers = ['Top', 'Buoni', 'Scommesse', 'Altri'];
+    const tiers = TIER_ORDER.slice();
     tiers.forEach(tierOption => {
         const option = document.createElement('option');
         option.value = tierOption;
@@ -1566,7 +1617,7 @@ function confirmImport() {
     try {
         // Apply imported data
         state = { ...pendingImportData.state };
-        playersData = JSON.parse(JSON.stringify(pendingImportData.playersData));
+        playersData = ensureTiers(JSON.parse(JSON.stringify(pendingImportData.playersData)));
 
         if (pendingImportData.csvPlayersData) {
             csvPlayersData = [...pendingImportData.csvPlayersData];

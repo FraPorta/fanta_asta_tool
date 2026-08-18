@@ -120,15 +120,6 @@
                 justify-content: center;
             }
 
-            /* Le card "Piccola" stanno su due colonne anche a 375px: le righe di controllo
-               (input+Compra e i quattro pulsanti icona da 44px) non ci stanno in larghezza,
-               e .fa-card ha overflow:hidden. Lasciandole andare a capo ogni controllo resta
-               raggiungibile senza toccare i target da 44px. flex-wrap è permissivo: quando
-               lo spazio basta (>= ~480px di viewport) le righe restano su una riga sola. */
-            .fa-card.compact .fa-buy-row,
-            .fa-card.compact .fa-ctl-row {
-                flex-wrap: wrap;
-            }
         }
 
         /* Improve table readability on mobile */
@@ -204,6 +195,10 @@
         .fa-card[data-tier="Top"]        { --tier-accent: linear-gradient(90deg,#f59e0b,#fb7185); --tier-glow: rgba(245,158,11,.16); }
         .fa-card[data-tier="Buoni"]      { --tier-accent: linear-gradient(90deg,#14b8a6,#38bdf8); --tier-glow: rgba(20,184,166,.14); }
         .fa-card[data-tier="Scommesse"]  { --tier-accent: linear-gradient(90deg,#a78bfa,#6366f1); --tier-glow: rgba(167,139,250,.14); }
+        /* Le tinte libere erano finite: un ciano pieno sarebbe stato quasi identico
+           alla fine del gradiente di "Buoni" (#38bdf8). La barra a righe si distingue
+           per trama, non solo per colore, anche a colpo d'occhio. */
+        .fa-card[data-tier="Titolari cheap"] { --tier-accent: repeating-linear-gradient(90deg,#22d3ee 0 9px,#0e7490 9px 18px); --tier-glow: rgba(34,211,238,.13); }
         .fa-card[data-tier="Altri"]      { --tier-accent: #475569; --tier-glow: transparent; }
 
         .fa-crest { width:34px; height:34px; border-radius:var(--radius-sm); object-fit:contain; background:rgba(255,255,255,.06); flex-shrink:0; }
@@ -223,6 +218,23 @@
             padding:9px; color:var(--text); text-align:center; font-weight:700; min-height:44px;
         }
         .fa-input:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 2px rgba(20,184,166,.25); }
+
+        /* Griglia della vista "Piccola". Le colonne seguono lo spazio disponibile
+           nel contenitore, non la larghezza della finestra: a >=1280px la rail
+           laterale toglie 340px al contenuto proprio alla soglia in cui le utility
+           xl:grid-cols-* avrebbero aumentato le colonne, e le card (overflow:hidden)
+           tagliavano il pulsante "Compra". Sotto i 640px restano due colonne fisse
+           per non perdere densita' sul telefono. */
+        .fa-grid-small { display: grid; gap: 12px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        @media (min-width: 640px) {
+            .fa-grid-small { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+        }
+
+        /* Difesa in profondita': le righe di controllo possono andare a capo a
+           QUALSIASI larghezza. flex-wrap e' permissivo — quando lo spazio basta non
+           cambia nulla — quindi copre anche i casi di larghezza che non abbiamo
+           previsto, invece di tagliare il pulsante. */
+        .fa-buy-row, .fa-ctl-row { flex-wrap: wrap; }
 
         .fa-card.compact { padding:11px; gap:8px; }
         .fa-card.compact .fa-hero { font-size:22px; }
@@ -415,19 +427,9 @@
             .fa-card .fa-hero { font-size: 24px; }
             .fa-card.compact .fa-hero { font-size: 20px; }
 
-            /* Le righe di controllo (prezzo+Compra, azioni icona) vanno a capo in
-               TUTTE le varianti card sotto i 1280px, non solo in "compact": senza
-               questo, sugli schermi stretti .fa-card (overflow:hidden) taglia i
-               pulsanti da 44px invece di lasciarli scendere a riga nuova.
-               .fa-ctl-row esiste anche nella vista lista (dentro .fa-row, non
-               .fa-card): senza il wrap qui, tra 641 e ~700px i 4 pulsanti icona
-               a riga unica (146px) fanno traboccare .fa-row perche' il nome ha
-               un min-width e .fa-row non va mai a capo in quella fascia (vedi
-               calcoli nel report). */
-            .fa-buy-row,
-            .fa-ctl-row {
-                flex-wrap: wrap;
-            }
+            /* Il wrap delle righe di controllo e' definito una volta sola come regola base
+               (vedi .fa-buy-row vicino a .fa-card): vale a tutte le larghezze. */
+
 
             /* Vista lista: il nome tiene una larghezza minima cosi' non si
                schiaccia a pochi caratteri quando le colonne Qt./Cons. e i
@@ -653,6 +655,7 @@
                     <option value="Top">Top</option>
                     <option value="Buoni">Buoni</option>
                     <option value="Scommesse">Scommesse</option>
+                    <option value="Titolari cheap">Titolari cheap</option>
                     <option value="Altri">Altri</option>
                 </select>
             </div>
@@ -815,6 +818,7 @@
                     <option value="Top">Top</option>
                     <option value="Buoni">Buoni</option>
                     <option value="Scommesse">Scommesse</option>
+                    <option value="Titolari cheap">Titolari cheap</option>
                     <option value="Altri">Altri</option>
                 </select>
             </div>

@@ -476,6 +476,11 @@ function updateViewMode() {
 // --- FUNZIONI DI RENDER ---
 function renderPlayers() {
     playersContainer.innerHTML = '';
+    // Difesa in profondita': lo stato puo' arrivare da un salvataggio precedente
+    // all'aggiunta di una categoria per strade diverse da loadState (import, stato
+    // gia' in memoria). Normalizzare qui costa nulla ed evita che una categoria
+    // manchi a schermo senza alcun errore visibile.
+    ensureTiers(playersData);
     const roleData = playersData[state.activeRole];
     const budgetAdvice = { P: 'Budget Consigliato: 20-30 (4-6%)', D: 'Budget Consigliato: 40-60 (8-12%)', C: 'Budget Consigliato: 120-150 (24-30%)', A: 'Budget Consigliato: 250-280 (50-56%)' };
 
@@ -687,6 +692,12 @@ function renderPlayers() {
 
 function renderTierContent(tier, players) {
     const tierContainer = document.getElementById(`tier-container-${tierSlug(tier)}`);
+    // Senza questa guardia una categoria priva di contenitore (stato non migrato)
+    // fa fallire l'intero render invece di saltare la sola sezione.
+    if (!tierContainer) {
+        console.warn(`Contenitore mancante per la categoria "${tier}": sezione saltata.`);
+        return;
+    }
     tierContainer.innerHTML = '';
     const sortKey = `${state.activeRole}-${tier}`;
     const sortType = state.sortOptions[sortKey] || 'price';

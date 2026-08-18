@@ -418,9 +418,14 @@
             /* Le righe di controllo (prezzo+Compra, azioni icona) vanno a capo in
                TUTTE le varianti card sotto i 1280px, non solo in "compact": senza
                questo, sugli schermi stretti .fa-card (overflow:hidden) taglia i
-               pulsanti da 44px invece di lasciarli scendere a riga nuova. */
-            .fa-card .fa-buy-row,
-            .fa-card .fa-ctl-row {
+               pulsanti da 44px invece di lasciarli scendere a riga nuova.
+               .fa-ctl-row esiste anche nella vista lista (dentro .fa-row, non
+               .fa-card): senza il wrap qui, tra 641 e ~700px i 4 pulsanti icona
+               a riga unica (146px) fanno traboccare .fa-row perche' il nome ha
+               un min-width e .fa-row non va mai a capo in quella fascia (vedi
+               calcoli nel report). */
+            .fa-buy-row,
+            .fa-ctl-row {
                 flex-wrap: wrap;
             }
 
@@ -483,7 +488,7 @@
         <button type="button" id="mobile-summary-toggle" class="fa-summary-toggle" aria-expanded="false"
             aria-controls="fa-rail" aria-label="Mostra budget e rosa">
             <span class="fa-chip ok num">€<span id="mobile-summary-budget">500</span></span>
-            <span class="fa-chip num" id="mobile-summary-count">0/25</span>
+            <span class="fa-chip num" id="mobile-summary-count">0 / 25</span>
             <svg class="fa-summary-chevron" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="14"
                 height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
                 stroke-linecap="round" stroke-linejoin="round">
